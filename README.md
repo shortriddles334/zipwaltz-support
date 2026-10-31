@@ -1,4 +1,4 @@
-# slingshot-support
+# zipwaltz-support
 Public support and privacy information for Zipwaltz
 
 ## Duel page (`/duel/`)
