@@ -70,6 +70,12 @@
      "Scoring & flight" raised the card's max-content width and the title grid widened the menu buttons. */
   #moreScreen .flight-rules p{contain:inline-size}
   .subtitle{margin-top:12px;font-size:clamp(12px,3.6cqw,17px);color:var(--dim);letter-spacing:.04em}
+  /* Arc E: a seasonal event's title banner (shown only while an event is on). A still pill: no motion. */
+  .event-banner{display:inline-block;margin:10px auto 0;padding:3px 12px;border-radius:999px;max-width:calc(100% - 16px);
+    border:1px solid rgba(242,176,76,.6);background:rgba(60,30,14,.72);color:#FFD9A0;
+    font:700 12px/1.35 var(--font-body);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+  .event-banner[hidden]{display:none}
+  .event-banner[data-event="winter"]{border-color:rgba(159,212,255,.6);background:rgba(16,30,56,.75);color:#DCEEFF}
   .how{margin-top:20px;font-size:clamp(12px,4cqw,18px);line-height:1.6;font-weight:700;color:var(--text)}
   /* Rank and mission text sit on ink. Words and counts back up the ✦ mark. No motion. */
   #metaStrip{margin:8px auto 0;max-width:340px;padding:4px 8px;border-radius:8px;
@@ -193,6 +199,9 @@
   .hangar-act{flex:0 0 auto;min-width:72px;min-height:44px;padding:8px 12px;border-radius:10px;cursor:pointer;
     border:1px solid #FFD966;background:#211B3A;color:#F3EFFF;font:700 14px var(--font-body)}
   .hangar-act:disabled{background:#120E2E;border-color:#A99CD6;color:#F3EFFF;cursor:default}
+  /* E4: a locked keepsake's hint sits on its own line under the name and button, so long languages wrap */
+  .keepsake-row{flex-wrap:wrap;row-gap:2px}
+  .keepsake-row .hangar-hint{order:3;flex:1 1 100%;min-width:0;white-space:normal;font-size:11px;font-weight:600;color:#C9C2EA}
   .hangar-act:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
   #missionResults{white-space:pre-line;margin-top:6px;padding:6px 8px;border-radius:8px;
     background:#120E2E;color:#F3EFFF;font-weight:700}
@@ -382,6 +391,8 @@
   .result-metric-label{font-size:11px;line-height:1.3}
   .result-metric b{font-size:22px;line-height:1.2;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
   .result-breakdown{font-size:11px;line-height:1.5}
+  /* E4: the one-time keepsake line on the results card. Still text, no motion. */
+  #keepsakeResult{color:var(--gold);font-weight:700}
   #gameOverScreen .newbest{animation:none;padding:4px 8px;border-radius:8px;
     background:rgba(110,231,200,.07);font-size:14px;line-height:1.3}
   #gameOverScreen .blink{animation:none;font-size:11px;line-height:1.4;color:var(--dim)}
@@ -613,6 +624,7 @@
 <div class="overlay" id="titleScreen" aria-hidden="false">
   <div class="screen-content">
   <div class="title" role="heading" aria-level="1">ZIPWALTZ</div>
+  <div id="eventBanner" class="event-banner" hidden></div>
   <div class="subtitle">Tap when the comet is in the glow</div>
   <div id="dailyStrip" aria-live="polite">Daily #1 · streak 0</div>
   <div id="duelStrip" hidden aria-live="polite"></div>
@@ -685,6 +697,7 @@
     <div class="go-line">
       <div id="nextGoal" class="result-goal">Next goal: beat 0</div>
       <div id="sunResult" class="result-breakdown" hidden></div>
+      <div id="keepsakeResult" class="result-breakdown" hidden></div>
     </div>
     <!-- 1.2 prototype: one score, best and one next goal up front; the rest is one tap away. -->
     <details id="resultDetails" class="result-details">
@@ -957,6 +970,13 @@ const I18N = Object.freeze({
   "item.pulsarComets": Object.freeze({ "en": "Pulsar Comets", "es": "Cometas púlsar", "de": "Pulsar-Kometen", "fr": "Comètes pulsar", "ja": "パルサー彗星", "pt-BR": "Cometas pulsar" }),
   "item.rivalGhostStyles": Object.freeze({ "en": "Rival Ghost Styles", "es": "Estilos de fantasma rival", "de": "Rivalen-Geisterstile", "fr": "Styles de fantôme rival", "ja": "ライバルゴーストスタイル", "pt-BR": "Estilos de fantasma rival" }),
   "item.solar": Object.freeze({ "en": "Solar", "es": "Solar", "de": "Solar", "fr": "Solaire", "ja": "ソーラー", "pt-BR": "Solar" }),
+  "item.harvestThread": Object.freeze({ "en": "Harvest Thread", "es": "Hilo de la cosecha", "de": "Erntefaden", "fr": "Fil des récoltes", "ja": "収穫の糸", "pt-BR": "Fio da colheita" }),
+  "item.winterThread": Object.freeze({ "en": "Winter Thread", "es": "Hilo invernal", "de": "Winterfaden", "fr": "Fil d’hiver", "ja": "冬の糸", "pt-BR": "Fio de inverno" }),
+  "keepsake.hint.harvest": Object.freeze({ "en": "Finish a run during Harvest Week", "es": "Termina una partida en la Semana de la Cosecha", "de": "Beende einen Lauf in der Erntewoche", "fr": "Termine une partie pendant la Semaine des récoltes", "ja": "収穫祭ウィーク中にランを終える", "pt-BR": "Termine uma partida na Semana da Colheita" }),
+  "keepsake.hint.winter": Object.freeze({ "en": "Finish a run during Winter Lights", "es": "Termina una partida en Luces de Invierno", "de": "Beende einen Lauf in den Winterlichtern", "fr": "Termine une partie pendant Lumières d’hiver", "ja": "ウィンターライト中にランを終える", "pt-BR": "Termine uma partida em Luzes de Inverno" }),
+  "keepsake.ariaLocked": Object.freeze({ "en": "{name}: locked. {hint}", "es": "{name}: bloqueado. {hint}", "de": "{name}: gesperrt. {hint}", "fr": "{name}\u00a0: verrouillé. {hint}", "ja": "{name}：ロック中。{hint}", "pt-BR": "{name}: bloqueado. {hint}" }),
+  "keepsake.tag": Object.freeze({ "en": "Keepsake", "es": "Recuerdo", "de": "Andenken", "fr": "Souvenir", "ja": "記念品", "pt-BR": "Lembrança" }),
+  "results.keepsake": Object.freeze({ "en": "Keepsake unlocked: {name}", "es": "Recuerdo desbloqueado: {name}", "de": "Andenken freigeschaltet: {name}", "fr": "Souvenir débloqué\u00a0: {name}", "ja": "記念品を獲得：{name}", "pt-BR": "Lembrança desbloqueada: {name}" }),
   "item.spark": Object.freeze({ "en": "Spark Thread", "es": "Hilo chispeante", "de": "Funkenfaden", "fr": "Fil étincelant", "ja": "火花の糸", "pt-BR": "Fio de faíscas" }),
   "item.standardFinish": Object.freeze({ "en": "Standard Finish", "es": "Final estándar", "de": "Standard-Finale", "fr": "Final standard", "ja": "標準フィニッシュ", "pt-BR": "Final padrão" }),
   "item.standardGhost": Object.freeze({ "en": "Standard Ghost", "es": "Fantasma estándar", "de": "Standardgeist", "fr": "Fantôme standard", "ja": "標準ゴースト", "pt-BR": "Fantasma padrão" }),
@@ -979,6 +999,10 @@ const I18N = Object.freeze({
   "more.rulesSummary": Object.freeze({ "en": "Scoring & flight", "es": "Puntuación y vuelo", "de": "Punkte & Flug", "fr": "Score et vol", "ja": "スコアと飛行", "pt-BR": "Pontuação e voo" }),
   "music.key.frost": Object.freeze({ "en": "F lydian", "es": "Fa lidio", "de": "F-Lydisch", "fr": "Fa lydien", "ja": "ヘ・リディア旋法", "pt-BR": "Fá lídio" }),
   "music.key.gas": Object.freeze({ "en": "D dorian", "es": "Re dórico", "de": "D-Dorisch", "fr": "Ré dorien", "ja": "ニ・ドリア旋法", "pt-BR": "Ré dórico" }),
+  "music.key.harvest": Object.freeze({ "en": "C# minor", "es": "Do♯ menor", "de": "cis-Moll", "fr": "Do♯ mineur", "ja": "嬰ハ短調", "pt-BR": "Dó♯ menor" }),
+  "music.key.snowfall": Object.freeze({ "en": "A major", "es": "La mayor", "de": "A-Dur", "fr": "La majeur", "ja": "イ長調", "pt-BR": "Lá maior" }),
+  "event.winter.title": Object.freeze({ "en": "Winter Lights", "es": "Luces de Invierno", "de": "Winterlichter", "fr": "Lumières d’hiver", "ja": "ウィンターライト", "pt-BR": "Luzes de Inverno" }),
+  "event.harvest.title": Object.freeze({ "en": "Harvest Week", "es": "Semana de la Cosecha", "de": "Erntewoche", "fr": "Semaine des récoltes", "ja": "収穫祭ウィーク", "pt-BR": "Semana da Colheita" }),
   "music.key.rocky": Object.freeze({ "en": "E major", "es": "Mi mayor", "de": "E-Dur", "fr": "Mi majeur", "ja": "ホ長調", "pt-BR": "Mi maior" }),
   "near.close": Object.freeze({ "en": "CLOSE!", "es": "¡POR POCO!", "de": "KNAPP!", "fr": "FRÔLÉ\u00a0!", "ja": "ニアミス！", "pt-BR": "QUASE!" }),
   "near.moon": Object.freeze({ "en": "CLOSE! moon graze", "es": "¡POR POCO! roce lunar", "de": "KNAPP! Mond gestreift", "fr": "FRÔLÉ\u00a0! la lune", "ja": "ニアミス！月をかすめた", "pt-BR": "QUASE! roçou a lua" }),
@@ -1020,8 +1044,8 @@ const I18N = Object.freeze({
   "duel.ahead": Object.freeze({ "en": "▲ {n} ahead", "es": "▲ {n} por delante", "de": "▲ {n} vorn", "fr": "▲ {n} d'avance", "ja": "▲ {n} リード", "pt-BR": "▲ {n} à frente" }),
   "duel.behind": Object.freeze({ "en": "▼ {n} behind", "es": "▼ {n} por detrás", "de": "▼ {n} zurück", "fr": "▼ {n} de retard", "ja": "▼ {n} ビハインド", "pt-BR": "▼ {n} atrás" }),
   "duel.level": Object.freeze({ "en": "level", "es": "empate", "de": "gleichauf", "fr": "à égalité", "ja": "互角", "pt-BR": "empatado" }),
-  "duel.beatWon": Object.freeze({ "en": "Won by {margin}", "es": "Ganaste por {margin}", "de": "Gewonnen mit {margin}", "fr": "Gagné de {margin}", "ja": "{margin}差で勝利", "pt-BR": "Venceu por {margin}" }),
-  "duel.beatLost": Object.freeze({ "en": "Lost by {margin}", "es": "Perdiste por {margin}", "de": "Verloren mit {margin}", "fr": "Perdu de {margin}", "ja": "{margin}差で敗北", "pt-BR": "Perdeu por {margin}" }),
+  "duel.beatWon": Object.freeze({ "en": "Won by {margin} points", "es": "Ganaste por {margin} puntos", "de": "Gewonnen mit {margin} Punkten", "fr": "Gagné de {margin} points", "ja": "{margin}点差で勝利", "pt-BR": "Venceu por {margin} pontos" }),
+  "duel.beatLost": Object.freeze({ "en": "Lost by {margin} points", "es": "Perdiste por {margin} puntos", "de": "Verloren mit {margin} Punkten", "fr": "Perdu de {margin} points", "ja": "{margin}点差で敗北", "pt-BR": "Perdeu por {margin} pontos" }),
   "duel.beatTied": Object.freeze({ "en": "Tied", "es": "Empate", "de": "Remis", "fr": "Égalité", "ja": "引き分け", "pt-BR": "Empate" }),
   "duel.place": Object.freeze({ "en": "#{p} of {n}", "es": "#{p} de {n}", "de": "Platz {p} von {n}", "fr": "{p}e sur {n}", "ja": "{n}人中{p}位", "pt-BR": "#{p} de {n}" }),
   "duel.overtake": Object.freeze({ "en": "OVERTAKE!", "es": "¡ADELANTAMIENTO!", "de": "ÜBERHOLT!", "fr": "DÉPASSEMENT\u00a0!", "ja": "逆転！", "pt-BR": "ULTRAPASSAGEM!" }),
@@ -3935,6 +3959,13 @@ const COSMETICS = Object.freeze([
   Object.freeze({ id: 'borealis', kind: 'theme', name: 'Borealis', rankMin: 6, cost: 280, style: '#10282A' }),
   Object.freeze({ id: 'sunrise', kind: 'theme', name: 'Sunrise', rankMin: 6, cost: 300, style: '#4A2418' })
 ]);
+// E4 event keepsakes: free trails unlocked by finishing a ranked Endless run during their event (the run's captured
+// runEvent). A new unlock source: no rank, no price, no purchase path, never in a native product list. Kept in the
+// saved owned list after the event ends. Painted through the trail path (keepsakeTrailPaint); presentation only.
+const EVENT_KEEPSAKES = Object.freeze([
+  Object.freeze({ id: 'harvest-thread', kind: 'trail', name: 'Harvest Thread', event: 'harvest', hint: 'keepsake.hint.harvest', style: '#F2B04C', paint: 'harvest' }),
+  Object.freeze({ id: 'winter-thread', kind: 'trail', name: 'Winter Thread', event: 'winter', hint: 'keepsake.hint.winter', style: '#DCEEFF', paint: 'winter' })
+]);
 // B8b premium packs (docs/launch/pricing_b8.md). Looks and sound only: nothing here reaches the sim, a score,
 // a catch window or a leaderboard. Ownership is never read from storage. A pack is owned only while the native
 // store's entitlement message lists it (setPremiumEntitlements); only the chosen item per kind is saved, and a
@@ -4228,10 +4259,15 @@ function presentationSkyStops(){
   if (state !== 'title'){
     // A run keeps the sector sky; an equipped non-default theme tints it (palettes built in applyRunTheme).
     const themed = runThemeSky ? runThemeSky[getSector().def.name] : null;
-    return themed || sectorSkyStops();
+    // Arc E: an Endless run during an event takes the event sky (an equipped theme still wins: the player's choice).
+    const evSky = !themed && runEvent ? eventRunSky(runEvent) : null;
+    return themed || (evSky && evSky[getSector().def.name]) || sectorSkyStops();
   }
   const base = sectorSkyStops();
   const tint = equippedThemeColor();
+  if (!tint && titleEvent && /^#[0-9A-Fa-f]{6}$/.test(titleEvent.sky)){
+    return [mixHex(base[0], titleEvent.sky, 0.30), mixHex(base[1], titleEvent.sky, 0.24), mixHex(base[2], titleEvent.sky, 0.18)];
+  }
   if (!tint) return base;
   return [
     mixHex(base[0], tint, 0.40),
@@ -4279,6 +4315,226 @@ function applyRunTheme(){
   for (const s of scenery){
     if (s.kind === 'nebula') s.runColor = tint ? mixHex(s.color, tint, RUN_THEME.nebula) : s.color;
   }
+}
+/* ---------- Arc E: seasonal events (E1 calendar, E2 Harvest Week, E3 Winter Lights). Presentation only. ---------- */
+// An event turns on by the device's LOCAL date (a holiday starts at local midnight; the Daily keeps its UTC date).
+// It is read once when a run starts (reset) or the title shows (syncEventBanner), so nothing swaps mid-run. An event
+// changes only the Endless song, the sky tint, a few drawn decorations and the title banner: no sim, forecast,
+// scoring, save, world RNG or presentation-stream read reaches any of it, and nothing here lives in the ZW-CORE region.
+// Daily, duel and the ghost frame never take an event (a duel link sounds and looks the same for both players).
+const EVENTS_ON = true; // the one off switch for every event
+// One row per event per year, dates inclusive (local). No recurrence rule: next year's rows are added explicitly.
+const EVENTS = Object.freeze([
+  Object.freeze({ id: 'harvest', first: '2026-11-23', last: '2026-11-29', music: 'harvest', sky: '#C8742E',
+    decor: 'leaves', title: 'event.harvest.title' }),
+  // E3: a cool teal glow under a night-blue middle; New Year's Eve and Day (local) add one burst on the title.
+  Object.freeze({ id: 'winter', first: '2026-12-18', last: '2027-01-01', music: 'snowfall', sky: '#4FA8C8', mid: '#1B2A4A',
+    decor: 'snow', title: 'event.winter.title', burst: Object.freeze(['12-31', '01-01']) })
+]);
+const ISO_DATE_RE = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+// Pure: the event on this local ISO date (YYYY-MM-DD), or null. ISO dates compare as strings.
+function activeEvent(iso, on = EVENTS_ON){
+  if (!on || typeof iso !== 'string' || !ISO_DATE_RE.test(iso)) return null;
+  for (const ev of EVENTS) if (iso >= ev.first && iso <= ev.last) return ev;
+  return null;
+}
+// Today's local date. Tests (and a review build) can fake it with window.__eventDate, as __skyDailyDate fakes the Daily.
+function eventTodayIso(){
+  try {
+    const override = typeof window !== 'undefined' ? window.__eventDate : undefined;
+    if (typeof override === 'string' && ISO_DATE_RE.test(override)) return override;
+  } catch (_) {}
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function eventGhostFrame(){ try { return typeof window !== 'undefined' && !!window.__ghostMode; } catch (_) { return false; } }
+let runEvent = null;   // the event captured when this run started (Endless only), or null
+let titleEvent = null; // the event captured when the title screen showed, or null
+let titleEventShown = false, titleEventIso = '', titleEventCheckAt = -Infinity;
+// Read at a run's start, after simReset has set the mode: Endless only (never the Daily, a duel or the ghost frame).
+function captureRunEvent(){
+  runEvent = !dailyActive && !duelActive && !eventGhostFrame() ? activeEvent(eventTodayIso()) : null;
+  return runEvent;
+}
+// The event song for this run, or null (then the sector song plays, as always).
+function runEventMusic(){
+  return runEvent && typeof MUSIC !== 'undefined' && Object.prototype.hasOwnProperty.call(MUSIC, runEvent.music) ? runEvent.music : null;
+}
+// Sky: a dusk palette per sector, built once per event from the sector's own stops (skyStopsFor, as the run theme
+// palette is). The top stays near the night indigo, the middle leans plum, and the event colour glows only from
+// the bottom, muted, like a low sunset: planets and rings keep their usual contrast.
+const EVENT_DUSK = Object.freeze({ night: '#0D1028', top: 0.35, plum: '#2E1F3E', mid: 0.2, glow: 0.28 });
+// An event may name its own middle colour (Winter Lights: night blue); the default is the Harvest plum.
+function buildEventDuskPalette(glow, mid = EVENT_DUSK.plum){
+  const palette = {};
+  for (const row of SECTORS){
+    const base = skyStopsFor(row.bg);
+    palette[row.name] = [mixHex(base[0], EVENT_DUSK.night, EVENT_DUSK.top), mixHex(base[1], mid, EVENT_DUSK.mid),
+      mixHex(base[2], glow, EVENT_DUSK.glow)];
+  }
+  return palette;
+}
+const eventSkyCache = Object.create(null);
+function eventRunSky(ev){
+  if (!ev || !/^#[0-9A-Fa-f]{6}$/.test(ev.sky)) return null;
+  const mid = /^#[0-9A-Fa-f]{6}$/.test(ev.mid || '') ? ev.mid : EVENT_DUSK.plum;
+  return eventSkyCache[ev.id] || (eventSkyCache[ev.id] = buildEventDuskPalette(ev.sky, mid));
+}
+// The title banner: shown only while an event is on. Read each time the title screen appears, and again when the
+// local date changes while the title stays up (tickEventBanner, about once a second; press() checks too), so an app
+// left open on the title across midnight never shows a stale banner or starts a run with a different event.
+function syncEventBanner(){
+  const onTitle = typeof state !== 'undefined' && state === 'title';
+  if (onTitle){
+    const iso = eventTodayIso();
+    const appearing = !titleEventShown;
+    if (appearing || iso !== titleEventIso){
+      titleEventIso = iso;
+      titleEvent = eventGhostFrame() ? null : activeEvent(iso);
+    }
+    // E3: one burst of colour each time the title appears on New Year's Eve or Day (never under Reduce Motion).
+    // Armed here; the clock starts on the first title frame drawn (drawTitleBurst), so a slow start never hides it.
+    if (appearing){ titleBurstArmed = eventBurstDay(titleEvent, iso) && !reducedMotion; titleBurstAt = -1; }
+  }
+  titleEventShown = onTitle;
+  const el = document.getElementById('eventBanner');
+  if (!el) return;
+  const text = titleEvent ? t(titleEvent.title) : '';
+  if (el.textContent !== text) el.textContent = text;
+  if (titleEvent) el.setAttribute('data-event', titleEvent.id); else el.removeAttribute('data-event');
+  el.hidden = !titleEvent;
+}
+function tickEventBanner(nowMs){
+  if (state !== 'title' || nowMs - titleEventCheckAt < 1000) return;
+  titleEventCheckAt = nowMs;
+  syncEventBanner();
+}
+// E2 decoration: a few drifting leaves, drawn only (no physics). Their own seeded stream (mulberry32 on a fixed
+// seed, never the world RNG or the presentation stream), positions a pure function of the wall clock. Reduce Motion: they hold still.
+const EVENT_LEAVES = Object.freeze({ count: 7, seed: 0x1EAF2026, alpha: 0.5,
+  colors: Object.freeze(['#E8913A', '#C8642A', '#F2B04C', '#A84E24']) });
+let eventLeafSet = null;
+const eventDecorStats = { leaves: 0, snow: 0, burst: 0 }; // tests and tuning only: what the last frame drew
+function eventLeafParams(){
+  if (eventLeafSet) return eventLeafSet;
+  const r = mulberry32(EVENT_LEAVES.seed);
+  const out = [];
+  for (let i = 0; i < EVENT_LEAVES.count; i++){
+    out.push(Object.freeze({ x: (i + 0.15 + r() * 0.7) / EVENT_LEAVES.count, y: r(), size: 5 + r() * 4,
+      fall: 12 + r() * 12, sway: 10 + r() * 14, freq: 0.5 + r() * 0.4, phase: r() * Math.PI * 2,
+      color: EVENT_LEAVES.colors[i % EVENT_LEAVES.colors.length] }));
+  }
+  return (eventLeafSet = Object.freeze(out));
+}
+// Screen positions at wall-clock seconds `secs`; Reduce Motion pins the clock, so every leaf is still.
+function eventLeafPositions(secs){
+  const t = reducedMotion ? 0 : secs;
+  const span = H + 40;
+  return eventLeafParams().map(L => ({
+    x: L.x * W + L.sway * Math.sin(L.freq * t + L.phase),
+    y: (((L.y * span + L.fall * t) % span) + span) % span - 20,
+    rot: L.phase + 0.6 * Math.sin(L.freq * t + L.phase * 0.5),
+    size: L.size, color: L.color
+  }));
+}
+function drawEventDecor(g, ev, nowMs){
+  eventDecorStats.leaves = 0; eventDecorStats.snow = 0; eventDecorStats.burst = 0;
+  if (state === 'title') drawTitleBurst(g, nowMs);
+  if (!ev || reducedEffects) return;
+  if (ev.decor === 'snow'){ drawEventSnow(g, nowMs); return; }
+  if (ev.decor !== 'leaves') return;
+  const leaves = eventLeafPositions(nowMs / 1000);
+  g.save();
+  g.globalAlpha = EVENT_LEAVES.alpha;
+  for (const L of leaves){
+    g.save();
+    g.translate(L.x, L.y);
+    g.rotate(L.rot);
+    g.fillStyle = L.color;
+    g.beginPath();
+    g.moveTo(0, -L.size);
+    g.quadraticCurveTo(L.size * 0.75, 0, 0, L.size);
+    g.quadraticCurveTo(-L.size * 0.75, 0, 0, -L.size);
+    g.fill();
+    g.restore();
+    eventDecorStats.leaves++;
+  }
+  g.restore();
+}
+// E3 decoration: light snow, drawn only. Its own seeded stream (mulberry32 on a fixed seed), built once; each
+// flake's position is a pure function of the wall clock, written into one reused point (no per-frame allocation).
+// Reduce Motion pins the clock, so the snow holds still.
+const EVENT_SNOW = Object.freeze({ count: 26, seed: 0x5A0F2026, alpha: 0.75, color: '#E8F1FF' });
+let eventSnowSet = null;
+function eventSnowParams(){
+  if (eventSnowSet) return eventSnowSet;
+  const r = mulberry32(EVENT_SNOW.seed);
+  const out = [];
+  for (let i = 0; i < EVENT_SNOW.count; i++){
+    out.push(Object.freeze({ x: (i + r()) / EVENT_SNOW.count, y: r(), r: 1.4 + r() * 1.4, fall: 10 + r() * 14,
+      sway: 4 + r() * 8, freq: 0.4 + r() * 0.5, phase: r() * Math.PI * 2, a: 0.5 + r() * 0.5 }));
+  }
+  return (eventSnowSet = Object.freeze(out));
+}
+const eventSnowPoint = { x: 0, y: 0, r: 0, a: 0 };
+function eventSnowAt(i, secs, out = eventSnowPoint){
+  const F = eventSnowParams()[i];
+  const t = reducedMotion ? 0 : secs;
+  const span = H + 20;
+  out.x = F.x * W + F.sway * Math.sin(F.freq * t + F.phase);
+  out.y = (((F.y * span + F.fall * t) % span) + span) % span - 10;
+  out.r = F.r; out.a = F.a;
+  return out;
+}
+function drawEventSnow(g, nowMs){
+  const secs = nowMs / 1000;
+  g.save();
+  g.fillStyle = EVENT_SNOW.color;
+  for (let i = 0; i < EVENT_SNOW.count; i++){
+    const p = eventSnowAt(i, secs);
+    g.globalAlpha = EVENT_SNOW.alpha * p.a;
+    g.beginPath(); g.arc(p.x, p.y, p.r, 0, Math.PI * 2); g.fill();
+    eventDecorStats.snow++;
+  }
+  g.restore();
+}
+// E3: New Year's Eve and Day (local) give the title one burst of colour when it appears: sparks from a point above
+// the title card, their own seeded stream, a pure function of the time since the title appeared, gone in 1.8 s.
+const TITLE_BURST = Object.freeze({ count: 36, seed: 0x2027B057, dur: 1.8, x: 0.5, y: 0.13, speed: 70, spread: 60,
+  colors: Object.freeze(['#FFD966', '#7CF0C8', '#FF8FB1', '#9FB0FF', '#FFB25E']) });
+let titleBurstAt = -1; // the draw time of the burst's first frame on this title visit, or -1 (none)
+let titleBurstArmed = false; // a burst waits for the next drawn title frame
+let titleBurstSet = null;
+function eventBurstDay(ev, iso){
+  return !!(ev && Array.isArray(ev.burst) && typeof iso === 'string' && ISO_DATE_RE.test(iso) && ev.burst.includes(iso.slice(5)));
+}
+function titleBurstParams(){
+  if (titleBurstSet) return titleBurstSet;
+  const r = mulberry32(TITLE_BURST.seed);
+  const out = [];
+  for (let i = 0; i < TITLE_BURST.count; i++){
+    const a = (i + r() * 0.6) / TITLE_BURST.count * Math.PI * 2;
+    out.push(Object.freeze({ dx: Math.cos(a), dy: Math.sin(a), v: TITLE_BURST.speed + r() * TITLE_BURST.spread,
+      r: 2.2 + r() * 1.6, color: TITLE_BURST.colors[i % TITLE_BURST.colors.length] }));
+  }
+  return (titleBurstSet = Object.freeze(out));
+}
+function drawTitleBurst(g, nowMs){
+  if (reducedMotion || reducedEffects){ titleBurstArmed = false; titleBurstAt = -1; return; } // still, or the light path
+  if (titleBurstArmed){ titleBurstArmed = false; titleBurstAt = nowMs; }
+  if (titleBurstAt < 0) return;
+  const e = (nowMs - titleBurstAt) / 1000;
+  if (e < 0 || e >= TITLE_BURST.dur){ if (e >= TITLE_BURST.dur) titleBurstAt = -1; return; }
+  const k = e / TITLE_BURST.dur, ease = 1 - (1 - k) * (1 - k), fall = 18 * e * e;
+  const cx = W * TITLE_BURST.x, cy = H * TITLE_BURST.y;
+  g.save();
+  for (const s of titleBurstParams()){
+    g.globalAlpha = 0.9 * (1 - k);
+    g.fillStyle = s.color;
+    g.beginPath(); g.arc(cx + s.dx * s.v * ease, cy + s.dy * s.v * ease + fall, s.r * (1 - 0.4 * k), 0, Math.PI * 2); g.fill();
+    eventDecorStats.burst++;
+  }
+  g.restore();
 }
 // Centered popup glyphs, in camera space, stay inside the playfield.
 // shiftX is the shake/nudge translation already applied outside that space.
@@ -5279,6 +5535,62 @@ const MUSIC = Object.freeze({
     kickSlots: Object.freeze([0]), driveKickSlots: Object.freeze([0, 3, 4]),
     peak: Object.freeze({ pad: 0.024, bass: 0.085, bassUpper: 0.032, pluck: 0.038, shimmer: 0.02, kick: 0.11, knock: 0.022, fill: 0.034 }),
     level: 1.06, overdriveLift: 1.08, fadeIn: 1.2, fadeOut: 0.4
+  }),
+  harvest: Object.freeze({
+    // E2 Harvest Waltz (Arc E, Endless during Harvest Week only): warm and unhurried, C# minor leaning to its
+    // relative major. C# natural minor holds every note of the E major-pentatonic catch melody, so catches never
+    // clash. PERFECT wait 15 / 80 = 0.188 s, under the 0.25 s target. Pads, bass and plucks stay at or under E4
+    // (the melody root), like Frost and Gas; the knock is C#4 and the duel tick C#5.
+    bpm: 80,
+    root: 138.59, // C#3
+    chords: Object.freeze({
+      Csm: Object.freeze({ bass: 0, pad: Object.freeze([3, 7, 12]) }),
+      Fsm: Object.freeze({ bass: -7, pad: Object.freeze([5, 8, 12]) }),
+      A: Object.freeze({ bass: -4, pad: Object.freeze([8, 12, 15]) }),
+      Gsm: Object.freeze({ bass: -5, pad: Object.freeze([7, 10, 14]) }),
+      E: Object.freeze({ bass: 3, pad: Object.freeze([7, 10, 15]) }),
+      B: Object.freeze({ bass: -2, pad: Object.freeze([5, 10, 14]) })
+    }),
+    // i iv VI v, then VI III VII i: a falling autumn line, then home through the relative major.
+    progressions: Object.freeze([
+      Object.freeze(['Csm', 'Fsm', 'A', 'Gsm']),
+      Object.freeze(['A', 'E', 'B', 'Csm'])
+    ]),
+    arp: Object.freeze([0, 1, 2, 1, 2, 0]),
+    // A long, soft oom; two gentle pahs, like Rocky.
+    bassSlots: Object.freeze([0]), bassHold: 4, sparseSlots: Object.freeze([2, 4]),
+    kickSlots: Object.freeze([0]), driveKickSlots: Object.freeze([0, 4]),
+    peak: Object.freeze({ pad: 0.024, bass: 0.075, bassUpper: 0.03, pluck: 0.036, shimmer: 0.018, kick: 0.09, knock: 0.018, fill: 0.03 }),
+    level: 1.06, overdriveLift: 1.08, fadeIn: 1.6, fadeOut: 0.5
+  }),
+  snowfall: Object.freeze({
+    // E3 Snowfall Waltz (Arc E, Endless during Winter Lights only): slow and glassy, in A major. A major holds every
+    // note of the E major-pentatonic catch melody, so catches never clash. PERFECT wait 15 / 72 = 0.208 s, under the
+    // 0.25 s target. Pads, bass and plucks stay at or under E4 (the melody root); the duel tick is A5 (880 Hz).
+    // The bell: a soft sine on the chord's top note two octaves up, with a quieter partial an octave and a fifth over
+    // it, on beat 1 of every other bar. Two music notes on the music bus, like the shimmer: no cue voice is used.
+    bpm: 72,
+    root: 220, // A3
+    chords: Object.freeze({
+      A: Object.freeze({ bass: -12, pad: Object.freeze([-5, 0, 4]) }),
+      Csm: Object.freeze({ bass: -8, pad: Object.freeze([-1, 4, 7]) }),
+      D: Object.freeze({ bass: -7, pad: Object.freeze([-3, 0, 5]) }),
+      E: Object.freeze({ bass: -5, pad: Object.freeze([-1, 2, 7]) }),
+      Fsm: Object.freeze({ bass: -15, pad: Object.freeze([-3, 0, 4]) }),
+      Bm: Object.freeze({ bass: -10, pad: Object.freeze([-3, 2, 5]) })
+    }),
+    // I iii IV V, then vi IV ii V: quiet, then home.
+    progressions: Object.freeze([
+      Object.freeze(['A', 'Csm', 'D', 'E']),
+      Object.freeze(['Fsm', 'D', 'Bm', 'E'])
+    ]),
+    arp: Object.freeze([0, 2, 1, 2, 1, 0]),
+    // One long oom per bar; two light pahs.
+    bassSlots: Object.freeze([0]), bassHold: 5, sparseSlots: Object.freeze([2, 4]),
+    kickSlots: Object.freeze([0]), driveKickSlots: Object.freeze([0, 4]),
+    bell: Object.freeze({ slot: 0, bars: 2, semis: 24, partial: 19, peak: 0.014, partialPeak: 0.006, hold: 1.6 }),
+    peak: Object.freeze({ pad: 0.024, bass: 0.07, bassUpper: 0.028, pluck: 0.034, shimmer: 0.016, kick: 0.08, knock: 0.014, fill: 0.028 }),
+    level: 1.06, overdriveLift: 1.08, fadeIn: 1.8, fadeOut: 0.6
   })
 });
 // Counted per scheduled note, for tests and tuning only.
@@ -5353,6 +5665,9 @@ function musicWanted(){
     return musicTrack;
   }
   if (state !== 'playing') return null;
+  // Arc E: an Endless run that started during an event plays the event song (captured at the run's start).
+  const ev = runEventMusic();
+  if (ev) return ev;
   const id = getSector().def.music;
   return Object.prototype.hasOwnProperty.call(MUSIC, id) ? id : null;
 }
@@ -5481,6 +5796,12 @@ function scheduleMusicStep(def, step, t){
     const peak = slot === 0 ? p.pluck : p.pluck * WALTZ.pah;
     musicNote(musicAc, 'sine', musicFreq(def, tone), t, peak, 0.008, eighth * 1.6);
     musicStats.plucks++;
+  }
+  // E3: a soft bell (only tracks that name one): the chord's top note two octaves up plus a quiet partial.
+  if (def.bell && slot === def.bell.slot && bar % def.bell.bars === 0){
+    const top = chord.pad[chord.pad.length - 1], b = def.bell;
+    musicNote(musicAc, 'sine', musicFreq(def, top + b.semis), t, b.peak, 0.004, b.hold);
+    musicNote(musicAc, 'sine', musicFreq(def, top + b.partial), t, b.partialPeak, 0.004, b.hold * 0.6);
   }
   if (density === 3 && slot % 2 === 1){
     const tone = chord.pad[def.arp[slot] % chord.pad.length] + 24;
@@ -5752,6 +6073,7 @@ function syncScrollFades(){
   }
 }
 function syncScreens(){
+  syncEventBanner(); // Arc E: the event is read once as the title screen appears
   if (state !== 'title') {
     hangarOpen = false;
     statsOpen = false;
@@ -5832,7 +6154,7 @@ const SONG = Object.freeze({
   maxSeconds: 24,  // a longer run compresses evenly to this length, so the card never waits for minutes
   lookahead: 0.18, // seconds of notes queued ahead on the audio clock (as musicTick)
   maxNotesPerSecond: 6, // voiced notes at most this dense: the #197 voice cap never drops one at random
-  keys: Object.freeze({ rocky: 'E major', frost: 'F lydian', gas: 'D dorian' })
+  keys: Object.freeze({ rocky: 'E major', frost: 'F lydian', gas: 'D dorian', harvest: 'C# minor', snowfall: 'A major' })
 });
 let songEvents = [], songTrack = 'rocky', songReplay = null, songFrameId = 0, songFrameKind = null, songOverflow = 0;
 let revealFit = null, revealFrom = null, revealStartedAt = 0, resultsTimer = 0;
@@ -6064,6 +6386,8 @@ function reset(){
   if (tut) calm = true;
   const checkpointFloor = checkpointActive && gateReached >= 0 ? capturesToFinish(gateReached) : null;
   simReset({ seed, H, mode: { checkpointFloor }, flags: { calm, tutorial: tut } });
+  captureRunEvent(); // Arc E: after simReset set the mode; presentation only
+  keepsakeNotice = null;
   renderPrev.valid = false; renderAlpha = 1; renderAlignedRun = RENDER_ALIGN_FRAMES; renderLag = 0;
   particles = []; popups = [];
   shake = 0; punch = null; nearFlash = null; hitStopUntil = 0;
@@ -6097,7 +6421,7 @@ function reset(){
   setRetryReady(true);
   constellationStars = []; constellationThread = []; flightSeg = []; captureIds = [];
   // Retry never waits for the results-card replay: it is cancelled here, synchronously.
-  cancelSongReplay(); songEvents = []; songTrack = 'rocky'; songOverflow = 0;
+  cancelSongReplay(); songEvents = []; songTrack = runEventMusic() || 'rocky'; songOverflow = 0;
   resultsShown = false; revealFit = null; revealFrom = null; revealStartedAt = 0;
   finishBeat = null; stepFinishBeat(0); // D2c: a retry never carries the last beat
   resetMelody();
@@ -6483,6 +6807,16 @@ function missionById(id){
 }
 function cosmeticById(id){
   for (let i = 0; i < COSMETICS.length; i++) if (COSMETICS[i].id === id) return COSMETICS[i];
+  return keepsakeById(id);
+}
+// E4: a keepsake by id; any other id (an unknown event's, a typo) is not a cosmetic, so a saved one is dropped on load.
+// Every row's event is a real EVENTS id (tests/event-keepsake.test.cjs).
+function keepsakeById(id){
+  for (let i = 0; i < EVENT_KEEPSAKES.length; i++) if (EVENT_KEEPSAKES[i].id === id) return EVENT_KEEPSAKES[i];
+  return null;
+}
+function keepsakeForEvent(eventId){
+  for (let i = 0; i < EVENT_KEEPSAKES.length; i++) if (EVENT_KEEPSAKES[i].event === eventId) return EVENT_KEEPSAKES[i];
   return null;
 }
 function starterOwned(){ return ['classic', 'thread', 'night']; }
@@ -6887,6 +7221,7 @@ function bankRunStardust(){
 function buyCosmetic(id){
   ensureMeta();
   const item = cosmeticById(id);
+  if (item && item.event) return false; // E4: a keepsake is earned, never for sale
   if (!item || meta.owned.indexOf(item.id) >= 0) return false;
   if (meta.rank < item.rankMin) return false;
   const cost = Math.max(0, Math.floor(Number(item.cost) || 0));
@@ -7018,6 +7353,12 @@ function hangarAction(item, owned, locked){
     });
     return btn;
   }
+  if (item.event){ // E4: a keepsake is earned, never bought: no Buy, no price
+    btn.textContent = t('hangar.locked');
+    btn.disabled = true;
+    btn.setAttribute('aria-label', t('keepsake.ariaLocked', { name: tl(item.name), hint: t(item.hint) }));
+    return btn;
+  }
   if (locked){
     btn.textContent = t('hangar.locked');
     btn.disabled = true;
@@ -7125,7 +7466,11 @@ function renderHangar(){
   const list = document.getElementById('hangarList');
   if (!list || typeof document.createElement !== 'function') return;
   if (typeof list.replaceChildren === 'function') list.replaceChildren();
-  const items = COSMETICS.concat(INSTRUMENTS);
+  // E4: a keepsake row shows once owned, or locked with its hint while its event is on; otherwise it is hidden.
+  const liveEvent = activeEvent(eventTodayIso());
+  const keepsakes = EVENT_KEEPSAKES.filter(k => keepsakeById(k.id) &&
+    (meta.owned.indexOf(k.id) >= 0 || (liveEvent && liveEvent.id === k.event)));
+  const items = COSMETICS.concat(keepsakes, INSTRUMENTS);
   for (let k = 0; k < HANGAR_KINDS.length; k++){
     const group = HANGAR_KINDS[k];
     const heading = document.createElement('div');
@@ -7147,7 +7492,10 @@ function renderHangar(){
       name.textContent = tl(item.name);
       const cost = document.createElement('div');
       cost.className = 'hangar-cost';
-      cost.textContent = owned ? t('hangar.owned') : (locked ? ('🔒 ' + t('meta.rank', { rank: item.rankMin })) : ('✦ ' + item.cost));
+      cost.textContent = item.event ? (owned ? t('keepsake.tag') : ('🔒 ' + t(item.hint))) :
+        owned ? t('hangar.owned') : (locked ? ('🔒 ' + t('meta.rank', { rank: item.rankMin })) : ('✦ ' + item.cost));
+      if (item.event) row.classList.add('keepsake-row');
+      if (item.event && !owned) cost.className = 'hangar-cost hangar-hint'; // the hint wraps on its own line
       if (item.kind === 'theme'){
         // Hover or focus previews the theme; neither buys nor equips.
         row.addEventListener('pointerenter', ()=> previewTheme(item.id));
@@ -7872,7 +8220,7 @@ function ownsHangarCosmetic(){
   if (!meta || !meta.owned) return false;
   const starters = starterOwned();
   for (let i = 0; i < meta.owned.length; i++){
-    if (starters.indexOf(meta.owned[i]) < 0) return true;
+    if (starters.indexOf(meta.owned[i]) < 0 && !keepsakeById(meta.owned[i])) return true; // a keepsake is not a Hangar unlock
   }
   return false;
 }
@@ -8216,7 +8564,7 @@ function endlessReplay(desc){
   if (!Number.isFinite(seed)) return null;
   // Every global the replay sets is saved here and restored in finally. The simulated run itself (planets, score,
   // state) is the replay's result and is not restored: the page that replays is a test page.
-  const saved = { H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, checkpointActive, launchedThisSession, endlessReplayNext, releaseGraceWindow, tutorialNext, tutorialSeen, duelArmed, duelActive };
+  const saved = { H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, checkpointActive, launchedThisSession, endlessReplayNext, releaseGraceWindow, tutorialNext, tutorialSeen, duelArmed, duelActive, runEvent, titleEvent, titleEventShown, titleEventIso, titleBurstAt, titleBurstArmed, keepsakeNotice };
   try {
     releaseGraceWindow = gw;
     H = Number(desc.H) > 0 ? Number(desc.H) : H;
@@ -8226,7 +8574,9 @@ function endlessReplay(desc){
     duelArmed = null; duelActive = false;
     endlessReplayNext = { seed: seed >>> 0, calm: !!desc.calm, ls: !!desc.ls, tut: !!desc.tut };
     state = 'title';
+    endlessReplaying = true; // E4: a replay never unlocks a keepsake (and plays no event)
     press(); // the game's own start path: reset() takes the seed and flags from endlessReplayNext
+    runEvent = null;
     endlessReplayNext = null;
     if (state !== 'playing') return null;
     const log = dailyRunLog;
@@ -8237,7 +8587,8 @@ function endlessReplay(desc){
     const run = coreRun({ ev, step: ENDLESS_STEP, maxSteps });
     return endlessResult(log.n, worldSig, log.bad || run.steps !== log.n);
   } finally {
-    ({ H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, checkpointActive, launchedThisSession, endlessReplayNext, releaseGraceWindow, tutorialNext, tutorialSeen, duelArmed, duelActive } = saved);
+    ({ H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, checkpointActive, launchedThisSession, endlessReplayNext, releaseGraceWindow, tutorialNext, tutorialSeen, duelArmed, duelActive, runEvent, titleEvent, titleEventShown, titleEventIso, titleBurstAt, titleBurstArmed, keepsakeNotice } = saved);
+    endlessReplaying = false;
   }
 }
 function endlessResult(steps, worldSig, bad){
@@ -8713,7 +9064,7 @@ function duelResultLine(you){
 // only: aria-hidden (the results announcement already says the outcome), no randomness, never read by the sim.
 // Panel 14 words ("Gewonnen mit 1234") are wider than a bare number: fitFinishBeat() steps the 44 px size down once
 // per beat so the label, at its full pop, keeps a 16 px gutter on a 320 px screen (never under minPx).
-const FINISH_BEAT = Object.freeze({ ms: 560, fadeInMs: 60, fadeOutMs: 180, popMs: 160, popScale: 1.35, gutter: 16, minPx: 16 });
+const FINISH_BEAT = Object.freeze({ ms: 560, fadeInMs: 60, fadeOutMs: 180, popMs: 160, popScale: 1.35, gutter: 16, minPx: 13 }); // Panel 15: 13, not 16: "Gewonnen mit 1234 Punkten" needs 13 px to keep the 16 px gutter at full pop on 320 px
 let finishBeat = null; // { text, side, at } for the run that just ended
 function duelFinishBeatText(you){
   const outcome = duelOutcome(you);
@@ -9682,7 +10033,31 @@ function runEnded(reason, previousBest){
   else renderMissionResults([], 0); // nothing moved: no board on the card
   if (runIsRanked()) bankRunStardust();
   else runDustBanked = true;
+  noteEventKeepsake();
   simFx.results(reason);
+}
+// E4: a finished ranked Endless run that started during an event unlocks that event's keepsake (once; kept forever).
+// Never the Daily, a duel, a Checkpoint run, an unranked ?grace= run or the ghost frame. The results card names it
+// once, on the run that unlocked it, except on a calm or tutorial run (the first-session rules: no extra notes).
+let keepsakeNotice = null; // the keepsake this run unlocked, for its results card, or null
+let endlessReplaying = false; // true inside endlessReplay: a replayed run is not a finished run
+function noteEventKeepsake(){
+  keepsakeNotice = null;
+  if (endlessReplaying || !runEvent || !runIsRanked() || dailyActive || duelActive || checkpointActive || eventGhostFrame()) return null;
+  const item = keepsakeForEvent(runEvent.id);
+  ensureMeta();
+  if (!item || meta.owned.indexOf(item.id) >= 0) return null;
+  meta.owned.push(item.id);
+  saveMeta();
+  if (!calmRun && !tutorialRun) keepsakeNotice = item.id;
+  return item;
+}
+function syncKeepsakeResult(){
+  const el = document.getElementById('keepsakeResult');
+  if (!el) return;
+  const item = keepsakeNotice ? cosmeticById(keepsakeNotice) : null;
+  el.hidden = !item;
+  el.textContent = item ? t('results.keepsake', { name: tl(item.name) }) : '';
 }
 // The results card for the run that just ended (die, through simFx.results).
 function showResults(reason){
@@ -9740,6 +10115,7 @@ function showResults(reason){
   if (sunCaught) sunEl.textContent = t('results.sun', { label: tl(SUN.label), score: formatScore(SUN.bonus * scoreScale()) });
   }
   document.getElementById('newBest').style.display = runWasBest ? 'block' : 'none';
+  syncKeepsakeResult();
   const note = document.getElementById('checkpointResult');
   note.hidden = !checkpointActive;
   if (checkpointActive) note.textContent = tl(CHECKPOINT.label);
@@ -9828,6 +10204,7 @@ function press(){
     checkpointActive = false;
     hideShareToast();
     recoverAudioFromGesture();
+    syncEventBanner(); // Arc E: a date change since the last check updates the banner, so the run's event matches it
     reset();
     state = 'playing';
     if (tutorialRun) startTutorial();
@@ -10742,7 +11119,9 @@ function paintConstellationThumbnail(){
 function recordSongEvent(p, grade, hz){
   if (songEvents.length >= SONG.maxEvents){ if (hz > 0) songOverflow++; return; } // a revisit (hz 0) is no note
   const def = getSector().def;
-  if (def && Object.prototype.hasOwnProperty.call(MUSIC, def.music)) songTrack = def.music;
+  const ev = runEventMusic(); // Arc E: the run's event song backs its replay and share clip
+  if (ev) songTrack = ev;
+  else if (def && Object.prototype.hasOwnProperty.call(MUSIC, def.music)) songTrack = def.music;
   songEvents.push({ t: Math.max(0, time), hz: hz > 0 ? hz : 0, combo, grade: grade || null, planet: p.id, x: p.x, y: p.y });
 }
 // Pure. The replay plan for these events at a tempo. Recorded seconds are trimmed to the first catch
@@ -11589,6 +11968,21 @@ function supporterTrailPaint(i, n){
   // Nebula: alternating two-tone beads that twinkle.
   const twinkle = 0.5 + 0.5 * Math.sin(i * 2.399 + clock * 5);
   return { color: i % 2 ? ink.fly : ink.orbit, width: 1, alpha: 0.55 + 0.45 * twinkle };
+}
+// E4 keepsake trails: Harvest runs amber to rust along the thread; Winter is icy white-blue with twinkling
+// beads. Both still under Reduce Motion (the clock holds); Overdrive keeps its warm stroke. No random stream.
+function keepsakeTrailPaint(i, n){
+  if (state === 'playing' && combo >= 12) return null;
+  const item = meta && meta.equipped ? cosmeticById(meta.equipped.trail) : null;
+  if (!item || !item.event || item.kind !== 'trail') return null;
+  const clock = reducedMotion ? 0 : performance.now() / 1000;
+  const u = n > 1 ? i / (n - 1) : 1;
+  if (item.paint === 'winter'){
+    const s = Math.pow(Math.max(0, Math.sin(i * 2.399 + clock * 6)), 4);
+    return { color: mixHex('#A9D8FF', '#FFFFFF', 0.35 + 0.65 * s), width: 1 + 0.5 * s, alpha: 0.75 + 0.25 * s };
+  }
+  const w = 0.5 + 0.5 * Math.sin(u * 7 - clock * 2);
+  return { color: mixHex('#F2B04C', '#C8642A', w), width: 1 + 0.3 * w, alpha: 1 };
 }
 function drawSupporterHalo(){
   if (!supporterActive() || !player) return;
@@ -12527,6 +12921,8 @@ function draw(){
     ctx.beginPath(); ctx.arc(s.x, py, s.r, 0, Math.PI*2); ctx.fill();
   }
   ctx.globalAlpha = 1;
+  // Arc E decorations (drawn only, their own stream; still under Reduce Motion).
+  drawEventDecor(ctx, state === 'title' ? titleEvent : runEvent, performance.now());
 
   const fitted = constellationView();
   // Presentation camera while playing (identity under Reduce Motion or at rest).
@@ -12651,7 +13047,7 @@ function draw(){
       ctx.lineWidth = 1.2 + 6.9 * taper;
       ctx.beginPath(); ctx.moveTo(prior.x, prior.y); ctx.lineTo(t.x, t.y); ctx.stroke();
     }
-    const paint = supporterTrailPaint(i, player.trail.length);
+    const paint = supporterTrailPaint(i, player.trail.length) || keepsakeTrailPaint(i, player.trail.length);
     ctx.globalAlpha = a*.5*fallDim*(paint ? paint.alpha : 1);
     ctx.strokeStyle = paint ? paint.color : trailInk();
     ctx.lineWidth = (.35+3.45*taper)*(paint ? paint.width : 1);
@@ -13062,11 +13458,13 @@ function rhythmIdAt(a){
 }
 // D6 PERFECT streak read (presentation only). The chain is the core's own: rhythm.lastGrade, which capture()
 // clears on any ungraded catch or revisit, and flick, a tutorial miss and rhythmResetRun() clear too. A PERFECT
-// whose previous grade is PERFECT extends the streak; anything else restarts it. From the 2nd PERFECT in a row
-// a small "N in a row" (rhythm.streak, localized; ASCII digits) sits under the word. Panel 14: not "×N", which
+// whose previous grade is PERFECT extends the streak; anything else restarts it. From the 5th PERFECT in a row
+// (PERFECT_STREAK_LINE_FROM) a small "N in a row" (rhythm.streak, localized; ASCII digits) sits under the word.
+// Panel 15: shown from 5 in a row; at 2-4 raters read it as clutter. Panel 14: not "×N", which
 // read as a score multiplier next to the x10 combo. Past 99 it reads "99+ in a row", so the label never grows
 // past two digits. Looked up once per flash, never per frame. Not announced: the flash itself is not either.
 const PERFECT_STREAK_SHOWN = 99;
+const PERFECT_STREAK_LINE_FROM = 5; // Panel 15: the line starts at 5 in a row; 2-4 read as clutter
 let perfectStreak = 0, flashStreak = '', flashStreakW = -1;
 function rhythmFlash(grade, x, y){
   // Sparingly: every PERFECT, but GOOD only when it ends a PERFECT streak.
@@ -13074,7 +13472,7 @@ function rhythmFlash(grade, x, y){
   rhythm.lastGrade = grade;
   perfectStreak = grade === 'perfect' ? (prev === 'perfect' ? perfectStreak + 1 : 1) : 0;
   if (grade === 'good' && prev !== 'perfect') return; // no new flash: a PERFECT still fading keeps its count
-  flashStreak = perfectStreak < 2 ? ''
+  flashStreak = perfectStreak < PERFECT_STREAK_LINE_FROM ? ''
     : t('rhythm.streak', { n: perfectStreak > PERFECT_STREAK_SHOWN ? PERFECT_STREAK_SHOWN + '+' : String(perfectStreak) });
   flashStreakW = -1; // measured once at the first draw, not per frame
   rhythm.flash = grade === 'perfect' ? 'PERFECT' : 'GOOD';
@@ -13502,6 +13900,7 @@ window.addEventListener('slingshot:native-reveal', revealWithoutResuming);
 window.addEventListener('slingshot:native-audio', noteAudioInterruptionEnded);
 function loop(now){
   sampleFps(now);
+  tickEventBanner(now); // Arc E: the title notices local midnight (about once a second)
   if (clipRecording && state !== 'dead') cancelShareClip('cancelled');
   try { musicTick(); } catch (e) {}
   // Hidden time never steps gameplay, not even through the visible-gap clamp below.
