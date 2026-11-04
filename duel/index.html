@@ -1649,7 +1649,7 @@ function simReset(runInit){
 let simFx = null;
 let reducedMotion = false; // a run input: the page sets it from prefers-reduced-motion (the run log records it)
 // Width stays 480. Height matches the viewport aspect at load so the playfield
-// fills that screen, then locks: a later resize only letterboxes, it does not
+// fills that screen (a landscape window keeps at least PLAYFIELD_MIN_H and is pillarboxed), then locks: a later resize only letterboxes, it does not
 // rebuild planets or scores.
 const W = 480;
 let H = 800;
@@ -3669,6 +3669,7 @@ try {
 // Native shell marker (layout only): the message handler exists from document start in the iOS app.
 try { if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.slingshot) document.documentElement.classList.add('native-shell'); } catch (_) {}
 let playfieldLocked = false;
+const PLAYFIELD_MIN_H = 640; // 3:4 at W 480
 let DPR = 1, viewScale = 1, viewX = 0, viewY = 0;
 // Top safe-area inset (iPhone Dynamic Island / notch with viewport-fit=cover).
 // 0 in ordinary browsers and wherever env() is unavailable.
@@ -3697,8 +3698,10 @@ function resize(){
   const viewportH = Math.max(1, fullH - safeTop);
   if (!playfieldLocked){
     const fitted = W * viewportH / viewportW;
-    // Canonical 3:5 (480×800 and the same aspect) stays exactly 800.
-    H = Math.abs(viewportW * 800 - viewportH * W) < 1e-6 ? 800 : fitted;
+    // Canonical 3:5 (480×800 and the same aspect) stays exactly 800. A wide (landscape) window keeps at least a 3:4
+    // portrait playfield (PLAYFIELD_MIN_H) and is pillarboxed: filling a 16:9 desktop width left a 270-300 px tall
+    // playfield drawn at about 3x. Phones (portrait) and a portrait iPad are unchanged.
+    H = Math.abs(viewportW * 800 - viewportH * W) < 1e-6 ? 800 : Math.max(PLAYFIELD_MIN_H, fitted);
   }
   viewScale = Math.min(viewportW / W, viewportH / H);
   viewX = (viewportW - W * viewScale) / 2;
