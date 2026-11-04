@@ -115,8 +115,21 @@
   #score{font-family:var(--font-display);font-size:clamp(24px,10cqw,48px);color:var(--text);
     text-shadow:0 2px 8px rgba(18,14,46,.9);font-variant-numeric:tabular-nums}
   #combo{font-family:var(--font-display);font-size:clamp(12px,4.5cqw,22px);color:var(--gold);min-height:1.4em}
+  /* F2: NEW BEST in the moment (Endless). One small label under the BEST line in the score HUD's right column ("SAVED
+     BEST 40" over "NEW BEST"), so nothing in the score column moves; the same ink halo as #hint (no glow). One 520 ms pop
+     as it appears, none under Reduce Motion or Reduced effects (static). The compact HUD hides #best: there the label
+     sits on the score's own line instead (data-new-best is set on both). */
+  #best[data-new-best]::after{content:attr(data-new-best);display:block;margin-top:3px;
+    font-family:var(--font-display);font-size:clamp(11px,3.4cqw,15px);line-height:1.1;color:var(--mint);letter-spacing:.03em;
+    white-space:nowrap;text-shadow:0 0 4px #120E2E, 0 1px 0 #120E2E;transform-origin:right center}
+  #best[data-new-best][data-flourish="1"]::after{animation:hudNewBestPop 520ms cubic-bezier(.2,.9,.3,1.2) both}
+  @keyframes hudNewBestPop{0%{opacity:0;transform:translateY(4px) scale(.72)}55%{opacity:1;transform:translateY(0) scale(1.12)}100%{opacity:1;transform:none}}
+  /* #hud #score: one id more than the compact HUD's pop below, so these win wherever they sit in the sheet. */
+  @media (prefers-reduced-motion: reduce){ #best[data-new-best][data-flourish="1"]::after,#hud #score[data-new-best][data-flourish="1"]::after{animation:none} }
+  #gameUI.fx-reduced #best[data-new-best][data-flourish="1"]::after,#gameUI.fx-reduced #score[data-new-best][data-flourish="1"]::after{animation:none}
   /* Tier color is backed up by glyph and size. The chip keeps dimmed text on ink. */
-  #combo:not(:empty){display:inline-block;padding:0 4px;border-radius:4px;background:#120E2E;text-shadow:0 1px 0 #120E2E}
+  /* F9: a block of its own width, so with the height and hint lines gone the void chip still starts its own line. */
+  #combo:not(:empty){display:block;width:max-content;max-width:100%;padding:0 4px;border-radius:4px;background:#120E2E;text-shadow:0 1px 0 #120E2E}
   #combo[data-tier="white"]{color:#FFFFFF}
   #combo[data-tier="white"]::before{content:'● '}
   #combo[data-tier="gold"]{color:#FFD966;font-size:clamp(13px,5cqw,25px)}
@@ -282,6 +295,8 @@
     #voidCue{order:6;display:block;width:max-content;max-width:100%;margin-top:4px;padding:2px 4px;font-size:11px;line-height:1.05;letter-spacing:0}
     #hud.reserve-void #voidCue[hidden]{display:block!important}
     #hud #best,#hud #height{display:none}
+    #score[data-new-best]::after{content:attr(data-new-best);display:inline-block;margin-left:6px;font-size:11px;color:var(--mint);white-space:nowrap;transform-origin:left center}
+    #score[data-new-best][data-flourish="1"]::after{animation:hudNewBestPop 520ms cubic-bezier(.2,.9,.3,1.2) both}
   }
   /* Without container queries/units (e.g. Chrome < 105) the cqw sizes above are dropped. Rebuild them from
      the fitted playfield: its width is min(100vw, 60vh) at the fixed 480x800 aspect, and its height is at most
@@ -338,6 +353,8 @@
       #voidCue{order:6;display:block;width:max-content;max-width:100%;margin-top:4px;padding:2px 4px;font-size:11px;line-height:1.05;letter-spacing:0}
       #hud.reserve-void #voidCue[hidden]{display:block!important}
       #hud #best,#hud #height{display:none}
+      #score[data-new-best]::after{content:attr(data-new-best);display:inline-block;margin-left:6px;font-size:11px;color:var(--mint);white-space:nowrap;transform-origin:left center}
+      #score[data-new-best][data-flourish="1"]::after{animation:hudNewBestPop 520ms cubic-bezier(.2,.9,.3,1.2) both}
     }
   }
   /* Batch C: keep Resume clear of the orbit area (comet + release arrow) while staying a 44px tap target. */
@@ -374,6 +391,11 @@
   .result-best{font-size:14px;line-height:1.4}
   .result-goal{white-space:pre-line;padding:8px 10px;border-radius:10px;background:rgba(110,231,200,.08);border:1px solid rgba(110,231,200,.28);
     color:var(--text);font-size:16px;line-height:1.35;font-weight:700}
+  /* F8: a quiet text link under the duel line (never an .action): Retry keeps its place and its timing. */
+  .lead-replay{display:block;margin:0 auto;min-height:32px;padding:4px 12px;border:0;border-radius:8px;background:transparent;
+    color:var(--dim);font:600 13px/1.3 'Space Grotesk',sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+  .lead-replay::before{content:"\25B6\FE0E\00A0";text-decoration:none;display:inline-block}
+  .lead-replay[hidden]{display:none}
   /* Details: everything else from the run, collapsed by default (1.2 prototype). */
   .result-details{margin-top:10px;text-align:center}
   .result-details > summary{display:inline-block;line-height:42px;box-sizing:border-box;min-height:44px;min-width:44px;
@@ -608,7 +630,7 @@
     <div id="score">0</div>
     <div id="combo"></div>
     <div id="height"></div>
-    <div id="hint">dashed ring catches</div>
+    <div id="hint">tap while inside the glow</div>
     <div id="voidCue" hidden>↑ VOID RISING</div>
     <div id="duelClock" hidden></div>
     <div id="duelLead" hidden></div>
@@ -696,6 +718,7 @@
     <div id="checkpointResult" hidden>Checkpoint run · score x0.5</div>
     <div class="go-line">
       <div id="nextGoal" class="result-goal">Next goal: beat 0</div>
+      <button id="leadReplay" class="lead-replay" type="button" hidden>Watch the lead change</button>
       <div id="sunResult" class="result-breakdown" hidden></div>
       <div id="keepsakeResult" class="result-breakdown" hidden></div>
     </div>
@@ -938,7 +961,7 @@ const I18N = Object.freeze({
   "hud.comboAria": Object.freeze({ "en": "x{combo} COMBO, {mark}, {tier} tier", "es": "x{combo} COMBO, {mark}, nivel {tier}", "de": "x{combo} COMBO, {mark}, Stufe {tier}", "fr": "combo x{combo}, {mark}, palier {tier}", "ja": "x{combo} コンボ、{mark}、{tier}ティア", "pt-BR": "x{combo} COMBO, {mark}, nível {tier}" }),
   "hud.height": Object.freeze({ "en": "height +{score}", "es": "altura +{score}", "de": "Höhe +{score}", "fr": "hauteur +{score}", "ja": "高度 +{score}", "pt-BR": "altura +{score}" }),
   "hud.hint.decay": Object.freeze({ "en": "combo bonus fades", "es": "el bonus de combo baja", "de": "Combo-Bonus verblasst", "fr": "le bonus de combo baisse", "ja": "コンボボーナスが減っていく", "pt-BR": "o bônus de combo cai" }),
-  "hud.hint.ring": Object.freeze({ "en": "dashed ring catches", "es": "el anillo punteado atrapa", "de": "der gestrichelte Ring fängt", "fr": "l'anneau pointillé attrape", "ja": "点線のリングでキャッチ", "pt-BR": "o anel tracejado captura" }),
+  "hud.hint.ring": Object.freeze({ "en": "tap while inside the glow", "es": "toca mientras estés en el resplandor", "de": "tippe, solange du im Leuchten bist", "fr": "touche pendant que tu es dans la lueur", "ja": "光の中にいる間にタップ", "pt-BR": "toque enquanto estiver no brilho" }),
   "hud.void": Object.freeze({ "en": "↑ VOID RISING", "es": "↑ EL VACÍO SUBE", "de": "↑ DIE LEERE STEIGT", "fr": "↑ LE VIDE MONTE", "ja": "↑ 虚無が上昇中", "pt-BR": "↑ O VAZIO SOBE" }),
   "instr.bells": Object.freeze({ "en": "Warm Bells", "es": "Campanas cálidas", "de": "Warme Glocken", "fr": "Cloches douces", "ja": "あたたかいベル", "pt-BR": "Sinos quentes" }),
   "instr.box": Object.freeze({ "en": "Music Box", "es": "Caja de música", "de": "Spieldose", "fr": "Boîte à musique", "ja": "オルゴール", "pt-BR": "Caixa de música" }),
@@ -1064,7 +1087,11 @@ const I18N = Object.freeze({
   "duel.new": Object.freeze({ "en": "Duel a friend", "es": "Reta a un amigo", "de": "Freund herausfordern", "fr": "Défier un ami", "ja": "フレンドと対戦", "pt-BR": "Desafiar um amigo" }),
   "duel.send": Object.freeze({ "en": "Share to send this run as a duel link", "es": "Comparte para enviar esta partida como duelo", "de": "Teilen, um diesen Lauf als Duell zu senden", "fr": "Partage pour envoyer cette partie en duel", "ja": "共有してこのランをデュエルとして送ろう", "pt-BR": "Compartilhe para enviar esta partida como duelo" }),
   "duel.sprint": Object.freeze({ "en": "Duel Sprint", "es": "Sprint de duelo", "de": "Duell-Sprint", "fr": "Sprint en duel", "ja": "デュエル・スプリント", "pt-BR": "Sprint de duelo" }),
+  "duel.watchLead": Object.freeze({ "en": "Watch the lead change", "es": "Ver el cambio de líder", "de": "Führungswechsel ansehen", "fr": "Revoir le changement de tête", "ja": "逆転の瞬間を見る", "pt-BR": "Ver a virada na liderança" }),
+  "duel.leadChangedOne": Object.freeze({ "en": "Lead changed once", "es": "El liderato cambió una vez", "de": "Die Führung wechselte einmal", "fr": "La tête a changé une fois", "ja": "リードが1回入れ替わった", "pt-BR": "A liderança mudou uma vez" }),
+  "duel.leadChanged": Object.freeze({ "en": "Lead changed {n} times", "es": "El liderato cambió {n} veces", "de": "Die Führung wechselte {n}-mal", "fr": "La tête a changé {n} fois", "ja": "リードが{n}回入れ替わった", "pt-BR": "A liderança mudou {n} vezes" }),
   "results.death.daily": Object.freeze({ "en": "DAILY COMPLETE", "es": "ÓRBITA DIARIA COMPLETADA", "de": "TAGESORBIT GESCHAFFT", "fr": "ORBITE DU JOUR TERMINÉE", "ja": "デイリー完了", "pt-BR": "ÓRBITA DIÁRIA CONCLUÍDA" }),
+  "results.cause.void": Object.freeze({ "en": "Ended in the void", "es": "Terminó en el vacío", "de": "Endete in der Leere", "fr": "Fini dans le vide", "ja": "虚無で終了", "pt-BR": "Terminou no vazio" }),
   "results.death.void": Object.freeze({ "en": "CAUGHT BY THE VOID", "es": "ATRAPADO POR EL VACÍO", "de": "VON DER LEERE ERWISCHT", "fr": "AVALÉ PAR LE VIDE", "ja": "虚無に飲み込まれた", "pt-BR": "ENGOLIDO PELO VAZIO" }),
   "results.death.wall": Object.freeze({ "en": "LEFT THE PLAYFIELD", "es": "SALISTE DEL CAMPO", "de": "SPIELFELD VERLASSEN", "fr": "SORTI DU TERRAIN", "ja": "フィールド外", "pt-BR": "SAIU DO CAMPO" }),
   "results.duel.won": Object.freeze({ "en": "DUEL WON", "es": "DUELO GANADO", "de": "DUELL GEWONNEN", "fr": "DUEL GAGNÉ", "ja": "デュエル勝利", "pt-BR": "DUELO VENCIDO" }),
@@ -1895,6 +1922,7 @@ function fireClose(x, y, reason){
   // Its own light flash, under Reduce Motion too (at reduced alpha). It never writes `punch`:
   // a near-miss must not squash the comet, re-trigger the catch camera punch, or overwrite a capture's punch.
   simFx.closeFlash({ t: time, x, y });
+  simFx.closeWhoosh(x); // F5: queued, played after the frame's steps unless the run ended
   simFx.native('near-miss', { reason: reason || 'ring', stardust: runStardust, count: nearMissCount });
 }
 // Eased capture snap (1.2): the orbit radius slides from the latch distance to the track over
@@ -3556,13 +3584,20 @@ function rhythmOrbitScale(){
 // catches no new planet. Sets rhythm.gradeId to the planet the grade belongs to.
 function gradeRelease(){
   rhythm.gradeId = -1; rhythm.grade = null;
-  if (!player || player.mode !== 'orbit' || !player.planet) return null;
-  // The grade is taken at the run's own step: DAILY_STEP for the Daily (unchanged) and ENDLESS_STEP for Endless.
-  const r = forecastCore(player.angle, player.planet, time, true, voidY, cam.y, RHYTHM.span, simStep(), rRes, null);
-  if (r.kind !== 'capture' || !rhythmIsNew(r.planetId, player.planet, time)) return null;
+  const r = releaseForecast(rRes);
+  if (!r) return null;
   rhythm.gradeId = r.planetId;
   rhythm.grade = gradeForDepth(r.depth);
   return rhythm.grade;
+}
+// The forecast a release at this instant grades (into res): its catch of a new planet, or null. gradeRelease and
+// the F7 ring depth glow (syncRingDepth) both read it, so the glow shows exactly the depth the grade would use.
+function releaseForecast(res){
+  if (!player || player.mode !== 'orbit' || !player.planet) return null;
+  // The grade is taken at the run's own step: DAILY_STEP for the Daily (unchanged) and ENDLESS_STEP for Endless.
+  const r = forecastCore(player.angle, player.planet, time, true, voidY, cam.y, RHYTHM.span, simStep(), res, null);
+  if (r.kind !== 'capture' || !rhythmIsNew(r.planetId, player.planet, time)) return null;
+  return r;
 }
 // The 1.5 Overdrive tuning (PERFECT steps, GOOD hold, flick drain) is Endless-only. A Daily run keeps
 // the 1.4 steps, so the pinned Daily trace stays byte-identical.
@@ -3760,6 +3795,7 @@ simFx = {
   // Draw-only state: the launch streak, the CLOSE! flash, the Sun flare.
   streak(v){ launchFx = v; },
   closeFlash(v){ nearFlash = v; },
+  closeWhoosh: x => queueCloseWhoosh(x),
   flare(v){ sunFlare = v; },
   // Camera lean toward flight. Draw-only; reduced motion keeps it flat.
   lean(wallDt){
@@ -5307,6 +5343,24 @@ function whoosh(){
   soundTone('sine', 420, 1050, .105, .075, 0, false, false, pan);
   soundTone('triangle', 105, 170, .085, .085, 0, false, false, pan);
 }
+// F5: a close call's whoosh, for the strict CLOSE! cases only (fireClose). A soft falling sweep with a faint airy top,
+// so it never reads as the launch whoosh (which rises) and sits well under the music. Panned to where the close call
+// happened. fireClose only queues it; loop() plays it after the frame's steps, so a close call on a lethal step (the
+// run ended in that frame) is silent. At most one every CLOSE_WHOOSH.cooldownMs of wall-clock time, and nothing
+// under Sound off. Presentation only: no random stream and no simulation state.
+const CLOSE_WHOOSH = Object.freeze({ cooldownMs: 2000, from: 880, to: 360, dur: 0.16, peak: 0.035, airFrom: 1760, airTo: 900, airPeak: 0.012 });
+let closeWhooshQueued = false, closeWhooshX = 0, closeWhooshAt = -Infinity;
+function queueCloseWhoosh(x){ closeWhooshQueued = true; closeWhooshX = x; }
+function flushCloseWhoosh(now){
+  if (!closeWhooshQueued) return;
+  closeWhooshQueued = false;
+  if (state !== 'playing' || muted) return;
+  if (now >= closeWhooshAt && now - closeWhooshAt < CLOSE_WHOOSH.cooldownMs) return;
+  closeWhooshAt = now;
+  const W5 = CLOSE_WHOOSH, pan = cuePan(closeWhooshX);
+  soundTone('sine', W5.from, W5.to, W5.dur, W5.peak, 0, false, false, pan);
+  soundTone('triangle', W5.airFrom, W5.airTo, W5.dur * 0.8, W5.airPeak, 0, false, false, pan);
+}
 function boom(){
   // Short reward tails finish naturally under a softer falling failure cue.
   soundTone('sine', 160, 42, .36, .18, 0, true);
@@ -5489,7 +5543,8 @@ const MUSIC = Object.freeze({
     // Kick from x4 on beat 1; Overdrive plays every beat.
     kickSlots: Object.freeze([0]), driveKickSlots: Object.freeze([0, 2, 4]),
     peak: Object.freeze({ pad: 0.025, bass: 0.08, bassUpper: 0.03, pluck: 0.04, shimmer: 0.02, kick: 0.11, knock: 0.022, fill: 0.034 }),
-    level: 1.06, overdriveLift: 1.08, fadeIn: 1.2, fadeOut: 0.4
+    level: 1.06, overdriveLift: 1.08, fadeIn: 1.2, fadeOut: 0.4,
+    melodyRoot: 12 // F3: the catch melody's root (E4), in semitones over the song root
   }),
   frost: Object.freeze({
     // Slower and airier: F and G major alternate (the lydian raised fourth, B, lives in G).
@@ -5512,7 +5567,8 @@ const MUSIC = Object.freeze({
     // Airier: one kick a bar on beat 1, two in Overdrive (beats 1 and 3), and a lighter one.
     kickSlots: Object.freeze([0]), driveKickSlots: Object.freeze([0, 4]),
     peak: Object.freeze({ pad: 0.022, bass: 0.07, bassUpper: 0.028, pluck: 0.035, shimmer: 0.022, kick: 0.085, knock: 0.016, fill: 0.03 }),
-    level: 1.06, overdriveLift: 1.08, fadeIn: 1.6, fadeOut: 0.5
+    level: 1.06, overdriveLift: 1.08, fadeIn: 1.6, fadeOut: 0.5,
+    melodyRoot: 12 // F4
   }),
   gas: Object.freeze({
     // Heavier groove: a Dm-G dorian vamp, with a push on the last eighth of the bar under the oom.
@@ -5534,7 +5590,8 @@ const MUSIC = Object.freeze({
     // The kick lands on the oom; Overdrive adds the off-beat pickup.
     kickSlots: Object.freeze([0]), driveKickSlots: Object.freeze([0, 3, 4]),
     peak: Object.freeze({ pad: 0.024, bass: 0.085, bassUpper: 0.032, pluck: 0.038, shimmer: 0.02, kick: 0.11, knock: 0.022, fill: 0.034 }),
-    level: 1.06, overdriveLift: 1.08, fadeIn: 1.2, fadeOut: 0.4
+    level: 1.06, overdriveLift: 1.08, fadeIn: 1.2, fadeOut: 0.4,
+    melodyRoot: 12 // D4
   }),
   harvest: Object.freeze({
     // E2 Harvest Waltz (Arc E, Endless during Harvest Week only): warm and unhurried, C# minor leaning to its
@@ -5561,7 +5618,8 @@ const MUSIC = Object.freeze({
     bassSlots: Object.freeze([0]), bassHold: 4, sparseSlots: Object.freeze([2, 4]),
     kickSlots: Object.freeze([0]), driveKickSlots: Object.freeze([0, 4]),
     peak: Object.freeze({ pad: 0.024, bass: 0.075, bassUpper: 0.03, pluck: 0.036, shimmer: 0.018, kick: 0.09, knock: 0.018, fill: 0.03 }),
-    level: 1.06, overdriveLift: 1.08, fadeIn: 1.6, fadeOut: 0.5
+    level: 1.06, overdriveLift: 1.08, fadeIn: 1.6, fadeOut: 0.5,
+    melodyRoot: 15 // E4 over C#3
   }),
   snowfall: Object.freeze({
     // E3 Snowfall Waltz (Arc E, Endless during Winter Lights only): slow and glassy, in A major. A major holds every
@@ -5590,11 +5648,12 @@ const MUSIC = Object.freeze({
     kickSlots: Object.freeze([0]), driveKickSlots: Object.freeze([0, 4]),
     bell: Object.freeze({ slot: 0, bars: 2, semis: 24, partial: 19, peak: 0.014, partialPeak: 0.006, hold: 1.6 }),
     peak: Object.freeze({ pad: 0.024, bass: 0.07, bassUpper: 0.028, pluck: 0.034, shimmer: 0.016, kick: 0.08, knock: 0.014, fill: 0.028 }),
-    level: 1.06, overdriveLift: 1.08, fadeIn: 1.8, fadeOut: 0.6
+    level: 1.06, overdriveLift: 1.08, fadeIn: 1.8, fadeOut: 0.6,
+    melodyRoot: 7 // E4 over A3
   })
 });
 // Counted per scheduled note, for tests and tuning only.
-const musicStats = { pads: 0, bass: 0, plucks: 0, shimmers: 0, kicks: 0, fills: 0 };
+const musicStats = { pads: 0, bass: 0, plucks: 0, shimmers: 0, kicks: 0, fills: 0, strings: 0, bells: 0, layerDrops: 0 };
 let musicTrack = null, musicGain = null, musicPadBus = null, musicAc = null, musicNextAt = 0, musicStep = 0, musicLifted = false;
 // Music carries across a death: the groove keeps going under the results card, ducked about -9 dB
 // and low-passed, and runs on into the retry, where it comes back up on the next beat. It does not
@@ -5650,6 +5709,107 @@ function musicKick(def, t){
   }
   musicStats.kicks++;
 }
+// F3: the waltz gets excited with you. Two instrument layers join the arrangement as the combo climbs:
+// strings (a sustained, slowly swelling chord of two slightly detuned triangles per tone) from x4 and
+// bells (a soft sine with a quiet octave partial, on beats 1 and 3) from x8. x12 stays Overdrive as before,
+// with both layers still playing. A layer enters only on a bar line (decided at slot 0 of the bar); when the
+// combo breaks (or the run ends) the layers it no longer earns drop at once with a tape slow-down: their
+// pitch sinks drop.semis while they fade over drop.time. Music notes on the music bus: the cue voice caps,
+// buses, the Sound and Music switches and the beat grid are untouched, and nothing here reads an RNG.
+// Every tone is a chord tone of the current chord. Strings are folded down an octave until they sit at or
+// under the catch melody's root (def.melodyRoot), like the Frost and Gas pads; bells ring two octaves over
+// the pad, in the shimmer's register and under its level, so the catch melody stays on top.
+const WALTZ_LAYERS = Object.freeze({
+  stringsAt: 4, bellsAt: 8,
+  strings: Object.freeze({ level: 0.4, attack: 0.6, release: 0.4, detune: 7 }),
+  bells: Object.freeze({ slots: Object.freeze([0, 4]), tones: Object.freeze([2, 1]), semis: 24, level: 0.6, decay: 1.1,
+    partial: 12, partialLevel: 0.2, partialDecay: 0.5 }),
+  drop: Object.freeze({ time: 0.4, semis: -3 })
+});
+let musicLayers = 0, musicLayerVoices = [], musicStringsUntil = 0;
+// How many layers the combo earns now: 0, 1 (strings) or 2 (strings and bells). None under the results card.
+function musicLayerWanted(){
+  if (typeof state !== 'undefined' && state === 'dead') return 0;
+  const c = typeof combo === 'number' ? combo : 1;
+  return c >= WALTZ_LAYERS.bellsAt ? 2 : c >= WALTZ_LAYERS.stringsAt ? 1 : 0;
+}
+// The strings' voicing: the chord's pad tones, each folded down an octave until it is at or under the melody root.
+function musicStringTones(def, chord){
+  return chord.pad.map(s => { let t = s; while (t > def.melodyRoot) t -= 12; return t; });
+}
+// One layer oscillator with a piecewise-linear envelope (env: [time, value] pairs, zero-ended). Kept in
+// musicLayerVoices until it ends, so a combo break can slow it down and fade it from wherever it is.
+function musicLayerNote(layer, type, freq, env, dest, detune){
+  const ac = musicAc;
+  try {
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    const start = env[0][0], end = env[env.length - 1][0];
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, start);
+    if (detune && osc.detune && typeof osc.detune.setValueAtTime === 'function') osc.detune.setValueAtTime(detune, start);
+    gain.gain.setValueAtTime(0, start);
+    for (let i = 1; i < env.length; i++) gain.gain.linearRampToValueAtTime(env[i][1], env[i][0]);
+    osc.connect(gain); gain.connect(dest || musicGain);
+    osc.start(start);
+    osc.stop(end + 0.02);
+    musicLayerVoices.push({ layer, osc, gain, freq, env, start, end });
+  } catch (e) {}
+}
+// The envelope's value at time t (linear between points, 0 outside).
+function musicLayerLevel(env, t){
+  if (t <= env[0][0] || t >= env[env.length - 1][0]) return 0;
+  for (let i = 1; i < env.length; i++){
+    const [t1, v1] = env[i], [t0, v0] = env[i - 1];
+    if (t <= t1) return t1 > t0 ? v0 + (v1 - v0) * (t - t0) / (t1 - t0) : v1;
+  }
+  return 0;
+}
+// Strings for the rest of the chord, from the bar line at t (bars: 2 on a chord change, 1 when entering mid-chord).
+function musicStrings(def, chord, t, bars){
+  const L = WALTZ_LAYERS.strings, bar = 30 / def.bpm * WALTZ.slots;
+  const end = t + bars * bar, peak = def.peak.pad * L.level;
+  const env = [[t, 0], [t + L.attack, peak], [end, peak], [end + L.release, 0]];
+  for (const tone of musicStringTones(def, chord)){
+    const f = musicFreq(def, tone);
+    musicLayerNote(1, 'triangle', f, env, musicPadBus, -L.detune);
+    musicLayerNote(1, 'triangle', f, env, musicPadBus, L.detune);
+  }
+  musicStringsUntil = end;
+  musicStats.strings++;
+}
+function musicBell(def, chord, t, slotIndex){
+  const B = WALTZ_LAYERS.bells, top = chord.pad.length - 1;
+  const tone = chord.pad[Math.min(B.tones[slotIndex], top)] + B.semis, peak = def.peak.shimmer * B.level;
+  musicLayerNote(2, 'sine', musicFreq(def, tone), [[t, 0], [t + 0.004, peak], [t + 0.004 + B.decay, 0]], musicGain, 0);
+  musicLayerNote(2, 'sine', musicFreq(def, tone + B.partial), [[t, 0], [t + 0.004, peak * B.partialLevel], [t + 0.004 + B.partialDecay, 0]], musicGain, 0);
+  musicStats.bells++;
+}
+// A combo break: every voice of a layer above `keep` slows down (pitch sinks) and fades out from now, on the audio clock.
+function musicLayersDrop(keep, now){
+  const D = WALTZ_LAYERS.drop, end = now + D.time, ratio = Math.pow(2, D.semis / 12);
+  musicLayers = keep;
+  if (keep < 1) musicStringsUntil = 0;
+  const kept = [];
+  for (const v of musicLayerVoices){
+    if (v.layer <= keep) { kept.push(v); continue; }
+    try {
+      const g = v.gain.gain;
+      g.cancelScheduledValues(now);
+      g.setValueAtTime(musicLayerLevel(v.env, now), now);
+      g.linearRampToValueAtTime(0, end);
+    } catch (e) {}
+    try { v.osc.stop(Math.max(end, v.start) + 0.02); } catch (e) {}
+    try {
+      const f = v.osc.frequency, from = Math.max(now, v.start);
+      f.setValueAtTime(v.freq, from);
+      f.linearRampToValueAtTime(v.freq * ratio, Math.max(end, from + 0.01));
+    } catch (e) {}
+  }
+  musicLayerVoices = kept;
+  musicStats.layerDrops++;
+}
+function musicLayersReset(){ musicLayers = 0; musicLayerVoices = []; musicStringsUntil = 0; }
 // Which arrangement should be playing right now, or null for silence.
 function musicWanted(){
   // Music follows the Music switch only; Sound off silences cues, not music (Settings, D1b).
@@ -5738,11 +5898,13 @@ function startMusic(id){
     musicPadBus.gain.setValueAtTime(1, t);
     musicPadBus.connect(musicGain);
     musicAc = ac; musicTrack = id; musicStep = 0; musicLifted = false; musicDucked = false; musicNextAt = t + 0.08;
+    musicLayersReset();
   } catch (e) { musicGain = null; musicPadBus = null; musicFilter = null; musicTrack = null; musicAc = null; }
 }
 function stopMusic(){
   const gain = musicGain, ac = musicAc, id = musicTrack, filter = musicFilter;
   musicGain = null; musicPadBus = null; musicFilter = null; musicAc = null; musicTrack = null; musicDucked = false;
+  musicLayersReset(); // the layers fade out with the track's gain
   if (!gain || !ac) return;
   const unplug = () => {
     try { gain.disconnect(); } catch (e) {}
@@ -5803,6 +5965,14 @@ function scheduleMusicStep(def, step, t){
     musicNote(musicAc, 'sine', musicFreq(def, top + b.semis), t, b.peak, 0.004, b.hold);
     musicNote(musicAc, 'sine', musicFreq(def, top + b.partial), t, b.partialPeak, 0.004, b.hold * 0.6);
   }
+  // F3: layers enter on a bar line only; strings hold to the chord's end, bells ring on beats 1 and 3.
+  if (slot === 0){
+    const want = musicLayerWanted();
+    if (want > musicLayers) musicLayers = want;
+    if (musicLayers >= 1 && (bar % 2 === 0 || musicStringsUntil < t + 1e-6)) musicStrings(def, chord, t, 2 - bar % 2);
+  }
+  const bellAt = WALTZ_LAYERS.bells.slots.indexOf(slot);
+  if (musicLayers >= 2 && bellAt >= 0 && !(def.bell && slot === def.bell.slot && bar % def.bell.bars === 0)) musicBell(def, chord, t, bellAt);
   if (density === 3 && slot % 2 === 1){
     const tone = chord.pad[def.arp[slot] % chord.pad.length] + 24;
     musicNote(musicAc, 'sine', musicFreq(def, tone), t, p.shimmer, 0.008, eighth);
@@ -5820,6 +5990,10 @@ function musicTick(){
   const lifted = !musicWantsDuck() && musicDensity() === 3;
   if ((lifted !== musicLifted || musicWantsDuck() !== musicDucked) && musicGain) musicLevelTo(def, now);
   if (musicNextAt < now - 0.25) musicNextAt = now + 0.05; // after an interruption, never burst-catch-up
+  // F3: a combo break drops the layers it no longer earns, now (with the tape slow-down), not on the bar line.
+  if (musicLayerVoices.length) musicLayerVoices = musicLayerVoices.filter(v => v.end > now);
+  const layers = musicLayerWanted();
+  if (layers < musicLayers) musicLayersDrop(layers, now);
   let guard = 0;
   while (musicNextAt < now + 0.18 && guard++ < 8){
     scheduleMusicStep(def, musicStep, musicNextAt);
@@ -6157,16 +6331,36 @@ const SONG = Object.freeze({
   keys: Object.freeze({ rocky: 'E major', frost: 'F lydian', gas: 'D dorian', harvest: 'C# minor', snowfall: 'A major' })
 });
 let songEvents = [], songTrack = 'rocky', songReplay = null, songFrameId = 0, songFrameKind = null, songOverflow = 0;
+// F8: the lead-change replay (see watch the lead change, by the song replay).
+const LEAD_REPLAY = Object.freeze({ beforeSteps: 90, afterSteps: 45, tailSteps: 30, holdMs: 700, stillMs: 2400,
+  pad: 12, minSpan: 90, you: '#F3EFFF', mark: '#FFE7A3', skipGuardMs: 400 });
+const LEAD_TAPE_STEPS = Math.ceil(DUEL_SPRINT_SECONDS / DAILY_STEP) + 8; // a sprint's steps, with room to spare
+// { xy: Float64Array (your step * 4: your x, y, the rival's x, y), lo, hi, marks: [your step of each C14 change] }:
+// the positions are allocated once and written allocation-free.
+let leadTape = null;
+let leadReplay = null, leadReplayFrameId = 0, leadReplayFrameKind = null, leadReplaySkippedAt = -Infinity;
 let revealFit = null, revealFrom = null, revealStartedAt = 0, resultsTimer = 0;
 let revealDurationMs = CONSTELLATION.revealMs; // this death's reveal: the zoom, or the short beat
 let best = 0, shake, deadAt;
 let punch = null; // last capture's draw-only punch; physics never reads it
+// F4: PERFECT lands. A PERFECT catch's planet body squashes about 5% for 80 ms of wall time (eased out), along the comet's
+// approach; under Reduce Motion a crisp still mark sits on the rim where the comet came in instead. Draw only: the body
+// is drawn through a transform, and planet.r, planet.capture and every hit or physics value stay as they are.
+const PERFECT_LAND = Object.freeze({ squash: 0.05, bulge: 0.02, ms: 80, markMs: 250, markArc: 1.9, markGap: 3, markWidth: 2, markAlpha: 0.8 });
+let perfectLand = null; // { id, at (wall ms), axis (approach angle), from (rim angle toward the comet) }
+// F2: new best, in the moment (Endless only). newBestFrom is the saved best as loaded at the run's start (0: not
+// eligible); newBestAt is the sim time the live score passed it (-1: not yet). Once per run.
+const NEW_BEST_HUD = Object.freeze({ hold: 2.6, peak: 0.05, glide: 0.12, attack: 0.01, decay: 0.55, from: 7, to: 12 });
+let newBestFrom = 0, newBestAt = -1;
 let nearFlash = null; // last CLOSE! flash: draw-only, separate from the capture punch
 const NEAR_FLASH_LIFE = 0.22; // sim seconds
 let hitStopUntil = 0; // wall clock (performance.now ms): loop() skips update() until then
 // Presentation camera on top of the fit camera: zoom about (zx, zy) on screen, then lead.
 // Wall-time eased in stepCameraFx(); cam.y stays the simulation camera.
 const camFx = { lx: 0, ly: 0, punch: 0, punchAt: -Infinity, punchX: 0, punchY: 0 };
+// F10 next-planet lean (see armNextLean). Draw only.
+const NEXT_LEAN = Object.freeze({ px: 6, inMs: 300, outMs: 300 });
+let nextLean = null; // { dx, dy (unit), at (wall ms the ease starts), out (wall ms of the release, or -1) }
 let launchFx = null; // release smear; draw-only
 let deathBoomTimer = 0, deathBoomPlayed = true, runWasBest = false;
 let confetti = [];
@@ -6298,7 +6492,9 @@ const DAILY_GHOST_PREF_KEY = 'slingshot-planet-daily-ghost-show';
 const DAILY_GHOST_MAX_EVENTS = 2000;
 const ENDLESS_LOG_MAX_EVENTS = 20000; // Endless runs are not ghosts: a longer input log is still replayable
 const DAILY_GHOST_FADE_MS = 600;
-const DAILY_GHOST_TRAIL = 18;
+const DAILY_GHOST_TRAIL = 18; // trail points the standard dots and the premium ghost styles draw
+// F1: points each ghost keeps (ring buffer). The duel rival's comet tail is half a second: 30 steps at 1/60 s.
+const GHOST_TRAIL_CAP = 32;
 const STATS_KEY = 'skythread.stats';
 const MUTE_LEGACY_KEYS = ['skythread.mute', 'slingshot-planet-mute', 'muted'];
 let lifetime = { captures: 0, sector: -1, combo: 0, bestStreak: 0, dailyAttempts: 0 };
@@ -6372,6 +6568,9 @@ function beginDailyStream(){
 // HUD, draw-only state, the run log and the tutorial, and generates the planets and the player (step 5 moves those).
 function reset(){
   const seed = runSeed();
+  armNewBest(); // F2: before the run's flags change below (endlessReplayNext is consumed here)
+  calmHudArm(); // F9: which hints still teach this run
+  closeWhooshQueued = false; // F5: a close call queued before this run (a replay hook) never plays in it
   dailyRunLog = newDailyRunLog();
   dailyAcc = 0;
   // Decided once per run, before any planet is made, so a catch in this run never changes its layout
@@ -6390,7 +6589,7 @@ function reset(){
   keepsakeNotice = null;
   renderPrev.valid = false; renderAlpha = 1; renderAlignedRun = RENDER_ALIGN_FRAMES; renderLag = 0;
   particles = []; popups = [];
-  shake = 0; punch = null; nearFlash = null; hitStopUntil = 0;
+  shake = 0; punch = null; nearFlash = null; hitStopUntil = 0; perfectLand = null;
   hideFlickHint();
   resetCameraFx();
   launchFx = null; runWasBest = false; confetti = [];
@@ -6422,6 +6621,8 @@ function reset(){
   constellationStars = []; constellationThread = []; flightSeg = []; captureIds = [];
   // Retry never waits for the results-card replay: it is cancelled here, synchronously.
   cancelSongReplay(); songEvents = []; songTrack = runEventMusic() || 'rocky'; songOverflow = 0;
+  cancelLeadReplay(); // F8: and neither for the lead-change replay, whose link goes with the card
+  { const lr = document.getElementById('leadReplay'); if (lr) lr.hidden = true; }
   resultsShown = false; revealFit = null; revealFrom = null; revealStartedAt = 0;
   finishBeat = null; stepFinishBeat(0); // D2c: a retry never carries the last beat
   resetMelody();
@@ -6515,7 +6716,11 @@ function armCapturePunch(p){
   // Real hit-stop: wall time only, so Reduce Motion keeps it (it is a pause, not motion).
   const wallNow = performance.now();
   hitStopUntil = wallNow + hitStopSeconds(combo) * 1000;
+  // F4: this catch's grade (rhythmFlash has just recorded it; an ungraded catch cleared it).
+  perfectLand = rhythm.lastGrade === 'perfect' ? { id: p.id, at: wallNow,
+    axis: Math.atan2(player.vy, player.vx) || 0, from: Math.atan2(player.y - p.y, player.x - p.x) || 0 } : null;
   armCameraPunch(p, wallNow);
+  armNextLean(p, wallNow); // F10: after the punch, toward the next target
   // Extra sparks use a rewound effects stream so later planet colors stay put.
   if (punch.milestone && !reducedMotion){
     const saved = fxRandomState;
@@ -8507,13 +8712,15 @@ function snapshotRenderPrev(){
 function drawInterpolated(){
   const r = renderPrev, a = renderAlpha;
   if (!(a < 1) || !r.valid || state !== 'playing'){ draw(); return; }
+  syncRingDepth(); // F7: at the sim state, before the blend below moves time
+  ringDepthHold = true;
   const n = r.n, list = planets;
   const px = player.x, py = player.y, camY = cam.y, vy = voidY, t = time;
   const trail = player.trail, head = trail.length ? trail[trail.length - 1] : null;
   const seg = flightSeg.length ? flightSeg[flightSeg.length - 1] : null;
   const gh = r.gh === dailyGhost ? r.gh : null;
   const gx = gh ? gh.out[0] : 0, gy = gh ? gh.out[1] : 0;
-  const gSlot = gh && gh.tn > 0 ? ((gh.tn - 1) % DAILY_GHOST_TRAIL) * 2 : -1;
+  const gSlot = gh && gh.tn > 0 ? ((gh.tn - 1) % (gh.trail.length >> 1)) * 2 : -1;
   const gtx = gSlot >= 0 ? gh.trail[gSlot] : 0, gty = gSlot >= 0 ? gh.trail[gSlot + 1] : 0;
   let headX = 0, headY = 0, segX = 0, segY = 0, onHead = false, onSeg = false;
   try {
@@ -8546,6 +8753,7 @@ function drawInterpolated(){
       gh.out[0] = gx; gh.out[1] = gy;
       if (gSlot >= 0){ gh.trail[gSlot] = gtx; gh.trail[gSlot + 1] = gty; }
     }
+    ringDepthHold = false;
   }
 }
 // Endless (B3): the same clock and log as the Daily. A run is its seed, its flags and its input log.
@@ -9042,10 +9250,12 @@ function duelOutcome(you){
   return you > them ? 'won' : you < them ? 'lost' : 'tied';
 }
 // How a run ended, in the small sentence-case words the results announcement uses (and a duel card's name line).
-function runEndCause(reason){
+// F6: beside a duel's outcome (outcome set) the void is told neutrally ("Ended in the void"), so "DUEL WON" never
+// sits on a line that reads as a loss; the race result and the way the run ended stay separate.
+function runEndCause(reason, outcome){
   return reason === 'wall' ? t('announce.leftPlayfield') :
     reason === 'duel' || (reason === 'daily' && duelActive) ? t('announce.sprintOver') :
-    reason === 'daily' ? t('announce.dailyComplete') : t('announce.caughtByVoid');
+    reason === 'daily' ? t('announce.dailyComplete') : outcome ? t('results.cause.void') : t('announce.caughtByVoid');
 }
 function duelResultLine(you){
   const rival = duelIncoming.rival;
@@ -9274,6 +9484,7 @@ function prepareDuelExtras(){
 // duelHoldsStart); a duel of your own (Duel a friend) has no rival, and a frame that fails here races solo.
 function startDuelGhost(){
   duelLead = null;
+  leadTapeReset(); // F8
   duelRaceRival = null;
   for (const x of duelExtras) x.gh = null; // no extra keeps stepping a previous run
   const inst = duelGhostInst, inc = duelIncoming;
@@ -9317,6 +9528,7 @@ function duelLeadTick(){
   if (!L || !gh || !gh.duel || state !== 'playing') return;
   L.lead = score - gh.out[3];
   duelMomentNote(L, L.lead, time, gh.n);
+  leadTapeNote(gh, L); // F8
   const ahead = L.lead > 0 ? true : L.lead < 0 ? false : L.ahead;
   if (L.ahead === false && ahead === true){
     L.overtakes++;
@@ -9350,6 +9562,7 @@ function duelMomentFinish(you){
   const gh = duelRaceRival, L = duelLead;
   if (!L || !gh || !gh.duel || L.end) return;
   duelMomentNote(L, you - gh.out[3], time, gh.n);
+  leadTapeNote(gh, L); // F8
   L.end = { t: time, n: gh.n };
   // A ghost that stopped short of its record (diverged, or its sim threw) left a partial score: no moment is true.
   L.broken = !!(gh.diverged || (gh.dead && gh.out[3] !== gh.rec.score));
@@ -9534,7 +9747,7 @@ function loadDailyGhost(){
 }
 function newDailyGhostState(rec, api, frame){
   return { rec, frame, api, n: 0, ei: 0, dead: false, diverged: false, fadeAt: 0,
-    out: new Float64Array(6), trail: new Float64Array(DAILY_GHOST_TRAIL * 2), tn: 0 };
+    out: new Float64Array(6), trail: new Float64Array(GHOST_TRAIL_CAP * 2), tn: 0 };
 }
 // Applies this step's recorded inputs, then runs the ghost one step. The same order the live run used.
 function ghostStepOnce(gh){
@@ -9549,7 +9762,7 @@ function ghostStepOnce(gh){
   const alive = gh.api.step(DAILY_STEP);
   gh.n++;
   gh.api.read(gh.out);
-  const slot = (gh.tn % DAILY_GHOST_TRAIL) * 2;
+  const slot = (gh.tn % (gh.trail.length >> 1)) * 2;
   gh.trail[slot] = gh.out[0]; gh.trail[slot + 1] = gh.out[1];
   gh.tn++;
   if (!alive) gh.dead = true;
@@ -9622,13 +9835,16 @@ function stopDailyGhost(){
   dailyGhost = null;
   syncDailyGhostLabel();
 }
+// F1: a duel's rival wears its name tag on the canvas, next to its comet (drawRivalTag), so the fixed HUD label is
+// the Daily ghost's only. The tag's text is built here, once per ghost and language, never per frame.
 function syncDailyGhostLabel(){
+  const gh = dailyGhost;
+  const nick = gh && gh.duel ? duelNickName(gh.rec.nick) : '';
+  rivalTagText = gh && gh.duel ? t('duel.ghostLabel', { name: nick, score: formatScore(gh.rec.score) }) : '';
   const el = document.getElementById('ghostLabel');
   if (!el) return;
-  const gh = dailyGhost;
-  if (gh && (ghostShow || gh.duel)){
-    const text = gh.duel ? t('duel.ghostLabel', { name: duelNickName(gh.rec.nick), score: formatScore(gh.rec.score) })
-      : t('ghost.label', { score: Number(gh.rec.score).toLocaleString('en-US') });
+  if (gh && !gh.duel && ghostShow){
+    const text = t('ghost.label', { score: Number(gh.rec.score).toLocaleString('en-US') });
     if (el.textContent !== text) el.textContent = text;
     el.hidden = false;
   } else {
@@ -9638,26 +9854,173 @@ function syncDailyGhostLabel(){
 }
 // Presentation only: reads the ghost's numbers and draws them. Calls nothing that changes the sim.
 function drawDailyGhost(){
-  for (let i = 0; i < duelExtras.length; i++){ const x = duelExtras[i]; if (x.gh) drawGhostComet(x.gh, x.color); } // B6: the chain's ghosts, under the rival (no per-frame allocation)
+  for (let i = 0; i < duelExtras.length; i++){ const x = duelExtras[i]; if (x.gh) drawGhostComet(x.gh, x.color, 'extra'); } // B6: the chain's ghosts, under the rival (no per-frame allocation)
   const gh = dailyGhost;
   if (!gh || !(ghostShow || gh.duel)) return; // a duel's rival always shows: racing it is the point
-  if (drawGhostComet(gh, gh.duel ? '#FFD2A8' : '#BFD6FF') === false) stopDailyGhost();
+  if (drawGhostComet(gh, gh.duel ? RIVAL_GHOST.color : '#BFD6FF', gh.duel ? 'rival' : '') === false) stopDailyGhost();
 }
-// One ghost comet and its trail. Returns false once its fade-out has finished.
-function drawGhostComet(gh, ghostColor){
+// F1: the duel rival's look. A hue nothing else in the game uses (lime; tests/rival-ghost-f1.test.cjs checks every
+// colour in the page and the contrast on every sky, Harvest and Winter included), a hollow head with a dark keyline,
+// a half-second comet tail and a name tag that follows it (drawRivalTag). Group racers keep their own colours and
+// dot trails, and the Daily ghost (your own past run) is unchanged, so the rival is the one that stands out.
+// Presentation only: it reads the checked replay's positions and the lead meter, and writes nothing they read.
+const RIVAL_GHOST = Object.freeze({
+  color: '#A8FF60', ink: '#120E2E', alpha: 0.9, tailSec: 0.5, tailSegs: 16, head: 8, ring: 2.5,
+  tagPx: 12, tagPad: 6, tagGap: 10, marker: 5, shrinkMs: 220, topCss: 132, edgeTopCss: 10, bottomCss: 64, sideCss: 8
+});
+let rivalTagText = '';   // "{name}: {score}" for the racing rival, built in syncDailyGhostLabel
+let rivalTagFont = '', rivalTagFontPx = 0, rivalTagMeasured = '', rivalTagW = 0; // memo: measured once per text and size
+let rivalTagK = 1;       // 1: the full name tag; 0: the small marker it shrinks to while you lead (it never vanishes)
+let rivalTagAt = -1;     // performance.now() of the last tag frame (-1: the next frame snaps)
+// The ghost's opacity factor from its fade-out: 1 while racing, falling to 0 over DAILY_GHOST_FADE_MS.
+function ghostFadeLeft(gh){
+  if (!gh.fadeAt) return 1;
+  return Math.max(0, 1 - (performance.now() - gh.fadeAt) / DAILY_GHOST_FADE_MS);
+}
+// One ghost comet and its trail. Returns false once its fade-out has finished. kind: 'rival' for a duel's
+// received rival (F1), 'extra' for a Group racer, '' for the Daily ghost.
+function drawGhostComet(gh, ghostColor, kind){
   if (!gh.fadeAt && state !== 'playing') gh.fadeAt = performance.now(); // the live run sealed or ended
-  let alpha = 0.42;
-  if (gh.fadeAt){
-    const left = 1 - (performance.now() - gh.fadeAt) / DAILY_GHOST_FADE_MS;
-    if (left <= 0) return false;
-    alpha *= left;
-  }
-  paintGhost(ctx, gh, ghostColor, alpha, simpleGhosts ? null : premiumActive('ghost'), ghostProximityGlow(gh));
+  const left = ghostFadeLeft(gh);
+  if (gh.fadeAt && left <= 0) return false;
+  const alpha = (kind === 'rival' ? RIVAL_GHOST.alpha : 0.42) * left;
+  paintGhost(ctx, gh, ghostColor, alpha, simpleGhosts ? null : premiumActive('ghost'), ghostProximityGlow(gh), kind || '');
   // A rival's premium skin (duel link format 2) rides on their ghost, in the ghost's fade. The ghost keeps its
-  // own colour, so who is who still reads; Simple rival ghosts leaves it off.
+  // own colour, so who is who still reads; Simple rival ghosts leaves it off. It keeps its quiet 0.42 opacity.
   const lookId = gh.duel && gh.rec && !simpleGhosts ? DUEL_LOOKS[gh.rec.look | 0] : '';
-  if (lookId && PREMIUM_COMET_INK[lookId]) paintPremiumCometAccent(ctx, lookId, gh.out[0], gh.out[1], premiumSpin(), alpha);
+  if (lookId && PREMIUM_COMET_INK[lookId]) paintPremiumCometAccent(ctx, lookId, gh.out[0], gh.out[1], premiumSpin(), 0.42 * left);
   return true;
+}
+// F1: true while you lead the race (the lead meter's own same-step reading). The tag then shrinks to a marker.
+function rivalTagLeading(){
+  return !!(duelLead && duelLead.ahead === true && dailyGhost && dailyGhost === duelRaceRival);
+}
+// F1: the rival's name tag, drawn in screen space after the camera so its text keeps one size. It sits above the
+// rival's head and follows it; at the playfield's edge it stays on screen and its pointer turns toward the rival
+// (up when the rival is above the HUD band), so it never leaves the screen while the rival races. Off the playfield
+// entirely it is an edge marker instead (drawRivalEdge, Panel 16). While you lead
+// it shrinks to a small marker, and it grows back when you fall behind or level. Reduce Motion: it switches at
+// once (no shrink animation) and nothing pulses. view is the camera (the fitted or led view) or null for the
+// plain camera at displayY. No allocation on a steady frame (the font and width are memoised).
+function drawRivalTag(view, displayY){
+  const gh = dailyGhost;
+  if (!gh || !gh.duel || !rivalTagText){ rivalTagAt = -1; return; }
+  const fade = ghostFadeLeft(gh);
+  if (!(fade > 0)) return;
+  const R = RIVAL_GHOST;
+  const target = rivalTagLeading() ? 0 : 1;
+  const now = performance.now();
+  if (reducedMotion || rivalTagAt < 0) rivalTagK = target;
+  else {
+    const stepK = Math.max(0, now - rivalTagAt) / R.shrinkMs;
+    rivalTagK = target > rivalTagK ? Math.min(target, rivalTagK + stepK) : Math.max(target, rivalTagK - stepK);
+  }
+  rivalTagAt = now;
+  const scale = view ? view.scale : 1;
+  // F10: the world is drawn shifted by the next-planet lean, so the tag follows the comet it labels.
+  const leanO = nextLeanOffset(now);
+  const hx = (view ? view.tx + scale * gh.out[0] : gh.out[0]) - scale * leanO.x;
+  const hy = (view ? view.ty + scale * gh.out[1] : gh.out[1] - displayY) - scale * leanO.y;
+  const vs = viewScale > 0 ? viewScale : 1;
+  // The HUD (#gameUI) sits on the playfield, not the window: on a tall phone a duel's fixed H leaves a letterbox
+  // (viewY) above it, so the bounds are measured from the playfield's top. The pinned tag also stays under the
+  // HUD's measured bottom (score, combo, clock and lead lines), read only on frames where it could reach it.
+  let top = R.topCss / vs;
+  const bottom = H - R.bottomCss / vs, side = R.sideCss / vs;
+  const px = Math.round(Math.max(R.tagPx, R.tagPx / vs)); // never smaller than 12 CSS px on a small screen
+  if (px !== rivalTagFontPx){ rivalTagFontPx = px; rivalTagFont = '700 ' + px + 'px "Space Grotesk", ui-sans-serif, system-ui, sans-serif'; rivalTagMeasured = ''; }
+  ctx.save();
+  ctx.font = rivalTagFont;
+  if (rivalTagMeasured !== rivalTagText){ rivalTagMeasured = rivalTagText; rivalTagW = ctx.measureText(rivalTagText).width; }
+  const k = rivalTagK;
+  const th = (px + 8) * (0.5 + 0.5 * k);                     // the pill's height: a full tag, or a marker-sized chip
+  const w = Math.max(th, (rivalTagW + 2 * R.tagPad / vs) * k); // the text's room shrinks away with k
+  const lift = (R.head + 3) * scale + R.tagGap / vs + th / 2;
+  let cx = hx, cy = hy - lift;
+  if (cy - th / 2 < top + H * 0.25){
+    const hud = document.getElementById('hud');
+    const rect = hud && !hud.hidden ? hud.getBoundingClientRect() : null;
+    if (rect && Number.isFinite(rect.bottom) && rect.bottom > viewY) top = Math.max(top, (rect.bottom - viewY) / vs + R.tagGap / vs);
+  }
+  // Panel 16 (M2): off the playfield (the head above its top or below its bottom) the rival is marked at the edge,
+  // not with the pinned name tag. Above, it sits on the playfield's top edge, or under the HUD where HUD text is in its way.
+  if (hy < 0 || hy > H){ drawRivalEdge(hx, hy < 0, R.edgeTopCss / vs, top, bottom, px, fade, vs, now); ctx.restore(); return; }
+  cx = Math.max(side + w / 2, Math.min(W - side - w / 2, cx));
+  const minY = top + th / 2, maxY = bottom - th / 2;
+  const above = cy < minY;
+  cy = above ? minY : cy > maxY ? maxY : cy;
+  // The pill: dark ink with a rival-hue keyline, so it reads on every sky.
+  const x0 = cx - w / 2, y0 = cy - th / 2, rr = th / 2;
+  ctx.globalAlpha = 0.88 * fade;
+  ctx.fillStyle = R.ink;
+  ctx.beginPath();
+  ctx.moveTo(x0 + rr, y0); ctx.lineTo(x0 + w - rr, y0); ctx.arc(x0 + w - rr, cy, rr, -Math.PI / 2, Math.PI / 2);
+  ctx.lineTo(x0 + rr, y0 + th); ctx.arc(x0 + rr, cy, rr, Math.PI / 2, Math.PI * 1.5);
+  ctx.fill();
+  ctx.globalAlpha = fade;
+  ctx.strokeStyle = R.color; ctx.lineWidth = 1.5 / vs;
+  ctx.stroke();
+  // The pointer: toward the rival (down at it, or up when it has gone above the HUD band).
+  const m = R.marker / vs, up = above && hy < cy;
+  const tipY = up ? y0 - m * 1.2 : y0 + th + m * 1.2, baseY = up ? y0 : y0 + th;
+  const tipX = Math.max(x0 + rr, Math.min(x0 + w - rr, hx));
+  ctx.fillStyle = R.color;
+  ctx.beginPath(); ctx.moveTo(tipX - m, baseY); ctx.lineTo(tipX + m, baseY); ctx.lineTo(tipX, tipY); ctx.closePath(); ctx.fill();
+  if (k > 0.35){
+    ctx.globalAlpha = fade * Math.min(1, (k - 0.35) / 0.4);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(rivalTagText, cx, cy);
+  } else {
+    // The marker: a hollow ring in the rival's hue, its head in miniature (a shape cue, not only a colour).
+    ctx.lineWidth = 1.5 / vs;
+    ctx.beginPath(); ctx.arc(cx, cy, th * 0.26, 0, Math.PI * 2); ctx.stroke();
+  }
+  ctx.restore();
+}
+// Panel 16 (M2): the off-screen rival's edge marker: a lime chevron flush on the playfield's edge at the rival's x
+// (clamped to the side margins), over a soft lime glow cap that grows out of the edge, pointing off the screen toward the
+// rival. No text and no pill (Panel 18: any label near the edge read as a planet's name): it is the screen edge lit up
+// where the rival is. Above, it sits on the top edge (RIVAL_GHOST.edgeTopCss; the playfield already starts below the
+// safe area), dropping under the HUD's bottom only where a line of HUD text would overlap it (Panel 17: the HUD box
+// spans the full width, so its text is measured); below, on the bottom edge. The gap stays the lead meter's line.
+// No shrink, no pulse, no animation, so Reduce Motion changes nothing here. Presentation only, no allocation.
+// The HUD's text boxes in canvas px, re-measured at most every RIVAL_EDGE_HUD_MS while the marker shows (a Range
+// over the HUD's contents gives one box per line of text; without Range, the HUD box itself).
+const RIVAL_EDGE_HUD_MS = 250;
+let rivalEdgeHudAt = -Infinity, rivalEdgeHud = [];
+function rivalEdgeHudBoxes(now, vs){
+  if (now - rivalEdgeHudAt < RIVAL_EDGE_HUD_MS && now >= rivalEdgeHudAt) return rivalEdgeHud;
+  rivalEdgeHudAt = now; rivalEdgeHud = [];
+  const hud = document.getElementById('hud');
+  if (!hud || hud.hidden) return rivalEdgeHud;
+  let rects = null;
+  if (typeof document.createRange === 'function'){ const r = document.createRange(); r.selectNodeContents(hud); rects = r.getClientRects(); }
+  else rects = [hud.getBoundingClientRect()];
+  for (const b of rects){
+    if (!b || !(b.right > b.left) || !(b.bottom > b.top)) continue;
+    rivalEdgeHud.push({ l: (b.left - viewX) / vs, t: (b.top - viewY) / vs, r: (b.right - viewX) / vs, b: (b.bottom - viewY) / vs });
+  }
+  return rivalEdgeHud;
+}
+function drawRivalEdge(hx, above, topEdge, hudTop, bottom, px, fade, vs, now){
+  const R = RIVAL_GHOST, side = R.sideCss / vs;
+  const cw = px * 0.8, ch = px * 0.5, gr = cw * 2.2;       // chevron half-width and height, glow cap radius
+  const cx = Math.max(side + gr, Math.min(W - side - gr, hx));
+  let ey = bottom;                                         // the edge the marker grows from
+  if (above){
+    ey = topEdge;
+    for (const b of rivalEdgeHudBoxes(now, vs)) if (b.r > cx - gr && b.l < cx + gr && b.b > ey && b.t < ey + gr){ ey = hudTop; break; }
+  }
+  const d = above ? 1 : -1;                                // into the playfield
+  // The glow cap: a circle centred beyond the edge, so only a shallow cap shows inside.
+  ctx.globalAlpha = 0.22 * fade;
+  ctx.fillStyle = R.color;
+  ctx.beginPath(); ctx.arc(cx, ey - d * gr * 0.45, gr, 0, Math.PI * 2); ctx.fill();
+  // The chevron: its tip at the edge, its arms reaching into the playfield.
+  const tipY = ey + d * 2 / vs, armY = tipY + d * ch;
+  ctx.globalAlpha = fade;
+  ctx.strokeStyle = R.color; ctx.lineWidth = 3 / vs; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.beginPath(); ctx.moveTo(cx - cw, armY); ctx.lineTo(cx, tipY); ctx.lineTo(cx + cw, armY); ctx.stroke();
 }
 // D2b: a racing rival's head brightens while it is close to your comet. 0 at GHOST_GLOW_FAR world px or more,
 // rising smoothly (smoothstep) to 1 at GHOST_GLOW_NEAR (the two heads overlapping). It reads only the checked
@@ -9681,17 +10044,39 @@ function ghostProximityGlow(gh){
 // glow (D2b, 0..1) brightens the head only, the same in every style: more opacity, and with motion a larger core
 // and halo. Reduce Motion keeps the head's size and has no halo, so the glow there is an opacity change only
 // (allowed by the Reduce Motion policy); neither version ever pulses with time.
-function paintGhost(g, gh, ghostColor, alpha, style, glow){
+// kind (F1): 'rival' draws the duel rival's comet (see RIVAL_GHOST): with no premium style a half-second tapering
+// tail instead of the dots, and always a hollow head with a dark keyline and no standing halo (it glows only when
+// lit). 'extra' (a Group racer) is the standard ghost without the standing halo, so the screen keeps at most two
+// glowing things. The trail is a ring buffer: its size is the ghost's own (trail.length / 2).
+function paintGhost(g, gh, ghostColor, alpha, style, glow, kind){
   const reduce = reducedMotion;
-  const count = Math.min(gh.tn, DAILY_GHOST_TRAIL);
+  const cap = gh.trail.length >> 1;
+  const count = Math.min(gh.tn, DAILY_GHOST_TRAIL, cap);
+  const rival = kind === 'rival';
   g.save();
   g.fillStyle = ghostColor;
   g.strokeStyle = ghostColor;
-  if (style === 'g-wisp'){
+  if (rival && !style){
+    // F1: the comet tail. Half a second of the replay's own positions, in tailSegs tapering strokes (thin and
+    // faint at the tail). No flicker, so Reduce Motion draws the same still silhouette.
+    const n = Math.min(gh.tn, cap - 1, Math.round(RIVAL_GHOST.tailSec / simStep()) + 1);
+    const stride = Math.max(1, Math.ceil((n - 1) / RIVAL_GHOST.tailSegs));
+    g.lineCap = 'round';
+    for (let i = stride; i < n; i += stride){
+      const k0 = (gh.tn - n + i - stride) % cap, k1 = (gh.tn - n + i) % cap;
+      const x0 = gh.trail[k0 * 2], y0 = gh.trail[k0 * 2 + 1], x1 = gh.trail[k1 * 2], y1 = gh.trail[k1 * 2 + 1];
+      const dx = x1 - x0, dy = y1 - y0;
+      if (dx * dx + dy * dy > 6400) continue; // never draw a bar across a jump
+      const age = i / n;
+      g.globalAlpha = alpha * 0.6 * age;
+      g.lineWidth = 1 + 6 * age;
+      g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+    }
+  } else if (style === 'g-wisp'){
     // One tapering stroke through the trail: thin and faint at the tail.
     g.lineCap = 'round';
     for (let i = 1; i < count; i++){
-      const k0 = (gh.tn - count + i - 1) % DAILY_GHOST_TRAIL, k1 = (gh.tn - count + i) % DAILY_GHOST_TRAIL;
+      const k0 = (gh.tn - count + i - 1) % cap, k1 = (gh.tn - count + i) % cap;
       const x0 = gh.trail[k0 * 2], y0 = gh.trail[k0 * 2 + 1], x1 = gh.trail[k1 * 2], y1 = gh.trail[k1 * 2 + 1];
       const dx = x1 - x0, dy = y1 - y0;
       if (dx * dx + dy * dy > 6400) continue; // never draw a bar across a jump
@@ -9703,7 +10088,7 @@ function paintGhost(g, gh, ghostColor, alpha, style, glow){
   } else if (style === 'g-prism'){
     // Diamonds that grow toward the head.
     for (let i = 0; i < count; i++){
-      const k = (gh.tn - count + i) % DAILY_GHOST_TRAIL;
+      const k = (gh.tn - count + i) % cap;
       const age = (i + 1) / (count + 1);
       g.globalAlpha = alpha * 0.45 * age;
       paintConstellationMark(g, gh.trail[k * 2], gh.trail[k * 2 + 1], 2 + 4.5 * age);
@@ -9712,14 +10097,14 @@ function paintGhost(g, gh, ghostColor, alpha, style, glow){
     // Hollow rings, every other point, widening as they fall behind like ripples.
     g.lineWidth = 1.3;
     for (let i = count % 2; i < count; i += 2){
-      const k = (gh.tn - count + i) % DAILY_GHOST_TRAIL;
+      const k = (gh.tn - count + i) % cap;
       const age = (i + 1) / (count + 1);
       g.globalAlpha = alpha * 0.55 * age;
       g.beginPath(); g.arc(gh.trail[k * 2], gh.trail[k * 2 + 1], 3 + 7 * (1 - age), 0, Math.PI * 2); g.stroke();
     }
   } else {
     for (let i = 0; i < count; i++){
-      const k = (gh.tn - count + i) % DAILY_GHOST_TRAIL;
+      const k = (gh.tn - count + i) % cap;
       const age = (i + 1) / (count + 1);
       // Reduced Motion: the trail holds still (no flicker).
       const flicker = reduce ? 1 : 0.8 + 0.2 * Math.sin(time * 11 + k * 1.7);
@@ -9730,8 +10115,28 @@ function paintGhost(g, gh, ghostColor, alpha, style, glow){
   const lit = glow > 0 ? Math.min(glow, 1) : 0;
   const headAlpha = lit ? Math.min(1, alpha * (1 + 1.2 * lit)) : alpha;
   g.globalAlpha = headAlpha;
+  if (rival){
+    // F1: the hollow head. A dark keyline under a rival-hue ring reads on bright and dark skies alike.
+    const r = reduce ? RIVAL_GHOST.head : RIVAL_GHOST.head + 2 * lit;
+    g.lineWidth = RIVAL_GHOST.ring + 2.5;
+    g.strokeStyle = RIVAL_GHOST.ink;
+    g.beginPath(); g.arc(gh.out[0], gh.out[1], r, 0, Math.PI * 2); g.stroke();
+    g.strokeStyle = ghostColor;
+    g.shadowColor = ghostColor;
+    g.shadowBlur = reduce ? 0 : 14 * lit; // a halo only while lit (D2b), never standing
+    g.lineWidth = reduce ? RIVAL_GHOST.ring : RIVAL_GHOST.ring + lit;
+    g.beginPath(); g.arc(gh.out[0], gh.out[1], r, 0, Math.PI * 2); g.stroke();
+    g.shadowBlur = 0;
+    if (lit){
+      g.globalAlpha = headAlpha * 0.85 * lit;
+      g.fillStyle = '#FFFFFF';
+      g.beginPath(); g.arc(gh.out[0], gh.out[1], 3.5, 0, Math.PI * 2); g.fill();
+    }
+    g.restore();
+    return;
+  }
   g.shadowColor = ghostColor;
-  g.shadowBlur = reduce ? 0 : 12 + 14 * lit;
+  g.shadowBlur = reduce ? 0 : kind === 'extra' ? 14 * lit : 12 + 14 * lit;
   g.beginPath(); g.arc(gh.out[0], gh.out[1], reduce ? 7 : 7 + 2 * lit, 0, Math.PI * 2); g.fill();
   g.shadowBlur = 0;
   g.lineWidth = reduce ? 1.5 : 1.5 + lit; // Reduce Motion: the ring keeps its width (opacity only)
@@ -9892,10 +10297,134 @@ function applyComboHud(){
   node.style.opacity = opacity < 0.999 ? String(Math.round(opacity * 1000) / 1000) : '';
   syncOverdrive(state === 'playing' && combo >= 12);
 }
+// F4: the squash at elapsedMs of wall time after a PERFECT (null once flat). Ease out: deepest at the catch.
+function perfectLandScale(elapsedMs){
+  const e = Number(elapsedMs);
+  if (!Number.isFinite(e) || e < 0 || e >= PERFECT_LAND.ms) return null;
+  const k = (1 - e / PERFECT_LAND.ms) * (1 - e / PERFECT_LAND.ms);
+  return { along: 1 - PERFECT_LAND.squash * k, across: 1 + PERFECT_LAND.bulge * k };
+}
+// What the planet draw shows for planet p at wall time now: { scale, axis } or { mark, from }, or null.
+function perfectLandView(p, now){
+  const land = perfectLand;
+  if (!land || !p || land.id !== p.id || state !== 'playing') return null;
+  const e = now - land.at;
+  if (reducedMotion) return e >= 0 && e < PERFECT_LAND.markMs ? { mark: true, from: land.from } : null;
+  const scale = perfectLandScale(e);
+  return scale ? { scale, axis: land.axis } : null;
+}
+// Reduce Motion: a still arc on the rim, centred where the comet came in. No glow, no growth, no fade.
+function drawPerfectMark(p, from){
+  ctx.save();
+  ctx.shadowBlur = 0;
+  ctx.setLineDash([]);
+  ctx.globalAlpha = PERFECT_LAND.markAlpha;
+  ctx.strokeStyle = '#F7FCFF';
+  ctx.lineWidth = PERFECT_LAND.markWidth;
+  ctx.lineCap = 'round';
+  const r = p.r + PERFECT_LAND.markGap, half = PERFECT_LAND.markArc / 2;
+  ctx.beginPath(); ctx.arc(p.x, p.y, r, from - half, from + half); ctx.stroke();
+  ctx.restore();
+}
+// F2: eligible only for an ordinary ranked Endless run with a saved best above 0 (never a first-ever run), and never
+// in the Daily, a duel, a Checkpoint run, the Daily ghost frame or an endless replay.
+function armNewBest(){
+  let ghost = false, replaying = false;
+  try { ghost = !!window.__ghostMode; } catch (_) {}
+  try { replaying = !!endlessReplaying; } catch (_) {} // declared further down the script
+  const eligible = !dailyActive && !duelActive && !checkpointActive && !ghost && !endlessReplayNext && !replaying &&
+    runIsRanked() && bestSaved && cleanScore(best) > 0;
+  newBestFrom = eligible ? cleanScore(best) : 0;
+  newBestAt = -1;
+  newBestShown = false;
+  for (const id of ['best', 'score']){
+    const node = document.getElementById(id);
+    if (node){ node.removeAttribute('data-new-best'); node.removeAttribute('data-flourish'); }
+  }
+}
+// Reads the score exactly as the HUD prints it (cleanScore, as formatScore does). Called from syncHud.
+// The label is data-new-best on #best (drawn under the BEST line by CSS; #score's copy is the compact HUD's), so setting
+// it never moves the score column. Allocation-free per call (hud-alloc): the DOM is touched only when it changes.
+let newBestShown = false;
+function setNewBestLabel(id, text){
+  const n = document.getElementById(id);
+  if (!n) return;
+  if (text === null) n.removeAttribute('data-new-best'); else n.setAttribute('data-new-best', text);
+}
+function setNewBestFlourish(id, on){
+  const n = document.getElementById(id);
+  if (!n) return;
+  if (on) n.setAttribute('data-flourish', '1'); else n.removeAttribute('data-flourish');
+}
+function syncNewBestHud(){
+  if (newBestAt < 0 && newBestFrom > 0 && state === 'playing' && cleanScore(score) > newBestFrom){
+    newBestAt = time;
+    // The pop on both copies (#best's, and #score's in the compact HUD); none under Reduce Motion or Reduced effects.
+    const pop = !reducedMotion && !reducedEffects;
+    setNewBestFlourish('best', pop);
+    setNewBestFlourish('score', pop);
+    newBestNote();
+    announce(t('announce.newBest')); // once, the same with or without Reduce Motion
+  }
+  const show = newBestAt >= 0 && state === 'playing' && time - newBestAt < NEW_BEST_HUD.hold;
+  if (show === newBestShown) return;
+  newBestShown = show;
+  const text = show ? t('results.newBest') : null;
+  setNewBestLabel('best', text);
+  setNewBestLabel('score', text);
+}
+// One rising note on the music grid (the next beat), in the song's key: the catch melody's fifth gliding up to its
+// octave, on the music bus. It follows the Music switch like the rest of the music: no track, no note.
+const newBestStats = { notes: 0 };
+function newBestNote(){
+  if (!musicOn || !musicTrack || !musicAc || !musicGain || !MUSIC[musicTrack]) return;
+  const def = MUSIC[musicTrack], N = NEW_BEST_HUD;
+  try {
+    const ac = musicAc, at = musicNextBeat(def, ac.currentTime);
+    const f0 = musicFreq(def, def.melodyRoot + N.from), f1 = musicFreq(def, def.melodyRoot + N.to);
+    const osc = ac.createOscillator(), gain = ac.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(f0, at);
+    gain.gain.setValueAtTime(0, at);
+    gain.gain.linearRampToValueAtTime(N.peak, at + N.attack);
+    gain.gain.linearRampToValueAtTime(0, at + N.glide + N.decay);
+    osc.connect(gain); gain.connect(musicGain);
+    osc.start(at);
+    osc.stop(at + N.glide + N.decay + 0.02);
+    newBestStats.notes++;
+    osc.frequency.exponentialRampToValueAtTime(f1, at + N.glide); // last: a stack without it still plays the note
+  } catch (e) {}
+}
+// F9 calm HUD. During play the top-left keeps the score and combo, a duel's clock and lead, and the void warning.
+// The two hints teach a new player and then retire: the ring hint ("tap while inside the glow") for the first
+// CALM_HUD.ringRuns finished runs, and "combo bonus fades" for the first CALM_HUD.decayRuns runs in which it showed.
+// Both counts are read once at the run's start (calmHudArm), so a hint never vanishes mid-run. Presentation only.
+const CALM_HUD = Object.freeze({ ringRuns: 3, decayRuns: 3, noteSecs: 4 });
+const DECAY_HINT_KEY = 'zipwaltz-decay-hint-runs';
+let calmRingLearning = true, calmDecayLearning = true, calmDecayNoted = false;
+function calmHudArm(){
+  let ghost = false;
+  try { ghost = !!window.__ghostMode; } catch (_) {}
+  const runs = readStoredNumber(RUNS_KEY), seen = readStoredNumber(DECAY_HINT_KEY);
+  calmRingLearning = (runs === null ? 0 : runs) < CALM_HUD.ringRuns;
+  calmDecayLearning = (seen === null ? 0 : seen) < CALM_HUD.decayRuns;
+  calmDecayNoted = ghost; // the ghost frame never counts a showing
+}
+function calmHintShows(decay){ return decay ? calmDecayLearning : calmRingLearning; }
+function noteDecayHintShown(){
+  if (calmDecayNoted) return;
+  calmDecayNoted = true;
+  let replaying = false;
+  try { replaying = !!endlessReplaying; } catch (_) {}
+  if (replaying) return;
+  const seen = readStoredNumber(DECAY_HINT_KEY);
+  writeStoredNumber(DECAY_HINT_KEY, Math.min(1000, (seen === null ? 0 : Math.floor(seen)) + 1));
+}
 function syncHud(){
   syncDuelClock();
   syncDuelLead();
   setHudText('score', formatScore(score));
+  syncNewBestHud();
   setHudText('combo', combo > 1 ? hudKeyed('combo', 'hud.combo', 'n', combo) : '');
   applyComboHud();
   if (duelActive){
@@ -9911,15 +10440,23 @@ function syncHud(){
   setHudText('height', hudKeyed('height', 'hud.height', 'score', formatScore(player.bestAlt || 0)));
   // Short cue while the combo-decay clock is visible; otherwise keep the catch-ring reminder.
   const showDecay = state === 'playing' && player && player.mode === 'orbit' && combo > 1;
-  setHudText('hint', tl(showDecay ? 'combo bonus fades' : 'dashed ring catches'));
+  setHudText('hint', tl(showDecay ? 'combo bonus fades' : 'tap while inside the glow'));
   // T1d (Panels 12/12b): during the tutorial the HUD keeps only the score; the height and hint lines wait.
   const calm = !!tutorial;
+  // F6: while the inline arc label ("tap when the comet is in the glow") teaches the first orbit, the HUD's ring
+  // hint would repeat it, so only the label shows; the hint returns with the first launch.
+  // F9 calm HUD: each hint teaches only while the player is still learning it (calmHintShows), then retires.
+  const quietHint = calm || (state === 'playing' && arcLabelShows()) || !calmHintShows(showDecay);
   const heightEl = document.getElementById('height'), hintEl = document.getElementById('hint'); // no per-call array
-  if (heightEl && heightEl.hidden !== calm) heightEl.hidden = calm;
-  if (hintEl && hintEl.hidden !== calm) hintEl.hidden = calm;
+  // F9: the height line is not something to act on mid-run; it is on the results card ("height points").
+  if (heightEl && heightEl.hidden !== true) heightEl.hidden = true;
+  if (hintEl && hintEl.hidden !== quietHint) hintEl.hidden = quietHint;
+  if (!quietHint && showDecay) noteDecayHintShown();
   const runNote = document.getElementById('checkpointHud');
   if (runNote){
-    const show = checkpointActive && state === 'playing';
+    // F9: the checkpoint note shows as the run starts, then leaves the play HUD (the BEST line and the results card
+    // keep saying it is a checkpoint run).
+    const show = checkpointActive && state === 'playing' && time < CALM_HUD.noteSecs;
     runNote.hidden = !show;
     if (show && runNote.textContent !== tl(CHECKPOINT.label)) runNote.textContent = tl(CHECKPOINT.label);
   }
@@ -10074,6 +10611,7 @@ function showResults(reason){
   document.getElementById('nextGoal').textContent = duelActive && duelIncoming ? duelResultLine(death.score) + (moment ? '\n' + moment : '')
     : duelActive && duelReplyLink() ? t('duel.send') : resultsNextGoal(death.score, shownBest); // B4d: only when Share has a link
   syncRetryLabel();
+  syncLeadReplayButton(); // F8
   document.getElementById('resultDetails').open = false;
   const dailyFront = document.getElementById('dailyFront');
   dailyFront.hidden = !dailyActive;
@@ -10120,7 +10658,7 @@ function showResults(reason){
   note.hidden = !checkpointActive;
   if (checkpointActive) note.textContent = tl(CHECKPOINT.label);
   // Panel 13: on a received duel's card the name line says how the run ended (the constellation name read as noise there).
-  document.getElementById('constellationName').textContent = outcome ? runEndCause(reason) : constellationLabel();
+  document.getElementById('constellationName').textContent = outcome ? runEndCause(reason, outcome) : constellationLabel();
   if (outcome) document.getElementById('songTail').hidden = true;
   syncBestLabel();
   armConstellationReveal();
@@ -11032,7 +11570,7 @@ function showConstellationResults(){
 function resultsAnnouncement(){
   // It says what the card's headline and name line say: a received duel's outcome, then how the run ended.
   const outcome = death ? duelOutcome(death.score) : '';
-  const cause = runEndCause(death && death.reason);
+  const cause = runEndCause(death && death.reason, outcome);
   const reason = outcome ? t(outcome === 'won' ? 'announce.duelWon' : outcome === 'lost' ? 'announce.duelLost' : 'announce.duelTied') + '. ' + cause : cause;
   const scoreLabel = document.getElementById('finalScore').getAttribute('aria-label') || '';
   const goal = (document.getElementById('nextGoal').textContent || '').replace(/\n/g, '. '); // C14: the moment line
@@ -11252,6 +11790,7 @@ function songGridOrigin(ctx, grid){
 function startSongReplay(seconds){
   cancelSongReplay();
   cutRoomTail(); // D5: every replay starts in a silent room, so it sounds the same each time
+  cancelLeadReplay(); // F8: one replay in the box at a time
   if (!songEvents.length) return; // no catches, no song: the card keeps its static picture
   const bpm = (MUSIC[songTrack] || MUSIC.rocky).bpm;
   const plan = songTimeline(songEvents, bpm, seconds > 0 ? seconds : SONG.maxSeconds);
@@ -11418,6 +11957,217 @@ function fitFinalScore(){
     if (state === 'dead' && resultsShown) skipSongReplay();
   });
 })();
+/* ---------- F8: watch the lead change. Presentation only. ---------- */
+// On a received duel's results, when C14's checked race record holds at least one lead change, a quiet link offers
+// a short replay of the last one in the results replay box: your comet and the rival's, at the positions each had on
+// those very steps (the lead tape below, written beside C14's own note at every live step and at the run's end).
+// The last change is the one replayed: it handed the lead to whoever held it as the run ended (C14's decisive
+// moment counts from it), so it is the change that decided the race. The count is C14's changes.length. A ghost
+// that diverged (C14's broken) or a duel with no rival offers nothing. Group races replay the main rival only
+// (C14 tracks only it). Tap anywhere skips; Retry never waits on it (no modal, no delay; Retry ends it). Reduce
+// Motion: a still frame of the change step. No glow (the budget is untouched), no sound, no randomness, and
+// nothing here is read by the sim, the race, the duel record or the results.
+// (F8's constants and state sit with the song replay's, near the top: reset() cancels the replay.)
+function leadTapeReset(){
+  if (leadTape){ leadTape.lo = -1; leadTape.hi = -1; leadTape.marks.length = 0; }
+}
+// The positions at the step C14 just noted, indexed by YOUR step (the run log's n): yours after the live step, and
+// the rival ghost's after the same step. A ghost that has crashed stops stepping (its gh.n freezes), so its step
+// cannot index the tape; its last position (gh.out, no longer read) is copied on, where it stopped. Each change C14
+// just added gets your step as its mark: C14's own record (its t and n) is untouched.
+function leadTapeNote(gh, L){
+  const n = dailyRunLog ? dailyRunLog.n : -1;
+  if (!leadTape) leadTape = { xy: new Float64Array(LEAD_TAPE_STEPS * 4), lo: -1, hi: -1, marks: [] };
+  const T = leadTape;
+  while (T.marks.length < L.changes.length) T.marks.push(n);
+  if (!(n >= 0 && n < LEAD_TAPE_STEPS)) return;
+  const i = n * 4;
+  T.xy[i] = player.x; T.xy[i + 1] = player.y; T.xy[i + 2] = gh.out[0]; T.xy[i + 3] = gh.out[1];
+  if (T.lo < 0 || n < T.lo) T.lo = n;
+  if (n > T.hi) T.hi = n;
+}
+// C14's lead-change count for a finished received duel against the rival, or 0 when the record cannot be trusted
+// (no race, not ended, or a ghost that stopped short of its record).
+function duelLeadChanges(){
+  const L = duelLead;
+  if (!duelActive || !duelIncoming || !duelRaceRival || !L || !L.end || L.broken) return 0;
+  return L.changes.length;
+}
+// The change the replay shows (the last one, at your step), or null when there is none or its steps were not taped.
+function leadReplayChange(){
+  if (!duelLeadChanges()) return null;
+  const k = duelLead.changes.length - 1, c = duelLead.changes[k], T = leadTape;
+  const n = T ? T.marks[k] : undefined; // your step when C14 noted it
+  if (!T || T.lo < 0 || !(n >= T.lo && n <= T.hi)) return null;
+  return { n, by: c.by, t: c.t };
+}
+// The share card's line: '' with no lead change.
+function duelLeadShareLine(){
+  const n = duelLeadChanges();
+  return n === 1 ? t('duel.leadChangedOne') : n > 1 ? t('duel.leadChanged', { n }) : '';
+}
+function syncLeadReplayButton(){
+  const btn = document.getElementById('leadReplay');
+  if (!btn) return;
+  const show = state === 'dead' && !!leadReplayChange();
+  btn.hidden = !show;
+  const text = t('duel.watchLead');
+  if (show && btn.textContent !== text) btn.textContent = text;
+}
+// Pure: the taped positions at step k (clamped to the replay's window).
+function leadReplayAt(rp, k){
+  const n = Math.max(rp.from, Math.min(rp.to, k | 0)), i = n * 4, xy = leadTape.xy;
+  return { n, you: [xy[i], xy[i + 1]], rival: [xy[i + 2], xy[i + 3]] };
+}
+// Pure: the box the whole window fits in (fixed for the replay, so nothing pans).
+function leadReplayBox(from, to, w, h){
+  const xy = leadTape.xy;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (let n = from; n <= to; n++){
+    for (let j = 0; j < 4; j += 2){
+      const x = xy[n * 4 + j], y = xy[n * 4 + j + 1];
+      if (x < minX) minX = x; if (x > maxX) maxX = x;
+      if (y < minY) minY = y; if (y > maxY) maxY = y;
+    }
+  }
+  const P = LEAD_REPLAY;
+  const bw = Math.max(P.minSpan, maxX - minX), bh = Math.max(P.minSpan, maxY - minY);
+  return { s: Math.min((w - P.pad * 2) / bw, (h - P.pad * 2) / bh), cx: (minX + maxX) / 2, cy: (minY + maxY) / 2 };
+}
+// The step shown `ms` after the replay started: real time, one taped step per DAILY_STEP.
+function leadReplayStep(rp, ms){
+  return Math.min(rp.to, rp.from + Math.floor(Math.max(0, ms) / (DAILY_STEP * 1000) + 1e-9));
+}
+function paintLeadFrame(rp, k){
+  const thumb = document.getElementById('constellationThumb');
+  if (!thumb || typeof thumb.getContext !== 'function') return;
+  const tctx = thumb.getContext('2d');
+  if (!tctx) return;
+  const dpr = Math.max(1, Math.min(3, Number(window.devicePixelRatio) || 1));
+  if (thumb.width !== SONG_CANVAS.w * dpr){ thumb.width = SONG_CANVAS.w * dpr; thumb.height = SONG_CANVAS.h * dpr; }
+  const w = SONG_CANVAS.w, h = SONG_CANVAS.h, b = rp.box, xy = leadTape.xy, P = LEAD_REPLAY;
+  const X = x => w / 2 + (x - b.cx) * b.s, Y = y => h / 2 + (y - b.cy) * b.s;
+  const at = leadReplayAt(rp, k);
+  tctx.save();
+  tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  tctx.clearRect(0, 0, w, h);
+  tctx.fillStyle = '#141028';
+  tctx.fillRect(0, 0, w, h);
+  tctx.shadowBlur = 0; // no glow: the replay adds nothing to the two-glow budget
+  tctx.lineCap = 'round';
+  tctx.lineJoin = 'round';
+  tctx.setLineDash([]);
+  // Half-second tails, the rival's under yours.
+  const tail0 = Math.max(rp.from, at.n - P.tailSteps);
+  for (const [j, color] of [[2, RIVAL_GHOST.color], [0, P.you]]){
+    tctx.strokeStyle = color;
+    tctx.globalAlpha = 0.55;
+    tctx.lineWidth = 1.6;
+    tctx.beginPath();
+    tctx.moveTo(X(xy[tail0 * 4 + j]), Y(xy[tail0 * 4 + j + 1]));
+    for (let n = tail0 + 1; n <= at.n; n++) tctx.lineTo(X(xy[n * 4 + j]), Y(xy[n * 4 + j + 1]));
+    tctx.stroke();
+  }
+  // From the change on, a thin ring marks where the new leader was when the lead passed.
+  if (at.n >= rp.at){
+    const m = leadReplayAt(rp, rp.at), p = rp.by === 'you' ? m.you : m.rival;
+    tctx.globalAlpha = 0.9;
+    tctx.strokeStyle = P.mark;
+    tctx.lineWidth = 1.2;
+    tctx.beginPath();
+    tctx.arc(X(p[0]), Y(p[1]), 8, 0, Math.PI * 2);
+    tctx.stroke();
+  }
+  // The heads: the rival hollow in its F1 hue (shape as well as colour), you solid.
+  tctx.globalAlpha = 1;
+  tctx.lineWidth = 2;
+  tctx.strokeStyle = RIVAL_GHOST.color;
+  tctx.beginPath();
+  tctx.arc(X(at.rival[0]), Y(at.rival[1]), 4, 0, Math.PI * 2);
+  tctx.stroke();
+  tctx.fillStyle = P.you;
+  tctx.beginPath();
+  tctx.arc(X(at.you[0]), Y(at.you[1]), 3.5, 0, Math.PI * 2);
+  tctx.fill();
+  tctx.restore();
+}
+function leadCancelFrame(){
+  if (!leadReplayFrameId) return;
+  if (leadReplayFrameKind === 'raf' && typeof cancelAnimationFrame === 'function') cancelAnimationFrame(leadReplayFrameId);
+  else clearTimeout(leadReplayFrameId);
+  leadReplayFrameId = 0;
+  leadReplayFrameKind = null;
+}
+function cancelLeadReplay(){
+  leadCancelFrame();
+  leadReplay = null;
+}
+function leadReplayDurationMs(rp){
+  return reducedMotion ? LEAD_REPLAY.stillMs : (rp.to - rp.from) * DAILY_STEP * 1000 + LEAD_REPLAY.holdMs;
+}
+function startLeadReplay(){
+  if (state !== 'dead' || !resultsShown) return false;
+  const c = leadReplayChange();
+  if (!c) return false;
+  cancelSongReplay(); // the box shows one replay; the song's notes stop with it
+  cancelLeadReplay();
+  const T = leadTape;
+  const from = Math.max(T.lo, c.n - LEAD_REPLAY.beforeSteps), to = Math.min(T.hi, c.n + LEAD_REPLAY.afterSteps);
+  leadReplay = { from, to, at: c.n, by: c.by, box: leadReplayBox(from, to, SONG_CANVAS.w, SONG_CANVAS.h), startedAt: performance.now() };
+  leadReplayAdvance(performance.now());
+  return true;
+}
+function leadReplaySchedule(){
+  if (!leadReplay) return;
+  if (reducedMotion){ // the still is painted once; one timer ends it
+    leadReplayFrameKind = 'timer';
+    leadReplayFrameId = setTimeout(leadReplayFrame, Math.max(0, leadReplay.startedAt + leadReplayDurationMs(leadReplay) - performance.now()));
+  } else if (typeof requestAnimationFrame === 'function'){
+    leadReplayFrameKind = 'raf';
+    leadReplayFrameId = requestAnimationFrame(leadReplayFrame);
+  } else {
+    leadReplayFrameKind = 'timer';
+    leadReplayFrameId = setTimeout(leadReplayFrame, 16);
+  }
+}
+function leadReplayFrame(){
+  leadReplayFrameId = 0;
+  leadReplayFrameKind = null;
+  leadReplayAdvance(performance.now());
+}
+function leadReplayAdvance(nowMs){
+  const rp = leadReplay;
+  if (!rp) return;
+  if (state !== 'dead' || !resultsShown){ cancelLeadReplay(); return; } // Retry (or anything else) ends it
+  const elapsed = nowMs - rp.startedAt;
+  if (elapsed >= leadReplayDurationMs(rp)){ skipLeadReplay(); return; }
+  if (reducedMotion){
+    if (!rp.painted){ rp.painted = true; paintLeadFrame(rp, rp.at); } // Reduce Motion: the change step, still
+  } else paintLeadFrame(rp, leadReplayStep(rp, elapsed));
+  leadReplaySchedule();
+}
+// Ends the replay (a tap anywhere, or its end): the box shows the card's own picture again.
+function skipLeadReplay(){
+  if (!leadReplay) return;
+  cancelLeadReplay();
+  if (state === 'dead') paintConstellationThumbnail();
+}
+(function bindLeadReplay(){
+  const btn = document.getElementById('leadReplay');
+  if (!btn) return;
+  btn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    // The tap that skipped a running replay (its pointerdown, below) does not start it again.
+    if (performance.now() - leadReplaySkippedAt < LEAD_REPLAY.skipGuardMs) return;
+    startLeadReplay();
+  });
+  // Tap anywhere skips. Capture phase and no stopPropagation: the same tap still reaches Retry, Share or the box.
+  window.addEventListener('pointerdown', ()=>{
+    if (!leadReplay) return;
+    skipLeadReplay();
+    leadReplaySkippedAt = performance.now();
+  }, true);
+})();
 // #214's share clip records the replay through this hook (playClipReplay). A clip is CLIP_SECONDS long,
 // so the replay is compressed to that length. Returns false when there is no replay to record.
 window.skythreadSongReplay = function skythreadSongReplay(seconds){
@@ -11507,6 +12257,13 @@ function renderShareCard(){
         context.font = '700 52px sans-serif';
         context.fillText('BEAT MY ' + formatShareScore(scored), w / 2, 214);
         textTop = 284;
+        const led = duelLeadShareLine(); // F8: "Lead changed N times", in the player's language
+        if (led){
+          context.fillStyle = '#C9D6FF';
+          context.font = '600 34px sans-serif';
+          context.fillText(led, w / 2, 266);
+          textTop = 330;
+        }
       }
       context.fillStyle = '#F3EFFF';
       context.font = '500 36px sans-serif';
@@ -11733,7 +12490,7 @@ const CLIP_START_GUARD_MS = 60000;                  // the system prompt may wai
 const CLIP_WATCHDOG_MS = (CLIP_SECONDS + 8) * 1000; // runs from clipStarted, never from the tap
 const SHARE_CLIP_FAILED = "Couldn't record clip";
 // Card controls that go inert while a clip records, so only the replay can be captured.
-const CLIP_LOCK_IDS = ['retry', 'share', 'shareCardOption', 'shareClipOption', 'constellationThumb', 'openSettingsResult', 'more', 'daily', 'hangar', 'openStats', 'openSettings', 'resultDetailsToggle'];
+const CLIP_LOCK_IDS = ['retry', 'share', 'shareCardOption', 'shareClipOption', 'constellationThumb', 'leadReplay', 'openSettingsResult', 'more', 'daily', 'hangar', 'openStats', 'openSettings', 'resultDetailsToggle'];
 let clipRecording = false, clipCapturing = false;
 // Session ids are unique across page loads: a random base per load, then a counter. Native rejects
 // nothing by id, so a reloaded page can never collide with a clip native still remembers.
@@ -12448,6 +13205,48 @@ function captureRingPaint(visited){
 function resetCameraFx(){
   camFx.lx = 0; camFx.ly = 0;
   camFx.punch = 0; camFx.punchAt = -Infinity; camFx.punchX = 0; camFx.punchY = 0;
+  nextLean = null;
+}
+// F10 next-planet lean. After a catch the view eases NEXT_LEAN.px logical px toward the next target (the nearest
+// unvisited planet above the caught one) over NEXT_LEAN.inMs of wall time after the hit-stop, holds while you orbit,
+// and eases back over NEXT_LEAN.outMs after the release. It is a screen translate in draw() only: cam, the planets,
+// the void and every input or aim value stay as they are (a tap is a release wherever it lands). None under Reduce
+// Motion and none in the ghost frame. The direction is fixed at the catch.
+function nextLeanTarget(p){
+  let pick = null, d2 = Infinity;
+  for (let i = 0; i < planets.length; i++){
+    const q = planets[i];
+    if (q === p || q.visited || !(q.y < p.y)) continue;
+    const dx = q.x - p.x, dy = q.y - p.y, d = dx * dx + dy * dy;
+    if (d < d2){ d2 = d; pick = q; }
+  }
+  return pick;
+}
+function armNextLean(p, wallNow){
+  nextLean = null;
+  if (reducedMotion || !p) return;
+  try { if (window.__ghostMode) return; } catch (_) {}
+  const q = nextLeanTarget(p);
+  if (!q) return;
+  const dx = q.x - p.x, dy = q.y - p.y, len = Math.hypot(dx, dy);
+  if (!(len > 0)) return;
+  nextLean = { dx: dx / len, dy: dy / len, at: Math.max(wallNow, hitStopUntil), out: -1 };
+}
+function leanEase(u){ const k = 1 - (u <= 0 ? 0 : u >= 1 ? 1 : u); return 1 - k * k * k; }
+// The lean (logical px, screen space) at wall time `wallNow`; {0, 0} when there is none.
+function nextLeanOffset(wallNow){
+  const L = nextLean;
+  if (!L || reducedMotion || state !== 'playing') return { x: 0, y: 0 };
+  let amt = leanEase((wallNow - L.at) / NEXT_LEAN.inMs);
+  if (L.out >= 0) amt *= 1 - leanEase((wallNow - L.out) / NEXT_LEAN.outMs);
+  if (!(amt > 0)) return { x: 0, y: 0 };
+  return { x: L.dx * NEXT_LEAN.px * amt, y: L.dy * NEXT_LEAN.px * amt };
+}
+function stepNextLean(wallNow){
+  if (!nextLean) return;
+  if (reducedMotion || state !== 'playing' || !player){ if (reducedMotion || state === 'title') nextLean = null; return; }
+  if (nextLean.out < 0 && player.mode !== 'orbit') nextLean.out = Math.max(wallNow, nextLean.at);
+  else if (nextLean.out >= 0 && wallNow - nextLean.out >= NEXT_LEAN.outMs) nextLean = null;
 }
 function armCameraPunch(p, wallNow){
   if (reducedMotion) return;
@@ -12466,6 +13265,7 @@ function cameraPunchAmount(wallNow){
   return camFx.punch * u * u;
 }
 function stepCameraFx(wallDt){
+  stepNextLean(performance.now()); // F10
   if (reducedMotion || state !== 'playing' || !player){
     if (reducedMotion || state === 'title') resetCameraFx();
     return;
@@ -12871,6 +13671,7 @@ function drawPickupLabel(){
 }
 
 function draw(){
+  syncRingDepth(); // F7 (a no-op inside drawInterpolated, which read it first)
   // syncHud may just have revealed the warning or resized its text. Measure the
   // final DOM bounds before painting; held/dead presentation remains frozen.
   if (state === 'playing' && firstReleaseDone && !runHeld && !suspended) {
@@ -12899,7 +13700,9 @@ function draw(){
   const displayY = displayCameraY();
   // Nudge is a render offset. cam.y and displayOffset stay on the fit camera.
   const nudge = captureNudge(displayY);
-  ctx.translate(sx - nudge.x, sy - nudge.y);
+  // F10: the lean moves the view toward the next target, so the world shifts the other way (draw only).
+  const lean = nextLeanOffset(performance.now());
+  ctx.translate(sx - nudge.x - lean.x, sy - nudge.y - lean.y);
   if (camLean && state !== 'dead'){
     ctx.translate(W / 2, H * 0.55);
     ctx.rotate(camLean);
@@ -12968,9 +13771,13 @@ function draw(){
     // Magnet enlarges the latch ring; a second tick ring is the non-color cue.
     const ringPaint = captureRingPaint(p.visited);
     ctx.setLineDash(ringPaint.dash);
-    ctx.strokeStyle = magnetLeft > 0 ? PICKUPS.magnet.color : p.color;
-    ctx.globalAlpha = occupied ? .9 : (flying ? (p.visited ? .5 : .85) : (p.visited ? .34 : .62));
-    ctx.lineWidth = flying ? 2 : (state === 'playing' ? 1.6 : 1.2);
+    const ringBase = magnetLeft > 0 ? PICKUPS.magnet.color : p.color;
+    const depthLit = p.id === ringDepthId ? ringDepthGlow : 0; // F7: the ring a tap now would catch on
+    // Panel 16 (M4): PERFECT (depthLit 1) has a capped boost and the gold tint; GOOD keeps its boost and colour.
+    const perfectLit = depthLit >= 1;
+    ctx.strokeStyle = perfectLit ? ringPerfectTint(ringBase) : ringBase;
+    ctx.globalAlpha = Math.min(1, (occupied ? .9 : (flying ? (p.visited ? .5 : .85) : (p.visited ? .34 : .62))) + (perfectLit ? RING_DEPTH.perfectAlpha : RING_DEPTH.alpha * depthLit));
+    ctx.lineWidth = (flying ? 2 : (state === 'playing' ? 1.6 : 1.2)) + (perfectLit ? RING_DEPTH.perfectWidth : RING_DEPTH.width * depthLit);
     ctx.beginPath(); ctx.arc(0, 0, latchR, 0, Math.PI*2); ctx.stroke();
     if (ringPaint.mark){
       ctx.setLineDash([]);
@@ -13020,7 +13827,15 @@ function draw(){
     ctx.globalAlpha = 1;
 
     const lit = lightAmount(p);
-    if (p.sun) drawSun(p); else paintPlanetBody(p, lit);
+    const land = perfectLand ? perfectLandView(p, performance.now()) : null; // F4
+    if (land && land.scale){
+      ctx.save();
+      ctx.translate(p.x, p.y); ctx.rotate(land.axis); ctx.scale(land.scale.along, land.scale.across);
+      ctx.rotate(-land.axis); ctx.translate(-p.x, -p.y);
+      if (p.sun) drawSun(p); else paintPlanetBody(p, lit);
+      ctx.restore();
+    } else if (p.sun) drawSun(p); else paintPlanetBody(p, lit);
+    if (land && land.mark) drawPerfectMark(p, land.from);
     drawPlanetWake(p, lit);
     drawMoons(p);
     drawFrostArc(p);
@@ -13199,6 +14014,7 @@ function draw(){
   ctx.restore(); // camera
   drawFinishReveal(fitted);
   ctx.restore(); // shake
+  drawRivalTag(fitted || (camActive && fx) || null, displayY); // F1: screen space
   drawSectorBanner();
   drawConfetti();
   drawOverdriveEdge();
@@ -13440,7 +14256,9 @@ function flightForecastInto(slot, duration, dt){
    Inputs that change the answer (another orbit, a spawn or cull, a capture, the magnet, a void
    reset, a combo-lost orbit reset, a teleport) rebuild it.
    Cost: at most RHYTHM.budget forecasts per update() including a rebuild (an extend starts only if
-   its worst case fits), plus one gradeRelease() forecast on the frame of a tap.
+   its worst case fits), plus one gradeRelease() forecast on the frame of a tap, plus one
+   releaseForecast() per new sim state while orbiting with the aim guide on (the F7 ring depth glow,
+   syncRingDepth; drawing only, outside RHYTHM.budget).
    Waltz: while a release would catch a new planet within RHYTHM.span, orbitAngleDelta is scaled by
    RHYTHM.waltz. The same for every aim guide setting (tested step for step). */
 function rhythmResetRun(){
@@ -13486,6 +14304,44 @@ function rhythmFlash(grade, x, y){
 // Off draws nothing; the slow-down is the cue there.
 // Drawn from the cache of this orbit even if a spawn or cull since the last update() changed the
 // planet list (the next update() rebuilds it).
+// F7: the ring depth glow. While you orbit, the catch ring of the planet a tap now would catch brightens with that
+// catch's depth (the grade's own forecast, releaseForecast): 0 when a tap catches nothing new, a GOOD level
+// (good0 at the rim rising to good1 at the PERFECT line) and 1, the peak, wherever gradeForDepth says PERFECT.
+// It modulates that ring's own stroke (its colour, more opacity and width), never an added halo, and only with
+// the aim guide on. Depth tracking is its only motion, so Reduce Motion draws it the same. Presentation only:
+// read once per sim state, before the frame is drawn (the interpolated draw never moves it), into its own result
+// object; no allocation, world RNG or fxRandom.
+const RING_DEPTH = Object.freeze({ good0: 0.25, good1: 0.6, alpha: 0.38, width: 1.6, perfectAlpha: 0.22, perfectWidth: 0.8, perfectTint: 0.5 });
+const ringRes = { kind: 'horizon', t: 0, step: 0, planetId: null, depth: 1 };
+let ringDepthId = -1, ringDepthGlow = 0;           // the lit ring's planet id and its level (0..1)
+let ringDepthKeyT = NaN, ringDepthKeyA = NaN, ringDepthKeyC = -1, ringDepthHold = false;
+function ringGlowForDepth(depth){
+  if (gradeForDepth(depth) === 'perfect') return 1;
+  const u = Math.max(0, Math.min(1, (1 - depth) / (1 - RHYTHM.perfect)));
+  return RING_DEPTH.good0 + (RING_DEPTH.good1 - RING_DEPTH.good0) * u;
+}
+// Panel 16 (M4): at PERFECT the ring's stroke is mixed toward the gold catch-ring halo (AIM_RING) by perfectTint, so the
+// depth ring and the catch ring read as one. The tints of the planet colours and the magnet's are mixed once, here
+// at load, so a frame only looks them up (no colour work per frame); any other colour is mixed on first use and kept.
+const RING_TINTS = {};
+for (const c of PAL.planets.concat([PICKUPS.magnet.color])) RING_TINTS[c] = mixHex(c, AIM_RING, RING_DEPTH.perfectTint);
+function ringPerfectTint(hex){
+  let out = RING_TINTS[hex];
+  if (out === undefined) out = RING_TINTS[hex] = mixHex(hex, AIM_RING, RING_DEPTH.perfectTint);
+  return out;
+}
+function syncRingDepth(){
+  if (ringDepthHold) return; // inside drawInterpolated: already read at the sim state
+  if (state !== 'playing' || aimGuide === 'off' || !player || player.mode !== 'orbit' || !player.planet){
+    ringDepthId = -1; ringDepthGlow = 0; ringDepthKeyT = NaN;
+    return;
+  }
+  if (time === ringDepthKeyT && player.angle === ringDepthKeyA && captureCount === ringDepthKeyC) return;
+  ringDepthKeyT = time; ringDepthKeyA = player.angle; ringDepthKeyC = captureCount;
+  const r = releaseForecast(ringRes);
+  ringDepthId = r ? r.planetId : -1;
+  ringDepthGlow = r ? ringGlowForDepth(r.depth) : 0;
+}
 // Arc v2 presentation flags. Written by the arc draw; read by the comet, the aim ring and the
 // first-orbit label, which draw after it in the same frame. update() never reads them.
 let arcCometInside = false, arcBandShown = false, arcLabelAnchor = null;
@@ -13935,6 +14791,7 @@ function loop(now){
       showConstellationResults();
     }
   }
+  flushCloseWhoosh(now); // F5: after the steps, so a lethal step's close call stays silent
   stepFinishBeat(now); // D2c: the finish margin's look for this frame
   drawInterpolated();
   stepEquipMoment(now);
