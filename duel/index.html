@@ -87,7 +87,7 @@
   #shareClip[hidden]{display:none}
   #clipStatus{font:600 14px/1.2 'Space Grotesk',sans-serif;text-align:center;margin-top:8px}
   #clipStatus[hidden]{display:none}
-  #daily,#duelNew,#more,#duelSkip,#moreBack,#share,#shareClip,#shareCardOption,#shareClipOption,#openStats,#openSettings,#openSettingsResult,#settingsBack,#statsBack{text-transform:none;letter-spacing:.01em}
+  #daily,#duelNew,#more,#openParty,#duelSkip,#moreBack,#share,#shareClip,#shareCardOption,#shareClipOption,#openStats,#openSettings,#openSettingsResult,#settingsBack,#statsBack{text-transform:none;letter-spacing:.01em}
   .settings-row{display:block;width:100%;min-height:44px;margin-top:8px;padding:8px 12px;border-radius:10px;cursor:pointer;
     border:1px solid #A99CD6;background:#120E2E;color:#F3EFFF;font:700 14px var(--font-body);text-align:left}
   /* Seven settings rows fit a 320x568 screen without scrolling: a slightly tighter gap on short screens. */
@@ -465,7 +465,7 @@
     #moreScreen .more-actions{margin-top:8px;gap:6px}
     #moreScreen #versionLabel{margin-top:4px}
   }
-  #hangar,#daily,#duelNew,#more,#duelSkip,#openStats,#openSettings{background:#211B3A;border-color:var(--dim);color:var(--text);box-shadow:none}
+  #hangar,#daily,#duelNew,#more,#duelSkip,#openStats,#openSettings,#openParty{background:#211B3A;border-color:var(--dim);color:var(--text);box-shadow:none}
   @container (max-width:260px){
     #gameOverScreen{grid-template-columns:auto;row-gap:0}
   }
@@ -618,6 +618,42 @@
   html:not([lang="en"]) #gameOverScreen .go-title,html:not([lang="en"]) .result-details > summary{white-space:normal;overflow-wrap:anywhere}
   html:not([lang="en"]) .result-details > summary{height:auto;line-height:1.25;padding:10px 0}
   html:not([lang="en"]) #gameOverScreen .action,html:not([lang="en"]) #gameOverScreen #retry,html:not([lang="en"]) #gameOverScreen #share,html:not([lang="en"]) #gameOverScreen #openSettingsResult{white-space:normal;line-height:1.15;overflow-wrap:anywhere}
+
+  /* B13 Orbit Party: the room screen reuses the overlay, panel and card-scroll of More. Presentation only. */
+  #partyScreen .screen-content{overflow:visible;display:flex;flex-direction:column;min-height:0}
+  #partyScreen .panel{flex:0 1 auto;min-height:0;max-height:100%;overflow:hidden;display:flex;flex-direction:column}
+  #partyScreen .card-scroll{flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y}
+  #partyHeading:focus{outline:none}
+  #partyScreen .action{text-transform:none;letter-spacing:.01em}
+  #partyStatus{margin:8px auto 0;max-width:340px;min-height:18px;font:700 13px/1.35 var(--font-body);color:var(--peri)}
+  #partyStatus.err{color:var(--rose)}
+  #partyMe{margin:10px auto 0;font:700 clamp(18px,6vw,26px)/1.2 var(--font-body);color:var(--text);overflow-wrap:anywhere}
+  .party-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px auto 0;max-width:340px}
+  .party-chip{margin:0!important;padding:6px 14px!important;font-size:14px!important;background:#211B3A!important;border-color:var(--dim)!important;color:var(--text)!important;box-shadow:none!important}
+  .party-note{margin:8px auto 0;max-width:320px;font-size:12px;line-height:1.4;color:var(--dim)}
+  .party-join{display:flex;gap:8px;justify-content:center;align-items:center;margin:12px auto 0;max-width:340px}
+  .party-join .action{margin:0}
+  #partyCode{width:7.5em;min-height:44px;border-radius:12px;border:1px solid var(--dim);background:#120E2E;color:var(--text);
+    font:700 20px var(--font-body);letter-spacing:.2em;text-align:center;text-transform:uppercase;padding:4px 8px;user-select:text;-webkit-user-select:text}
+  #partyCode:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+  .party-code-label{margin-top:10px;font-size:12px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+  #partyCodeShow{margin:2px auto 0;font:400 clamp(28px,12vw,44px)/1.1 var(--font-display);letter-spacing:.12em;color:var(--gold)}
+  .party-link-row{margin:8px auto 0}
+  .party-list{list-style:none;margin:12px auto 0;padding:0;max-width:340px;text-align:left}
+  .party-list li{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;background:#120E2E;margin-top:6px;
+    font:700 14px/1.25 var(--font-body);color:var(--text);overflow-wrap:anywhere}
+  .party-list li .rk{flex:0 0 auto;min-width:1.4em;color:var(--peri);font-variant-numeric:tabular-nums}
+  .party-list li .em{flex:0 0 auto;font-size:18px}
+  .party-list li .nm{flex:1 1 auto;min-width:0}
+  .party-list li .tag{flex:0 0 auto;font-size:11px;padding:1px 8px;border-radius:999px;border:1px solid rgba(255,217,102,.55);color:var(--gold)}
+  .party-list li .tag.dim{border-color:rgba(143,160,255,.4);color:var(--peri)}
+  .party-list li .pt{flex:0 0 auto;font-variant-numeric:tabular-nums;color:var(--gold)}
+  .party-list li.me{outline:1px solid rgba(168,255,96,.5)}
+  #partyHeatLine,#partyBoardTitle{margin-top:12px;font:700 15px/1.3 var(--font-body);color:var(--text)}
+  #partyCountdown{margin:6px auto 0;font:400 clamp(44px,20vw,84px)/1 var(--font-display);color:var(--gold)}
+  #partyFallbackText{margin:14px auto 0;max-width:300px;font:700 16px/1.4 var(--font-body);color:var(--text)}
+  #partyHud{position:absolute;left:8px;bottom:8px;max-width:calc(100% - 16px);z-index:3;pointer-events:none;padding:2px 8px;
+    border-radius:999px;background:rgba(18,14,46,.5);color:rgba(243,239,255,.7);font:700 11px/1.5 var(--font-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
 <body>
@@ -630,7 +666,7 @@
     <div id="score">0</div>
     <div id="combo"></div>
     <div id="height"></div>
-    <div id="hint">tap while inside the glow</div>
+    <div id="hint">tap anywhere while inside the glow</div>
     <div id="voidCue" hidden>↑ VOID RISING</div>
     <div id="duelClock" hidden></div>
     <div id="duelLead" hidden></div>
@@ -641,6 +677,7 @@
 </div>
 
 <div id="duelFinishBeat" hidden aria-hidden="true"></div>
+<div id="partyHud" hidden aria-hidden="true"></div>
 <div id="flickHint" hidden>tap again mid-flight to steer</div>
 <div id="tutorialCue" hidden><span id="tutorialText" aria-hidden="true"></span><button id="tutorialSkip" type="button" aria-label="Skip tutorial">Skip</button></div>
 <div class="overlay" id="titleScreen" aria-hidden="false">
@@ -673,12 +710,67 @@
         <button class="action" id="openStats" type="button" aria-label="Stats">Stats</button>
         <button class="action" id="openSettings" type="button" aria-label="Settings">&#x2699;&#xFE0E; Settings</button>
         <button class="action" id="howToPlay" type="button">How to play</button>
+        <button class="action" id="openParty" type="button" hidden>&#x2728; Orbit Party</button>
       </div>
-      <div id="versionLabel">v1.6.0</div>
+      <div id="versionLabel">v1.8.0</div>
     </div>
     </div>
   </div>
   <button class="action" id="moreBack" type="button">Back</button>
+</div>
+
+<div class="overlay" id="partyScreen" hidden inert aria-hidden="true" role="dialog" aria-label="Orbit Party">
+  <div class="screen-content">
+    <div class="panel">
+    <div class="card-scroll">
+      <div class="go-title" id="partyHeading" role="heading" aria-level="2" tabindex="-1">Orbit Party</div>
+      <div id="partyStatus" role="status" aria-live="polite"></div>
+      <div id="partyName">
+        <div id="partyMe" aria-live="polite"></div>
+        <div class="party-chips">
+          <button class="action party-chip" id="partyEmoji" type="button" aria-label="Change emoji"></button>
+          <button class="action party-chip" id="partyAdj" type="button" aria-label="Change first word"></button>
+          <button class="action party-chip" id="partyNoun" type="button" aria-label="Change second word"></button>
+          <button class="action party-chip" id="partyShuffle" type="button">Shuffle</button>
+        </div>
+        <div class="party-note">Names come from friendly lists. No typing, and nothing is kept after the room.</div>
+      </div>
+      <div id="partyEntry">
+        <button class="action" id="partyCreate" type="button">Create a room</button>
+        <div class="party-join">
+          <input id="partyCode" type="text" inputmode="text" maxlength="5" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Room code" placeholder="CODE">
+          <button class="action" id="partyJoin" type="button">Join</button>
+        </div>
+      </div>
+      <div id="partyLobby" hidden>
+        <div class="party-code-label">Room code</div>
+        <div id="partyCodeShow"></div>
+        <div class="party-link-row">
+          <button class="action party-chip" id="partyCopy" type="button">Copy invite link</button>
+        </div>
+        <ul id="partyPlayers" class="party-list" aria-label="Players"></ul>
+        <button class="action" id="partyStart" type="button">Start heat 1</button>
+        <div id="partyLobbyHint" class="party-note"></div>
+      </div>
+      <div id="partyRace" hidden>
+        <div id="partyHeatLine"></div>
+        <div id="partyCountdown" aria-live="off"></div>
+        <ul id="partyDone" class="party-list" aria-label="Who has finished"></ul>
+      </div>
+      <div id="partyBoard" hidden>
+        <div id="partyBoardTitle"></div>
+        <ol id="partyStandings" class="party-list" aria-label="Standings"></ol>
+        <button class="action" id="partyRematch" type="button">Rematch</button>
+        <div id="partyBoardHint" class="party-note"></div>
+      </div>
+      <div id="partyFallback" hidden>
+        <div id="partyFallbackText">Rooms are full right now. Play a duel instead</div>
+        <button class="action" id="partyDuel" type="button">Play a duel instead</button>
+      </div>
+    </div>
+    </div>
+  </div>
+  <button class="action" id="partyBack" type="button">Back</button>
 </div>
 
 <div class="overlay" id="hangarScreen" hidden inert aria-hidden="true" role="dialog" aria-label="Hangar">
@@ -824,6 +916,40 @@ const WEB_DUEL_PAGE = true;
 // B16: web portal builds (tools/build-portal.cjs sets 'poki'). Null in the game, the app builds and the duel page, where
 // every Portal hook below does nothing. A portal build carries no outgoing link, store link, purchase UI or duel link.
 const WEB_PORTAL = null;
+// B13: Orbit Party rooms (browser-first). On for the web and duel-page builds; the iOS and Android copies turn it off
+// (ios/tools/prepare_html.py, and its --check enforces it) because rooms in the store apps need John's separate yes
+// (the privacy label). A portal build never shows rooms. ROOMS_URL is the room server's WebSocket address (no path; the client appends /v1/ws):
+// the live Worker, deployed 2026-11-06. Tests inject their own local URL and never contact it. Nothing connects until a player taps Create
+// or Join.
+const ROOMS_ENABLED = true;
+const ROOMS_URL = 'wss://zipwaltz-rooms.shortriddles334.workers.dev';
+// B13 state (declared here so the screen code, which runs during load, never reads it too early). The glue is near the end.
+// Rooms run only against a secure server: wss:// and not a local address. A local ws:// server is allowed on a dev host
+// only (localhost, 127.0.0.1, or a file page under test), so a build shipped with the dev default shows no rooms.
+const ROOMS_URL_LOCAL = /^wss?:\/\/(localhost|127\.\d+\.\d+\.\d+|\[::1\])(:\d+)?\/?$/i.test(ROOMS_URL);
+const ROOMS_DEV_HOST = typeof location !== 'undefined' && (location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname));
+const ROOMS_URL_OK = /^wss:\/\/[^\s/]+(\/.*)?$/i.test(ROOMS_URL) && !ROOMS_URL_LOCAL ? true : ROOMS_URL_LOCAL && ROOMS_DEV_HOST;
+const ROOMS_ON = ROOMS_ENABLED && ROOMS_URL_OK && !WEB_PORTAL && !(typeof window !== 'undefined' && !!window.__ghostMode); // never in a ghost frame
+const PARTY_NICK_KEY = 'zipwaltz-party-nick';
+const PARTY_COLORS = Object.freeze(['#7FE3FF', '#FFB38A', '#C9B8FF', '#9FFFC0', '#FF9EC4', '#F5E27A', '#8FA0FF']);
+const PARTY_TAG = Object.freeze({ px: 12, pad: 7, gap: 9, keepPad: 8, headKeep: 34, topCss: 132, bottomCss: 64, sideCss: 8 });
+let partyNick = -1;
+let partyClient = null;
+let partyPanelOpen = false;
+let partyFromMore = false;
+let partyRunning = false;      // a heat's run is being played
+let partyLaunching = false;    // press() is starting a heat
+let partyHeatNo = 0;           // the last heat launched (a resume repeats heat_start; it must not launch twice)
+let partyOwnScore = 0;
+let partyLaunchTimer = 0, partyShowTimer = 0, partyTickTimer = 0;
+let partyNote = '', partyNoteErr = false;
+let partyCodeText = '';        // the invited room code from a link
+const partyRivals = [];        // { id, nick, label, color, visible, gh, w }
+const partyAim = { on: false, x0: 0, y0: 0, x1: 0, y1: 0 };
+const partyTagDebug = { tags: [], keeps: [], bounds: null, vs: 1 }; // last frame's layout, for the tests
+const partyPos = { x: 0, y: 0 };
+const PARTY_NO_TAGS = Object.freeze([]);
+let partyCountTimer = 0;
 const WEB_STORE_LINKS = {"ios":"https://apps.apple.com/app/id6822071006","android":"https://play.google.com/store/apps/details?id=com.shortygames.zipwaltz"}; // the duel page build sets { ios, android }: the app builds carry no store addresses
 // B4b: every store link we hand out carries a campaign token naming the kind of share, never the player. Play counts
 // downloads by its utm referrer now; App Store Connect counts ct only together with APP_STORE_PT, Apple's provider
@@ -875,7 +1001,7 @@ const I18N = Object.freeze({
   "announce.newBest": Object.freeze({ "en": "New best.", "es": "¡Nuevo récord!", "de": "Neuer Rekord.", "fr": "Nouveau record.", "ja": "新記録！", "pt-BR": "Novo recorde." }),
   "announce.sector": Object.freeze({ "en": "Sector {n}, {name}", "es": "Sector {n}, {name}", "de": "Sektor {n}, {name}", "fr": "Secteur {n}, {name}", "ja": "セクター {n}、{name}", "pt-BR": "Setor {n}, {name}" }),
   "announce.voidRising": Object.freeze({ "en": "Void rising", "es": "El vacío sube", "de": "Leere steigt", "fr": "Le vide monte", "ja": "虚無が上昇", "pt-BR": "O vazio sobe" }),
-  "arc.label": Object.freeze({ "en": "tap when the comet is in the glow", "es": "toca cuando el cometa esté en el resplandor", "de": "tippe, wenn der Komet im Leuchten ist", "fr": "touche quand la comète est dans la lueur", "ja": "彗星が光の中に入ったらタップ", "pt-BR": "toque quando o cometa estiver no brilho" }),
+  "arc.label": Object.freeze({ "en": "tap anywhere when the comet is in the glow", "es": "toca en cualquier lugar cuando el cometa esté en el resplandor", "de": "tippe irgendwo, wenn der Komet im Leuchten ist", "fr": "touche n'importe où quand la comète est dans la lueur", "ja": "彗星が光の中に入ったら、どこでもタップ", "pt-BR": "toque em qualquer lugar quando o cometa estiver no brilho" }),
   "aria.endRun": Object.freeze({ "en": "End run and return to title", "es": "Terminar partida y volver al título", "de": "Lauf beenden und zum Titel zurückkehren", "fr": "Terminer la partie et revenir à l'écran titre", "ja": "プレイを終了してタイトルに戻る", "pt-BR": "Encerrar partida e voltar ao título" }),
   "aria.game": Object.freeze({ "en": "Zipwaltz game. Use Start or Retry, or press Space, Enter or Arrow Up. During play, tap inside the playfield to release from orbit.", "es": "Juego Zipwaltz. Usa Empezar o Reintentar, o pulsa Espacio, Intro o la flecha arriba. Durante la partida, toca dentro del campo para soltarte de la órbita.", "de": "Zipwaltz-Spiel. Nutze Start oder Nochmal oder drücke Leertaste, Enter oder Pfeil nach oben. Tippe während des Spiels in das Spielfeld, um dich aus der Umlaufbahn zu lösen.", "fr": "Jeu Zipwaltz. Utilise Démarrer ou Rejouer, ou appuie sur Espace, Entrée ou Flèche haut. Pendant la partie, touche le terrain pour quitter l'orbite.", "ja": "Zipwaltzのゲーム。スタートまたはリトライを使うか、スペース、Enter、↑キーを押します。プレイ中はフィールド内をタップして軌道から離れます。", "pt-BR": "Jogo Zipwaltz. Use Iniciar ou Tentar de novo, ou pressione Espaço, Enter ou Seta para cima. Durante o jogo, toque no campo para sair da órbita." }),
   "aria.gameTouch": Object.freeze({ "en": "Zipwaltz game. Use Start or Retry. During play, tap inside the playfield to release from orbit.", "es": "Juego Zipwaltz. Usa Empezar o Reintentar. Durante la partida, toca dentro del campo para soltarte de la órbita.", "de": "Zipwaltz-Spiel. Nutze Start oder Nochmal. Tippe während des Spiels in das Spielfeld, um dich aus der Umlaufbahn zu lösen.", "fr": "Jeu Zipwaltz. Utilise Démarrer ou Rejouer. Pendant la partie, touche le terrain pour quitter l'orbite.", "ja": "Zipwaltzのゲーム。スタートまたはリトライを使います。プレイ中はフィールド内をタップして軌道から離れます。", "pt-BR": "Jogo Zipwaltz. Use Iniciar ou Tentar de novo. Durante o jogo, toque no campo para sair da órbita." }),
@@ -926,7 +1052,7 @@ const I18N = Object.freeze({
   "tut.catch": Object.freeze({ "en": "The ring around the next planet catches you", "es": "El anillo del siguiente planeta te atrapa", "de": "Der Ring um den nächsten Planeten fängt dich", "fr": "L'anneau de la planète suivante t'attrape", "ja": "次の惑星の輪がキャッチしてくれる", "pt-BR": "O anel do próximo planeta pega você" }),
   "tut.missed": Object.freeze({ "en": "Missed! In a real run a miss can end it. Try again", "es": "¡Fallaste! En una partida real un fallo puede acabarla. Otra vez", "de": "Daneben! In einem echten Lauf kann das das Ende sein. Nochmal", "fr": "Raté ! En vraie partie, un raté peut tout finir. Réessaie", "ja": "ミス！本番ではミスで終わることも。もう一度", "pt-BR": "Errou! Numa partida real um erro pode encerrá-la. De novo" }),
   "tut.tapNow": Object.freeze({ "en": "Tap now", "es": "Toca ahora", "de": "Jetzt tippen", "fr": "Touche maintenant", "ja": "今タップ", "pt-BR": "Toque agora" }),
-  "tut.yourTurn": Object.freeze({ "en": "Your turn: tap in the glow", "es": "Tu turno: toca en el resplandor", "de": "Du bist dran: tippe im Leuchten", "fr": "À toi : touche dans la lueur", "ja": "あなたの番：光の中でタップ", "pt-BR": "Sua vez: toque no brilho" }),
+  "tut.yourTurn": Object.freeze({ "en": "Your turn: tap anywhere when it's in the glow", "es": "Tu turno: toca en cualquier lugar cuando esté en el resplandor", "de": "Du bist dran: tippe irgendwo, wenn er im Leuchten ist", "fr": "À toi : touche n'importe où quand elle est dans la lueur", "ja": "あなたの番：光の中に入ったら、どこでもタップ", "pt-BR": "Sua vez: toque em qualquer lugar quando estiver no brilho" }),
   "tut.void": Object.freeze({ "en": "The void rises. Keep moving up", "es": "El vacío sube. Sigue subiendo", "de": "Die Leere steigt. Weiter nach oben", "fr": "Le vide monte. Continue de monter", "ja": "虚無が上昇中。上へ進み続けよう", "pt-BR": "O vazio sobe. Continue subindo" }),
   "tut.skip": Object.freeze({ "en": "Skip", "es": "Omitir", "de": "Überspringen", "fr": "Passer", "ja": "スキップ", "pt-BR": "Pular" }),
   "btn.howToPlay": Object.freeze({ "en": "How to play", "es": "Cómo jugar", "de": "Spielanleitung", "fr": "Comment jouer", "ja": "遊び方", "pt-BR": "Como jogar" }),
@@ -961,7 +1087,7 @@ const I18N = Object.freeze({
   "hud.comboAria": Object.freeze({ "en": "x{combo} COMBO, {mark}, {tier} tier", "es": "x{combo} COMBO, {mark}, nivel {tier}", "de": "x{combo} COMBO, {mark}, Stufe {tier}", "fr": "combo x{combo}, {mark}, palier {tier}", "ja": "x{combo} コンボ、{mark}、{tier}ティア", "pt-BR": "x{combo} COMBO, {mark}, nível {tier}" }),
   "hud.height": Object.freeze({ "en": "height +{score}", "es": "altura +{score}", "de": "Höhe +{score}", "fr": "hauteur +{score}", "ja": "高度 +{score}", "pt-BR": "altura +{score}" }),
   "hud.hint.decay": Object.freeze({ "en": "combo bonus fades", "es": "el bonus de combo baja", "de": "Combo-Bonus verblasst", "fr": "le bonus de combo baisse", "ja": "コンボボーナスが減っていく", "pt-BR": "o bônus de combo cai" }),
-  "hud.hint.ring": Object.freeze({ "en": "tap while inside the glow", "es": "toca mientras estés en el resplandor", "de": "tippe, solange du im Leuchten bist", "fr": "touche pendant que tu es dans la lueur", "ja": "光の中にいる間にタップ", "pt-BR": "toque enquanto estiver no brilho" }),
+  "hud.hint.ring": Object.freeze({ "en": "tap anywhere while inside the glow", "es": "toca en cualquier lugar mientras estés en el resplandor", "de": "tippe irgendwo, solange du im Leuchten bist", "fr": "touche n'importe où pendant que tu es dans la lueur", "ja": "光の中にいる間に、どこでもタップ", "pt-BR": "toque em qualquer lugar enquanto estiver no brilho" }),
   "hud.void": Object.freeze({ "en": "↑ VOID RISING", "es": "↑ EL VACÍO SUBE", "de": "↑ DIE LEERE STEIGT", "fr": "↑ LE VIDE MONTE", "ja": "↑ 虚無が上昇中", "pt-BR": "↑ O VAZIO SOBE" }),
   "instr.bells": Object.freeze({ "en": "Warm Bells", "es": "Campanas cálidas", "de": "Warme Glocken", "fr": "Cloches douces", "ja": "あたたかいベル", "pt-BR": "Sinos quentes" }),
   "instr.box": Object.freeze({ "en": "Music Box", "es": "Caja de música", "de": "Spieldose", "fr": "Boîte à musique", "ja": "オルゴール", "pt-BR": "Caixa de música" }),
@@ -4117,7 +4243,7 @@ const PREMIUM_PACK_NAMES = Object.freeze({ 'pack.pulsar': 'Pulsar Comets', 'pack
 const PREMIUM_SHOP_ORDER = Object.freeze(['pack.founders', 'pack.pulsar', 'pack.ghosts', 'pack.strings', 'pack.finish']);
 let premiumShop = null; // { prices: { pack: text }, buyable: { pack: true }, busy, message (a shop.msg code) }
 // The Android build sets this true (android/tools/prepare_html.py); its shop is Play Billing (B8e) through the
-// ZipwaltzAndroid interface, which only takes shopOpen(), shopBuy(id) and shopRestore().
+// ZipwaltzAndroid interface, which only takes shopOpen(), shopBuy(id), shopRestore() and menuMusic(track, gain) (G7).
 let ANDROID_SHELL = false; // a let only so tests can drive the Android path
 const SHOP_MESSAGES = Object.freeze(['unavailable', 'offline', 'pending', 'cancelled', 'incomplete', 'failed', 'restoreFailed',
   'unverified', 'revoked', 'nothingToRestore', 'restored', 'thanks', 'received', 'cannotBuy',
@@ -4293,6 +4419,28 @@ function letterboxInk(){
   if (state !== 'title') return '#120E2E';
   const tint = equippedThemeColor();
   return tint ? mixHex('#120E2E', tint, 0.42) : '#120E2E';
+}
+// G4: entering a new place. Draw time only: when a run's sky changes (a sector change), it eases from the old stops
+// to the new over SKY_EASE.seconds of game time instead of cutting; a shorter plain crossfade under Reduce Motion. A
+// change mid-ease starts from the colours on screen, and a new run starts on its own sky. presentationSkyStops and the
+// core are unchanged; the eased colours are only what draw() paints.
+const SKY_EASE = Object.freeze({ seconds: 1.0, reducedSeconds: 0.35 });
+const skyEase = { from: null, to: null, at: -Infinity, shown: ['', '', ''] };
+function easedSkyStops(){
+  const to = presentationSkyStops();
+  const e = skyEase;
+  if (state !== 'playing'){ e.to = null; e.from = null; return to; }
+  if (!e.to){ e.to = to; return to; }
+  if (to[0] !== e.to[0] || to[1] !== e.to[1] || to[2] !== e.to[2]){
+    e.from = e.from ? [e.shown[0], e.shown[1], e.shown[2]] : e.to;
+    e.to = to; e.at = time;
+  }
+  if (!e.from) return to;
+  const u = (time - e.at) / (reducedMotion ? SKY_EASE.reducedSeconds : SKY_EASE.seconds);
+  if (!(u < 1)){ e.from = null; return to; }
+  const k = u <= 0 ? 0 : u * u * (3 - 2 * u);
+  for (let i = 0; i < 3; i++) e.shown[i] = mixHex(e.from[i], to[i], k);
+  return e.shown;
 }
 function presentationSkyStops(){
   if (state !== 'title'){
@@ -4962,15 +5110,29 @@ function soundOutput(ac){
    side is +1.6 dB and the far side -2.6 dB, and a mono downmix stays within .3 dB. Where the browser
    has no StereoPannerNode (older Safari) the voice is simply not panned.
    The melody (catch notes and the results-card song) also feeds a short room: a shared send at
-   ROOM.wet into a ConvolverNode whose stereo impulse is decaying noise from a local seeded generator,
-   identical on every load and never drawn from a gameplay or effects stream. The dry path is unchanged;
-   the room returns into the cue bus. Sound off and Music off cut a ringing tail (cutRoomTail). */
+   ROOM.wet into a small Schroeder/Freeverb-lite room: per side four parallel lowpassed feedback combs
+   (DelayNode + BiquadFilter + feedback GainNode) and two allpass diffusers, left and right sets offset
+   so the sides decorrelate, joined by a ChannelMerger. No ConvolverNode: the first room (6a1c42b,
+   1.7.0) used a 1 s stereo noise convolver, the heaviest node on the audio thread, and on iPhone
+   the whole mix dropped out for 1-3 ms at launch and catch taps (heard as crackle; Music off cured it).
+   One comb pair alone buzzed (each note a ~30 Hz pulse train), hence four mutually prime combs and the
+   diffusers. This graph is a few dozen multiply-adds per sample. Nothing is random. The dry path is
+   unchanged; the room returns into the cue bus. Sound off and Music off cut a ringing tail (cutRoomTail). */
 const CUE_PAN = 0.3;
-// 0.9 s RT60 in a 1 s buffer: a small room that rings over about three melody eighths, so an x12 run
-// stays clear. Wet .22 (about -13 dB send; on the short bell notes the tail sits near -30 dB): space, not wash. 12 ms pre-delay keeps the
-// attack dry; the noise darkens as it decays so the tail never hisses on phone speakers.
-const ROOM = Object.freeze({ seconds: 1, rt60: 0.9, predelay: 0.012, wet: 0.22, seed: 0x5A17C0DE, dark: 0.85 });
-let soundPanBus = null, soundRoom = null, roomBuffer = null, roomBufferContext = null, roomSamples = null;
+// 0.9 s RT60: a small room that rings over about three melody eighths, so an x12 run stays clear. Wet .22
+// (about -13 dB send; on the short bell notes the tail sits near -30 dB): space, not wash. 12 ms pre-delay
+// keeps the attack dry. Comb delays are the Freeverb set in samples at 44.1 kHz (1116 1188 1277 1356,
+// 25-31 ms, mutually unrelated), the right side +23 samples (0.5 ms). Each loop's feedback
+// g = 10^(-3 d / rt60) puts its tail 60 dB down at rt60, clamped under ROOM.maxFeedback so the loop can
+// never grow; the in-loop lowpass darkens the tail so it never hisses on phone speakers. Two Schroeder
+// allpasses per side (5 ms and 3 ms, g .5; the loop delay cannot go under one 128-frame render quantum) smear the echo train; an allpass has unit gain at every
+// frequency, so they add no level. Comb inputs carry sqrt(1 - g^2) / 2 (the square root of the comb count): unit energy per side, then
+// ROOM.trim .85: rendered offline on five short triangle bells, the combs ring tonal notes a little harder
+// than the old noise impulse did (about +1.4 dB peak untrimmed), so .85 puts the wet RMS and peak just
+// under the old room's.
+const ROOM = Object.freeze({ rt60: 0.9, predelay: 0.012, wet: 0.22, rate: 44100, combSamples: Object.freeze([1116, 1188, 1277, 1356]), spread: 23,
+  allpass: Object.freeze([0.005, 0.003]), allpassGain: 0.5, cycleFrames: 128, lowpass: 3000, lowpassQ: -3.0103, maxFeedback: 0.9, trim: 0.85 });
+let soundPanBus = null, soundRoom = null;
 // Pure. Pan for a playfield x (0..W): -CUE_PAN at the left edge, +CUE_PAN at the right, clamped.
 function cuePan(x){
   if (!Number.isFinite(x)) return 0;
@@ -4991,76 +5153,81 @@ function panOutput(ac){
   }
   return soundPanBus;
 }
-// A local, seeded generator (mulberry32 shape) used only for the room impulse.
-function roomNoise(seed){
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6D2B79F5) >>> 0;
-    let t = Math.imul(a ^ (a >>> 15), a | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+// Pure. Feedback gain of a comb with this delay (seconds): 60 dB down after rt60, always in [0, maxFeedback].
+function roomFeedback(delay){
+  const g = Math.pow(10, -3 * delay / ROOM.rt60);
+  return Number.isFinite(g) ? Math.min(ROOM.maxFeedback, Math.max(0, g)) : 0;
 }
-// Pure for a sample rate: two decorrelated channels, each normalised to unit energy, cached per rate.
-function roomImpulse(rate){
-  if (roomSamples && roomSamples.rate === rate) return roomSamples.channels;
-  const n = Math.max(1, Math.round(ROOM.seconds * rate)), pre = Math.min(n - 1, Math.round(ROOM.predelay * rate));
-  const channels = [];
-  for (let c = 0; c < 2; c++){
-    const next = roomNoise(ROOM.seed + c * 0x9E3779B9), data = new Float32Array(n);
-    let lp = 0, energy = 0;
-    for (let i = pre; i < n; i++){
-      const t = (i - pre) / rate;
-      lp += (1 - ROOM.dark * t / ROOM.seconds) * ((next() * 2 - 1) - lp);
-      const v = lp * Math.pow(10, -3 * t / ROOM.rt60);
-      data[i] = v; energy += v * v;
-    }
-    const k = energy > 0 ? 1 / Math.sqrt(energy) : 0;
-    for (let i = pre; i < n; i++) data[i] *= k;
-    channels.push(data);
-  }
-  roomSamples = { rate, channels };
-  return channels;
+// Pure. Delay times (seconds) of one side: side 0 left, 1 right (offset by ROOM.spread samples).
+function roomSide(side){
+  const off = side ? ROOM.spread : 0;
+  return { combs: ROOM.combSamples.map(n => (n + off) / ROOM.rate), allpass: ROOM.allpass.map(d => d + (side ? 0.0005 : 0)) };
 }
-// The room's send for this context, or null where the browser has no ConvolverNode or anything fails:
-// the melody then plays dry, as before. D5b: built on the first melody note that needs it (soundTone
-// with Music on), never at audio init, so a Music-off or Sound-only session allocates no ConvolverNode;
-// after a cut the next melody note builds a fresh chain on the same cached impulse.
+// The room's send for this context, or null where the browser lacks a node or anything fails: the melody
+// then plays dry, as before. D5b: built on the first melody note that needs it (soundTone with Music on),
+// never at audio init, so a Music-off or Sound-only session allocates no room; after a cut the next melody
+// note builds a fresh chain.
 function roomInput(ac){
   if (soundRoom && soundRoom.ac === ac) return soundRoom.send;
   if (soundRoom) cutRoomTail();
-  if (typeof ac.createConvolver !== 'function' || typeof ac.createBuffer !== 'function') return null;
+  if (typeof ac.createDelay !== 'function' || typeof ac.createBiquadFilter !== 'function' || typeof ac.createChannelMerger !== 'function') return null;
+  let nodes = [];
   try {
-    if (roomBufferContext !== ac){
-      const rate = ac.sampleRate > 0 ? ac.sampleRate : 48000, ch = roomImpulse(rate);
-      const buffer = ac.createBuffer(2, ch[0].length, rate);
-      buffer.getChannelData(0).set(ch[0]);
-      buffer.getChannelData(1).set(ch[1]);
-      roomBuffer = buffer; roomBufferContext = ac;
-    }
-    const send = ac.createGain();
-    send.gain.value = ROOM.wet;
-    const conv = ac.createConvolver();
-    conv.normalize = false; // the impulse is already normalised: the same level in every browser
-    conv.buffer = roomBuffer;
-    const out = ac.createGain();
-    out.gain.value = 1;
-    send.connect(conv); conv.connect(out); out.connect(soundOutput(ac));
-    soundRoom = { ac, send, conv, out };
+    const make = n => { nodes.push(n); return n; };
+    const gainNode = v => { const n = make(ac.createGain()); n.gain.value = v; return n; };
+    const delayNode = d => { const n = make(ac.createDelay(0.1)); n.delayTime.value = d; return n; };
+    const send = gainNode(ROOM.wet);
+    const pre = delayNode(ROOM.predelay);
+    const merger = make(ac.createChannelMerger(2));
+    const out = gainNode(1);
+    send.connect(pre);
+    const ag = Math.min(ROOM.maxFeedback, Math.max(0, ROOM.allpassGain));
+    const rate = Number.isFinite(ac.sampleRate) && ac.sampleRate > 0 ? ac.sampleRate : ROOM.rate; // 44.1 or 48 kHz, whatever this context runs at
+    const cycle = ROOM.cycleFrames / rate;
+    const sides = [0, 1].map(side => {
+      const t = roomSide(side), combs = [], allpasses = [];
+      const sum = gainNode(1); // the side's comb sum, also the first allpass's input
+      for (const d of t.combs){
+        const g = roomFeedback(d);
+        const input = gainNode(ROOM.trim * Math.sqrt(1 - g * g) / Math.sqrt(t.combs.length));
+        const delay = delayNode(d);
+        const lp = make(ac.createBiquadFilter());
+        lp.type = 'lowpass'; lp.frequency.value = ROOM.lowpass; lp.Q.value = ROOM.lowpassQ; // a lowpass's Q is in dB: -3.01 dB is Butterworth, flat; 0.707 would be a +0.7 dB peak that rings in the loop
+        const fb = gainNode(g);
+        pre.connect(input); input.connect(delay); delay.connect(lp);
+        lp.connect(fb); fb.connect(delay); // the loop always holds the DelayNode
+        lp.connect(sum);
+        combs.push({ input, delay, lp, fb });
+      }
+      let x = sum;
+      for (const d of t.allpass){
+        // Schroeder allpass, direct form: y = -g x + x(n-d) + g y(n-d). The feedback runs through the
+        // DelayNode (d2); d1 is the feed-forward tap. Blink runs a DelayNode that sits in a cycle one render
+        // quantum (128 frames) longer than its delayTime, so d1 is lengthened by the same: exactly allpass there.
+        const neg = gainNode(-ag), d1 = delayNode(d + cycle), y = gainNode(1), d2 = delayNode(d), fb = gainNode(ag);
+        x.connect(neg); neg.connect(y); x.connect(d1); d1.connect(y);
+        y.connect(d2); d2.connect(fb); fb.connect(y);
+        allpasses.push({ neg, d1, delay: d2, fb, y });
+        x = y;
+      }
+      x.connect(merger, 0, side);
+      return { sum, combs, allpasses };
+    });
+    merger.connect(out); out.connect(soundOutput(ac));
+    soundRoom = { ac, send, out, nodes, sides, combs: sides.flatMap(sd => sd.combs), allpasses: sides.flatMap(sd => sd.allpasses) };
     return send;
-  } catch (e) { soundRoom = null; return null; }
+  } catch (e) {
+    for (const n of nodes) { try { n.disconnect(); } catch (ignored) {} }
+    soundRoom = null; return null;
+  }
 }
 // Silence a ringing tail: an 8 ms fade, then the chain is unplugged. The next melody note builds a
-// fresh chain on the same impulse, so nothing old rings into it.
+// fresh chain, so nothing old rings into it.
 function cutRoomTail(){
   const room = soundRoom;
   soundRoom = null;
   if (!room) return;
-  const unplug = () => {
-    try { room.send.disconnect(); } catch (e) {}
-    try { room.conv.disconnect(); } catch (e) {}
-    try { room.out.disconnect(); } catch (e) {}
-  };
+  const unplug = () => { for (const n of room.nodes) { try { n.disconnect(); } catch (e) {} } };
   try {
     const now = room.ac.currentTime, g = room.out.gain;
     g.cancelScheduledValues(now);
@@ -5834,6 +6001,28 @@ function musicWanted(){
   const id = getSector().def.music;
   return Object.prototype.hasOwnProperty.call(MUSIC, id) ? id : null;
 }
+// G7: menu music, native only. Two Flow Music loops (title and Hangar) bundled in the iOS and Android apps; the page
+// says which one should sound and the shell plays and fades it. Never in a run (the synth above is the run's music),
+// never on the web build, silent with Music or Sound off and while the app is hidden. gain: per-track loudness match.
+let MENU_MUSIC_ON = true; // the flag (a let only so tests can drive it off)
+// Takes (John 2026-11-04, Google Flow's blind pick): title = Flow "title loop B" (-12.8 LUFS), Hangar = "title loop A"
+// (-14.9 LUFS); the title gain is 2.1 dB lower so both sit at the same loudness.
+const MENU_MUSIC = Object.freeze({ gain: Object.freeze({ title: 0.39, hangar: 0.5 }) });
+let menuTrackSent; // undefined until the first sync, so the first frame always tells the shell
+function menuTrackWanted(){
+  if (!MENU_MUSIC_ON || !musicOn || muted || state !== 'title' || suspended || runHeld ||
+      (typeof document !== 'undefined' && document.hidden)) return null;
+  return hangarOpen ? 'hangar' : 'title';
+}
+function syncMenuMusic(){
+  const track = menuTrackWanted();
+  if (track === menuTrackSent) return;
+  menuTrackSent = track;
+  const gain = track ? MENU_MUSIC.gain[track] : 0;
+  Native.post('music.menu', { track, gain });
+  if (!ANDROID_SHELL || window.__ghostMode) return;
+  try { const a = window.ZipwaltzAndroid; if (a && typeof a.menuMusic === 'function') a.menuMusic(track || '', gain); } catch (_) {}
+}
 // How busy the plucks are: sparse at first, quarter notes from x4, every eighth in Overdrive.
 // Under the results card the groove drops to its calm layer (pads, bass, sparse plucks).
 function musicDensity(){
@@ -6234,7 +6423,7 @@ function syncResume(){
 }
 // D/C: the scrolling cards are their own scroll boxes. A soft edge shows only where there is more to scroll
 // (fade-top / fade-bottom). Presentation only: a scroll listener toggles the class; nothing else reads it.
-const SCROLL_CARD_SELECTOR = '#hangarScreen .card-scroll, #settingsScreen .card-scroll, #moreScreen .card-scroll, #gameOverScreen .card-scroll';
+const SCROLL_CARD_SELECTOR = '#hangarScreen .card-scroll, #settingsScreen .card-scroll, #moreScreen .card-scroll, #gameOverScreen .card-scroll, #partyScreen .card-scroll';
 function syncScrollFades(){
   if (typeof document === 'undefined' || !document.querySelectorAll) return;
   const cards = document.querySelectorAll(SCROLL_CARD_SELECTOR);
@@ -6266,14 +6455,17 @@ function syncScreens(){
   const showHangar = hangarOpen && state === 'title' && !showSettings && !showStats;
   const showMore = moreOpen && state === 'title' && !showSettings && !showStats && !showHangar;
   const over = state === 'dead' && resultsShown;
+  const showParty = ROOMS_ON && partyPanelOpen && state !== 'playing' && !showSettings; // B13: the room screen replaces whatever is under it
+  const inRoom = ROOMS_ON && partyInRoom();                                              // in a room the results card is the room screen's
   const overlayStates = [
-    ['titleScreen', state === 'title' && !showMore && !showHangar && !showSettings && !showStats],
-    ['moreScreen', showMore],
+    ['titleScreen', state === 'title' && !showMore && !showHangar && !showSettings && !showStats && !showParty],
+    ['moreScreen', showMore && !showParty],
     ['hangarScreen', showHangar],
-    ['gameOverScreen', over && !showSettings],
+    ['gameOverScreen', over && !showSettings && !showParty && !inRoom],
     ['hud', state === 'playing'],
     ['settingsScreen', showSettings],
-    ['statsScreen', showStats]
+    ['statsScreen', showStats],
+    ['partyScreen', showParty]
   ];
   // Replace, don't overlap: a card that shows while another card goes (More to Hangar or Settings,
   // Hangar or Settings back to More, results to Settings) hides the outgoing card at once. Only a close
@@ -6592,7 +6784,7 @@ function reset(){
   keepsakeNotice = null;
   renderPrev.valid = false; renderAlpha = 1; renderAlignedRun = RENDER_ALIGN_FRAMES; renderLag = 0;
   particles = []; popups = [];
-  shake = 0; punch = null; nearFlash = null; hitStopUntil = 0; perfectLand = null;
+  shake = 0; punch = null; nearFlash = null; hitStopUntil = 0; perfectLand = null; perfectPop.on = false;
   hideFlickHint();
   resetCameraFx();
   launchFx = null; runWasBest = false; confetti = [];
@@ -6665,6 +6857,39 @@ function sparkHotStops(color){
 // Milestone extra sparks and the death boom: hot sparks with no colour shift. Any look marks a burst as hot
 // (the catch looks CATCH_SPARK and CATCH_SPARK_PERFECT are the others); plain bursts (pickups) stay flat.
 const HOT_SPARK = Object.freeze({ c2: null, lifeMul: 1, rMul: 1 });
+// G3: captures with character. Catch sparks take a shape from the sector they land in (rocky facets, frost flecks,
+// gas ribbons, binary twins), drawn on top of the round core. Picked from the sector at spawn, no fxRandom draws.
+const CAPTURE_SHAPE = Object.freeze({ rocky: 'facet', frost: 'fleck', gas: 'ribbon', binary: 'twin' });
+const SPARK_ACCENT = Object.freeze({ facet: 2.2, fleck: 2.4, ribbon: 0.06, ribbonBend: 1.6, twin: 2.4, twinR: 0.6 });
+function captureShape(look){
+  if (look !== CATCH_SPARK && look !== CATCH_SPARK_PERFECT) return null;
+  return CAPTURE_SHAPE[getSector().def.mix] || null;
+}
+// The accent for one spark, in its current fill colour, along its direction of travel.
+function drawSparkAccent(q, r){
+  const sp = Math.hypot(q.vx, q.vy) || 1, ux = q.vx / sp, uy = q.vy / sp, x = q.x, y = q.y;
+  ctx.beginPath();
+  if (q.shape === 'facet'){
+    const L = r * SPARK_ACCENT.facet;
+    ctx.moveTo(x + ux * L, y + uy * L); ctx.lineTo(x - uy * r, y + ux * r);
+    ctx.lineTo(x - ux * r, y - uy * r); ctx.lineTo(x + uy * r, y - ux * r); ctx.lineTo(x + ux * L, y + uy * L);
+    ctx.fill();
+  } else if (q.shape === 'fleck'){
+    const L = r * SPARK_ACCENT.fleck;
+    ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = Math.max(0.6, r * 0.35);
+    ctx.moveTo(x - L, y); ctx.lineTo(x + L, y); ctx.moveTo(x, y - L); ctx.lineTo(x, y + L);
+    ctx.stroke();
+  } else if (q.shape === 'ribbon'){
+    const tx = x - q.vx * SPARK_ACCENT.ribbon, ty = y - q.vy * SPARK_ACCENT.ribbon, b = r * SPARK_ACCENT.ribbonBend;
+    ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = r * 0.9;
+    ctx.moveTo(x, y); ctx.quadraticCurveTo((x + tx) / 2 - uy * b, (y + ty) / 2 + ux * b, tx, ty);
+    ctx.stroke();
+  } else if (q.shape === 'twin'){
+    const o = r * SPARK_ACCENT.twin;
+    ctx.arc(x - uy * o, y + ux * o, r * SPARK_ACCENT.twinR, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
 // D3 Reduce Motion: no particles. The four fxRandom draws per particle still run, with n capped at 12 as before,
 // so the effects stream ends exactly where it always has (48 draws for a catch or a death, not the 104/240 of full motion).
 function burst(x, y, color, n, look){
@@ -6673,11 +6898,12 @@ function burst(x, y, color, n, look){
   const c2 = look ? look.c2 : null, lifeMul = look ? look.lifeMul : 1, rMul = look ? look.rMul : 1;
   const mid = c2 ? (/^#[0-9a-fA-F]{6}$/.test(color) ? sparkMidHex(color, c2) : c2) : null;
   const hot = look && !still ? sparkHotStops(color) : null;
+  const shape = still ? null : captureShape(look);
   for (let i=0;i<n;i++){
     const a = fxRandom()*Math.PI*2, s = 60 + fxRandom()*220;
     const life = (0.5+fxRandom()*0.4)*lifeMul, r = (1.5+fxRandom()*2.5)*rMul;
     if (still) continue;
-    particles.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s, life, t:0, color, c2, mid, r, hot });
+    particles.push({ x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s, life, t:0, color, c2, mid, r, hot, shape });
   }
   if (particles.length > JUICE.particleCap) particles.splice(0, particles.length - JUICE.particleCap);
 }
@@ -6722,6 +6948,7 @@ function armCapturePunch(p){
   // F4: this catch's grade (rhythmFlash has just recorded it; an ungraded catch cleared it).
   perfectLand = rhythm.lastGrade === 'perfect' ? { id: p.id, at: wallNow,
     axis: Math.atan2(player.vy, player.vx) || 0, from: Math.atan2(player.y - p.y, player.x - p.x) || 0 } : null;
+  armPerfectPop(p, wallNow, combo); // J2
   armCameraPunch(p, wallNow);
   armNextLean(p, wallNow); // F10: after the punch, toward the next target
   // Extra sparks use a rewound effects stream so later planet colors stay put.
@@ -8900,6 +9127,402 @@ function duelNickName(i){
   if (!Number.isInteger(i) || i < 0 || i >= DUEL_NICK_COUNT) return '';
   return DUEL_NICK_ADJ[Math.floor(i / DUEL_NICK_NOUN.length)] + ' ' + DUEL_NICK_NOUN[i % DUEL_NICK_NOUN.length];
 }
+/* ==== ORBIT-PARTY BEGIN ==== */
+/* B13 Orbit Party client: names, rival tracks, tag layout and the room client. Pure data and logic: no DOM, storage,
+   audio, clock or global of its own (every dependency comes in as an argument), so tools/orbit_party.cjs can load this
+   exact text in Node for the server (name validation) and the tests. The page glue is outside this region.
+   Names are PRESETS ONLY (no free text anywhere): an adjective, a noun and an emoji, packed into one integer, the
+   protocol's `nick`. Protocol: docs/multiplayer/room_protocol.md. Privacy: docs/privacy/orbit_party_room_data.md. */
+// 64 adjectives x 64 nouns x 16 emoji = 65536 names = a 16-bit nick. Curated: kind words, space and friendly animals.
+// tests/orbit-party-names.test.cjs scans every pair against a blocklist; adjectives never combine into a slur or a
+// rude phrase with any noun. The first 8 adjectives, 8 nouns and 4 emoji are the "starter set" (see ROOMS_NICK_SPACE).
+const ORBIT_ADJ = Object.freeze(['Swift', 'Bright', 'Lucky', 'Brave', 'Calm', 'Cosmic', 'Sunny', 'Clever',
+  'Bold', 'Cheery', 'Cozy', 'Dreamy', 'Gentle', 'Gleaming', 'Happy', 'Jolly', 'Keen', 'Lively', 'Merry', 'Mighty', 'Nimble',
+  'Noble', 'Plucky', 'Polite', 'Proud', 'Quick', 'Quiet', 'Radiant', 'Shiny', 'Silver', 'Snappy', 'Spry', 'Steady', 'Sparkly',
+  'Stellar', 'Tough', 'Sweet', 'Tidy', 'Twinkly', 'Wise', 'Witty', 'Zesty', 'Zippy', 'Golden', 'Amber', 'Mellow', 'Misty',
+  'Frosty', 'Fuzzy', 'Humble', 'Breezy', 'Peppy', 'Rosy', 'Toasty', 'Rapid', 'Bouncy', 'Dandy', 'Fancy', 'Glad', 'Hardy',
+  'Jaunty', 'Lunar', 'Solar', 'Starry']);
+const ORBIT_NOUN = Object.freeze(['Comet', 'Nova', 'Orbit', 'Moon', 'Star', 'Rocket', 'Otter', 'Panda',
+  'Fox', 'Owl', 'Penguin', 'Dolphin', 'Koala', 'Bunny', 'Kitten', 'Puppy', 'Turtle', 'Falcon', 'Robin', 'Heron', 'Lynx',
+  'Badger', 'Puffin', 'Hedgehog', 'Lemur', 'Llama', 'Alpaca', 'Narwhal', 'Seal', 'Walrus', 'Whale', 'Starling', 'Sparrow',
+  'Finch', 'Wren', 'Pelican', 'Quokka', 'Gecko', 'Newt', 'Meteor', 'Aurora', 'Galaxy', 'Nebula', 'Pulsar', 'Quasar', 'Photon',
+  'Planet', 'Lander', 'Satellite', 'Beacon', 'Cosmos', 'Zenith', 'Ember', 'Lantern', 'Pebble', 'Acorn', 'Clover', 'Maple',
+  'Willow', 'Fern', 'Daisy', 'Pixel', 'Tulip', 'Sunbeam']);
+const ORBIT_EMOJI = Object.freeze(['\u{1F680}', '\u{1F31F}', '\u{1FA90}', '\u{1F319}', '\u{1F419}', '\u{1F98A}', '\u{1F43C}', '\u{1F427}',
+  '\u{1F989}', '\u{1F422}', '\u{1F984}', '\u{1F42C}', '\u{1F340}', '\u{1F308}', '\u{1F41D}', '\u{1F98B}']);
+const ORBIT_NICK_COUNT = ORBIT_ADJ.length * ORBIT_NOUN.length * ORBIT_EMOJI.length; // 65536: a uint16
+// The nick the server accepts: the room core validates 0..NICK_COUNT-1 (server/room-core.cjs, 65536: the whole space; a test
+// fails if the two differ). The picker only offers names whose nick is below ROOMS_NICK_SPACE, so it never offers one the
+// server refuses. Packing puts the starter set in the low byte: adjective bits 0-2, noun bits 3-5, emoji bits 6-7
+// (8 x 8 x 4 = 256 names); the rest of each index sits in the higher bits.
+const ROOMS_NICK_SPACE = 65536;
+function orbitNickIndex(a, n, e){
+  if (!Number.isInteger(a) || !Number.isInteger(n) || !Number.isInteger(e)) return -1;
+  if (a < 0 || a >= ORBIT_ADJ.length || n < 0 || n >= ORBIT_NOUN.length || e < 0 || e >= ORBIT_EMOJI.length) return -1;
+  return (a & 7) | ((n & 7) << 3) | ((e & 3) << 6) | ((a >> 3) << 8) | ((n >> 3) << 11) | ((e >> 2) << 14);
+}
+function orbitNickParts(i){
+  if (!Number.isInteger(i) || i < 0 || i >= ORBIT_NICK_COUNT) return null;
+  return { a: (i & 7) | (((i >> 8) & 7) << 3), n: ((i >> 3) & 7) | (((i >> 11) & 7) << 3), e: ((i >> 6) & 3) | (((i >> 14) & 3) << 2) };
+}
+function orbitNickName(i){ const p = orbitNickParts(i); return p ? ORBIT_ADJ[p.a] + ' ' + ORBIT_NOUN[p.n] : ''; }
+function orbitNickEmoji(i){ const p = orbitNickParts(i); return p ? ORBIT_EMOJI[p.e] : ''; }
+function orbitNickLabel(i){ const p = orbitNickParts(i); return p ? ORBIT_EMOJI[p.e] + ' ' + ORBIT_ADJ[p.a] + ' ' + ORBIT_NOUN[p.n] : ''; }
+function orbitNickOffered(i){ return Number.isInteger(i) && i >= 0 && i < ROOMS_NICK_SPACE && i < ORBIT_NICK_COUNT; }
+// A random offered nick from `rand` (a () => [0,1) function; the page passes a crypto-backed one).
+function orbitRandomNick(rand){
+  for (let k = 0; k < 64; k++){
+    const i = orbitNickIndex(Math.floor(rand() * ORBIT_ADJ.length), Math.floor(rand() * ORBIT_NOUN.length), Math.floor(rand() * ORBIT_EMOJI.length));
+    if (orbitNickOffered(i)) return i;
+  }
+  return Math.floor(rand() * Math.min(ROOMS_NICK_SPACE, ORBIT_NICK_COUNT));
+}
+// The next offered nick after changing one part (part: 'a' adjective, 'n' noun, 'e' emoji) by +1 or -1, wrapping.
+function orbitNickCycle(i, part, dir){
+  const p = orbitNickParts(i) || { a: 0, n: 0, e: 0 };
+  const len = part === 'a' ? ORBIT_ADJ.length : part === 'n' ? ORBIT_NOUN.length : ORBIT_EMOJI.length;
+  for (let k = 1; k <= len; k++){
+    const q = { a: p.a, n: p.n, e: p.e };
+    q[part] = (((p[part] + (dir < 0 ? -k : k)) % len) + len) % len;
+    const j = orbitNickIndex(q.a, q.n, q.e);
+    if (orbitNickOffered(j)) return j;
+  }
+  return i;
+}
+
+// ---- rival tracks ------------------------------------------------------------------------------------------------
+// A rival's last few position snapshots (arrival time in ms, x, y, score). sample(t) renders `delay` ms behind the
+// newest snapshot, interpolating between the two around that time; past the newest it extrapolates at the last
+// velocity for at most `ahead` ms and then holds; with nothing for `stale` ms it reports no position (null).
+const PARTY_TRACK = Object.freeze({ keep: 6, delay: 220, ahead: 250, stale: 1800 });
+function createRivalTrack(){
+  const tr = { t: [], x: [], y: [], sc: [], seen: 0 };
+  tr.push = function(t, x, y, sc){
+    if (!(Number.isFinite(t) && Number.isFinite(x) && Number.isFinite(y))) return false;
+    const n = tr.t.length;
+    if (n && t <= tr.t[n - 1]) return false;          // out of order: ignored
+    tr.t.push(t); tr.x.push(x); tr.y.push(y); tr.sc.push(sc | 0);
+    if (tr.t.length > PARTY_TRACK.keep){ tr.t.shift(); tr.x.shift(); tr.y.shift(); tr.sc.shift(); }
+    tr.seen++;
+    return true;
+  };
+  // Writes { x, y } into `out` and returns true, or returns false when there is nothing to draw.
+  tr.sample = function(now, out){
+    const n = tr.t.length;
+    if (!n || now - tr.t[n - 1] > PARTY_TRACK.stale) return false;
+    const at = now - PARTY_TRACK.delay;
+    if (n === 1 || at <= tr.t[0]){ out.x = tr.x[0]; out.y = tr.y[0]; return true; }
+    for (let i = 1; i < n; i++){
+      if (at <= tr.t[i]){
+        const k = (at - tr.t[i - 1]) / (tr.t[i] - tr.t[i - 1]);
+        out.x = tr.x[i - 1] + (tr.x[i] - tr.x[i - 1]) * k;
+        out.y = tr.y[i - 1] + (tr.y[i] - tr.y[i - 1]) * k;
+        return true;
+      }
+    }
+    // Past the newest snapshot: carry on at the last velocity for a short while, then hold.
+    const dt = tr.t[n - 1] - tr.t[n - 2], over = Math.min(at - tr.t[n - 1], PARTY_TRACK.ahead);
+    const vx = (tr.x[n - 1] - tr.x[n - 2]) / dt, vy = (tr.y[n - 1] - tr.y[n - 2]) / dt;
+    out.x = tr.x[n - 1] + vx * over; out.y = tr.y[n - 1] + vy * over;
+    return true;
+  };
+  tr.score = function(){ return tr.sc.length ? tr.sc[tr.sc.length - 1] : 0; };
+  return tr;
+}
+
+// ---- name tag layout ---------------------------------------------------------------------------------------------
+// Pure geometry in screen px. items: [{ id, x, y (the rival's head), w, h (its tag) }], in priority order (the first
+// gets the best spot). keeps: [{ l, t, r, b }] rectangles a tag must never cover (the player's aim guide). bounds is
+// the playfield { l, t, r, b }. Each tag tries above, below, right, then left of its head, and takes the first spot that
+// is inside the bounds and clear of every keep rectangle and every tag already placed. If no spot is clear of the aim
+// guide the tag is hidden (alpha 0); if the only trouble is other tags it fades (alpha 0.3). Returns
+// [{ id, l, t, w, h, alpha }].
+function partyPlaceTags(items, keeps, bounds, gap){
+  const out = [], g = gap == null ? 8 : gap;
+  const hit = (a, b) => a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t;
+  for (let i = 0; i < items.length; i++){
+    const it = items[i], hw = it.w / 2, hh = it.h / 2;
+    const cands = [[it.x - hw, it.y - g - it.h], [it.x - hw, it.y + g], [it.x + g, it.y - hh], [it.x - g - it.w, it.y - hh]];
+    let chosen = null, keepFree = null;
+    for (let c = 0; c < cands.length && !chosen; c++){
+      let l = cands[c][0], t = cands[c][1];
+      l = Math.max(bounds.l, Math.min(bounds.r - it.w, l));
+      t = Math.max(bounds.t, Math.min(bounds.b - it.h, t));
+      const box = { l, t, r: l + it.w, b: t + it.h };
+      if (keeps.some(k => hit(box, k))) continue;
+      if (!keepFree) keepFree = box;
+      if (out.some(o => o.alpha > 0 && hit(box, { l: o.l, t: o.t, r: o.l + o.w, b: o.t + o.h }))) continue;
+      chosen = box;
+    }
+    if (chosen) out.push({ id: it.id, l: chosen.l, t: chosen.t, w: it.w, h: it.h, alpha: 1 });
+    else if (keepFree) out.push({ id: it.id, l: keepFree.l, t: keepFree.t, w: it.w, h: it.h, alpha: 0.3 });
+    else out.push({ id: it.id, l: cands[0][0], t: cands[0][1], w: it.w, h: it.h, alpha: 0 });
+  }
+  return out;
+}
+
+// ---- room client -------------------------------------------------------------------------------------------------
+const PARTY_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const PARTY_FULL_MESSAGE = 'Rooms are full right now. Play a duel instead';
+function partyInt(v){ return Number.isFinite(+v) ? Math.trunc(+v) : 0; } // a number from the server, shown only as an integer
+function partyNormalizeCode(s){
+  let out = '';
+  const up = String(s == null ? '' : s).toUpperCase();
+  for (let i = 0; i < up.length && out.length < 5; i++) if (PARTY_CODE_ALPHABET.indexOf(up[i]) >= 0) out += up[i];
+  return out;
+}
+// A code in a link or a pasted line: the first run of five code characters after "room=", or the whole text.
+function partyCodeFromText(s){
+  const text = String(s || '');
+  const m = /[?&#]room=([A-Za-z0-9]{5})(?![A-Za-z0-9])/.exec(text);
+  if (!m && /room=/i.test(text)) return '';              // a link whose code is not five characters
+  const code = partyNormalizeCode(m ? m[1] : text);
+  return code.length === 5 ? code : '';
+}
+// Friendly text for the server's error codes (the server never echoes client input, and neither do these).
+const PARTY_ERROR_TEXT = Object.freeze({
+  bad_code: 'That room code does not look right. Room codes have 5 letters and numbers.',
+  no_such_room: 'No room with that code. It may have closed. Ask your friend for a new link.',
+  room_in_progress: 'That room is already racing. Ask your friend to start a new one, or wait for the next round.',
+  room_full: 'That room is full.',
+  name_taken: 'Someone in that room already has that name. Shuffle for another.',
+  bad_nick: 'That name was not accepted. Shuffle for another.',
+  not_host: 'Only the host can do that.',
+  not_enough_players: 'You need at least 2 players to start.',
+  bad_phase: 'Not right now. Try again in a moment.',
+  seat_expired: 'You were away too long and your seat was given up.',
+  already_in_room: 'You are already in a room.',
+  late: 'Your run came in too late to count.',
+  bad_run: 'Your run could not be counted.',
+  rate_limited: 'Too many tries. Wait a moment.',
+  unknown_type: 'The room did not understand that. Reload the game and try again.'
+});
+const PARTY_RUN_REFUSED_TEXT = 'Your run could not be counted this heat. The next heat is a fresh start.';
+const PARTY_FALLBACK_CODES = Object.freeze(['rooms_closed', 'rooms_full']);
+const PARTY_RECONNECT_DELAYS = Object.freeze([0, 400, 1000, 2000, 3000, 4000, 4000, 4000]);
+// deps: { url (ws base, no path), WebSocket (constructor), now (ms clock), setTimeout, clearTimeout, setInterval,
+// clearInterval }. Nothing is read from a global. Listeners get (type, data); the snapshot is client.state.
+function createPartyClient(deps){
+  const WS = deps.WebSocket, nowMs = deps.now, setT = deps.setTimeout, clearT = deps.clearTimeout, setI = deps.setInterval, clearI = deps.clearInterval;
+  const base = String(deps.url || '').replace(/\/+$/, '').replace(/\/v1\/ws$/, '');
+  const connectTimeoutMs = deps.connectTimeoutMs || 6000;
+  const listeners = [];
+  let ws = null, intentional = false, pingTimer = null, pingN = 0, connectTimer = null, resumeTimer = null, resumeTry = 0, resumeStart = 0;
+  let lastPosAt = -Infinity, nameRetries = 0, pendingNick = null, pendingJoin = null;
+  const state = {
+    status: 'idle',            // idle | connecting | open | in_room | reconnecting | closed | fallback
+    code: '', you: 0, created: false, room: null,
+    heat: null,                // the current heat_start with startAt in local ms (localStartAt)
+    submitted: false, ack: null, result: null, final: null,
+    error: null,               // { code, message } of the last refusal
+    fallback: null,            // { reason, message } when rooms are unavailable
+    closedReason: '', launched: 0
+  };
+  const token = { v: '' };     // the seat token lives only here, in memory
+  const tracks = new Map();    // seat id -> rival track
+  const api = { state, tracks };
+  const emit = (type, data) => { for (const l of listeners.slice()) { try { l(type, data); } catch (_) { /* a listener never breaks the client */ } } };
+  const changed = () => emit('state', state);
+  const send = obj => {
+    if (!ws || ws.readyState !== 1) return false;
+    try { ws.send(JSON.stringify(Object.assign({ v: 1 }, obj))); return true; } catch (_) { return false; }
+  };
+  function setFallback(reason, message){
+    state.status = 'fallback';
+    state.fallback = { reason, message: message || PARTY_FULL_MESSAGE };
+    stopTimers(); intentional = true;
+    if (ws){ try { ws.close(); } catch (_) {} ws = null; }
+    emit('fallback', state.fallback);
+    changed();
+  }
+  function stopTimers(){
+    if (pingTimer){ clearI(pingTimer); pingTimer = null; }
+    if (connectTimer){ clearT(connectTimer); connectTimer = null; }
+    if (resumeTimer){ clearT(resumeTimer); resumeTimer = null; }
+  }
+  function startPing(){
+    if (pingTimer) clearI(pingTimer);
+    pingTimer = setI(() => { send({ t: 'ping', n: ++pingN }); }, 25000);
+  }
+  function onMessage(ev){
+    let m = null;
+    try { m = JSON.parse(typeof ev.data === 'string' ? ev.data : String(ev.data)); } catch (_) { return; }
+    if (!m || typeof m !== 'object' || m.v !== 1) return;
+    switch (m.t){
+      case 'joined':
+        if (!validSeat(m) || typeof m.token !== 'string' || !/^[A-Za-z0-9]{8,64}$/.test(m.token)){ badReply(); break; }
+        state.code = m.code; state.you = m.you; state.created = !!m.created; token.v = m.token;
+        state.status = 'in_room'; state.error = null; nameRetries = 0; pendingJoin = null;
+        startPing(); changed(); break;
+      case 'resumed':
+        if (!validSeat(m)){ badReply(); break; }
+        state.code = m.code; state.you = m.you; state.status = 'in_room'; state.error = null; resumeTry = 0;
+        if (resumeTimer){ clearT(resumeTimer); resumeTimer = null; }
+        startPing(); changed(); break;
+      case 'room':
+        if (typeof m.code !== 'string' || partyNormalizeCode(m.code) !== m.code || m.code.length !== 5 || !Array.isArray(m.players)) break;
+        state.room = m;
+        if (m.phase === 'lobby'){ state.final = null; state.result = null; state.heat = null; state.submitted = false; tracks.clear(); } // a rematch starts clean
+        changed(); emit('room', m); break;
+      case 'heat_start': {
+        if (![m.heat, m.seed, m.startAt, m.now].every(Number.isInteger)) break;
+        // The server clock aligned to ours (one-way delay ignored); a start further off than 15 s is clamped.
+        const startAt = nowMs() + Math.max(0, Math.min(15000, m.startAt - m.now));
+        state.heat = Object.assign({}, m, { localStartAt: startAt });
+        state.submitted = !!m.submitted; state.ack = null; state.result = null;
+        tracks.clear(); lastPosAt = -Infinity;
+        changed(); emit('heat_start', state.heat); break;
+      }
+      case 'run_ack': state.ack = m; state.submitted = true; changed(); emit('run_ack', m); break;
+      case 'heat_result': state.result = m; changed(); emit('heat_result', m); break;
+      case 'final': state.final = m; changed(); emit('final', m); break;
+      case 'pos':
+        // Live positions relayed by the room (docs/multiplayer/room_protocol.md "pos relay"). Ignored without a current heat.
+        if (state.heat && m.heat === state.heat.heat && Array.isArray(m.p)){
+          const t = nowMs();
+          for (const row of m.p){
+            if (!Array.isArray(row) || row.length < 5 || row[0] === state.you) continue;
+            if (!state.room || !state.room.players.some(p => p.id === row[0] && !p.left)) continue; // only seated rivals
+            let tr = tracks.get(row[0]);
+            if (!tr){ tr = createRivalTrack(); tracks.set(row[0], tr); }
+            tr.push(t, +row[2], +row[3], row[4]);
+          }
+          emit('pos', m);
+        }
+        break;
+      case 'closed':
+        state.closedReason = m.reason; stopTimers(); intentional = true;
+        if (ws){ try { ws.close(); } catch (_) {} ws = null; }
+        if (m.reason === 'kill_switch'){ setFallback('kill_switch', PARTY_FULL_MESSAGE); break; }
+        if (m.reason === 'left'){ resetRoom(); state.status = 'idle'; } else state.status = 'closed';
+        changed(); emit('closed', m); break;
+      case 'error': onError(m); break;
+      default: break;                                         // pong and anything newer: ignored
+    }
+  }
+  function onError(m){
+    const code = String(m.code || '');
+    const setup = m.ref === 'create' || m.ref === 'join' || m.ref === 'resume' || state.status !== 'in_room';
+    if (PARTY_FALLBACK_CODES.indexOf(code) >= 0 || (code === 'rate_limited' && setup)){
+      setFallback(code, PARTY_FULL_MESSAGE); return;
+    }
+    // A run the server refused for the rate limit or because it is busy was NOT recorded: the heat will close without it (DNF).
+    // Do not leave the heat screen showing a submitted tick and waiting: say so, once. A rate_limited with no `ref` is the
+    // connection's message window; while a run is waiting for its ack that is almost certainly the run itself, and an ack that
+    // does arrive anyway puts the tick back.
+    if ((code === 'rate_limited' || code === 'server_busy') && (m.ref === 'run' || (m.ref === undefined && state.submitted && !state.ack))){
+      state.submitted = false;
+      state.ack = { t: 'run_ack', heat: state.heat ? state.heat.heat : 0, status: 'dnf', score: 0, reason: code, local: true };
+      state.error = { code, message: PARTY_RUN_REFUSED_TEXT };
+      changed(); emit('error', state.error); return;
+    }
+    if (code === 'name_taken' && pendingJoin && pendingJoin.nickFn && nameRetries < 8){
+      nameRetries++;
+      send({ t: 'join', code: pendingJoin.code, nick: pendingJoin.nickFn() });
+      return;
+    }
+    if (code === 'seat_expired'){ stopTimers(); intentional = true; resetRoom(); state.status = 'closed'; state.closedReason = 'seat_expired'; }
+    state.error = { code, message: PARTY_ERROR_TEXT[code] || 'Something went wrong. Try again.' };
+    changed(); emit('error', state.error);
+  }
+  const validSeat = m => typeof m.code === 'string' && m.code.length === 5 && partyNormalizeCode(m.code) === m.code && Number.isInteger(m.you);
+  function badReply(){
+    stopTimers(); intentional = true;
+    if (ws){ try { ws.close(); } catch (_) {} ws = null; }
+    resetRoom(); state.status = 'closed'; state.closedReason = 'bad_reply';
+    state.error = { code: 'bad_reply', message: 'The room sent something unexpected. Try again.' };
+    changed(); emit('error', state.error);
+  }
+  function resetRoom(){
+    state.code = ''; state.you = 0; state.room = null; state.heat = null; state.submitted = false;
+    state.ack = null; state.result = null; state.final = null; token.v = ''; tracks.clear(); state.launched = 0;
+  }
+  function onClose(sock, ev){
+    if (sock !== ws) return;
+    ws = null;
+    if (pingTimer){ clearI(pingTimer); pingTimer = null; }
+    if (connectTimer){ clearT(connectTimer); connectTimer = null; }
+    if (intentional) return;
+    // 1013 is the server saying rooms are off (the daily budget tripped or the kill switch): the duel fallback at once, no reconnects.
+    if (ev && ev.code === 1013){ setFallback('rooms_closed', PARTY_FULL_MESSAGE); return; }
+    if ((state.status === 'in_room' || state.status === 'reconnecting') && token.v){ scheduleResume(); return; }
+    if (state.status === 'connecting' || state.status === 'open'){ setFallback('connect_failed', PARTY_FULL_MESSAGE); }
+  }
+  // Takes the seat back with the token inside the server's 20 s grace window (docs/multiplayer/room_protocol.md).
+  function scheduleResume(){
+    if (!resumeStart) resumeStart = nowMs();
+    if (state.status !== 'reconnecting'){ state.status = 'reconnecting'; changed(); emit('reconnecting', null); }
+    if (nowMs() - resumeStart > 19000 || resumeTry >= PARTY_RECONNECT_DELAYS.length){
+      resumeStart = 0; stopTimers(); intentional = true; resetRoom(); state.status = 'closed'; state.closedReason = 'lost';
+      state.error = { code: 'lost', message: 'Lost the connection to the room.' };
+      changed(); emit('closed', { reason: 'lost' }); return;
+    }
+    const delay = PARTY_RECONNECT_DELAYS[resumeTry++];
+    resumeTimer = setT(() => {
+      resumeTimer = null;
+      openSocket(() => { send({ t: 'resume', code: state.code, token: token.v }); resumeStart = 0; },
+        () => { if (state.status === 'reconnecting') scheduleResume(); });
+    }, delay);
+  }
+  function openSocket(onOpen, onFail){
+    let sock = null, done = false;
+    try { sock = new WS(base + '/v1/ws'); } catch (_) { onFail(); return; }
+    ws = sock;
+    const fail = () => { if (done) return; done = true; if (connectTimer){ clearT(connectTimer); connectTimer = null; } if (ws === sock) ws = null; try { sock.close(); } catch (_) {} onFail(); };
+    connectTimer = setT(fail, connectTimeoutMs);
+    sock.onopen = () => { if (done || ws !== sock) return; done = true; clearT(connectTimer); connectTimer = null; onOpen(); };
+    sock.onmessage = onMessage;
+    sock.onerror = () => {};                                  // onclose follows
+    sock.onclose = ev => { if (!done){ fail(); return; } onClose(sock, ev); };
+  }
+  function begin(first){
+    if (state.status === 'connecting' || state.status === 'in_room' || state.status === 'reconnecting') return;
+    if (state.status === 'open' && ws && ws.readyState === 1){ state.error = null; first(); changed(); return; } // a refused try reuses the socket
+    intentional = false; resetRoom(); resumeStart = 0; resumeTry = 0; nameRetries = 0;
+    state.error = null; state.fallback = null; state.closedReason = ''; state.final = null;
+    state.status = 'connecting'; changed();
+    openSocket(() => { state.status = 'open'; changed(); first(); },
+      () => { if (state.status === 'connecting') setFallback('connect_failed', PARTY_FULL_MESSAGE); });
+  }
+  api.on = fn => { listeners.push(fn); };
+  api.off = fn => { const i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); };
+  api.create = nick => begin(() => { pendingNick = nick; send({ t: 'create', nick }); });
+  // nick: a wire index, or a function returning one (called again with a fresh name when the room says name_taken).
+  api.join = (code, nick) => {
+    const nickFn = typeof nick === 'function' ? nick : null;
+    const c = partyNormalizeCode(code);
+    if (c.length !== 5){ state.error = { code: 'bad_code', message: PARTY_ERROR_TEXT.bad_code }; changed(); emit('error', state.error); return; }
+    begin(() => { pendingJoin = { code: c, nickFn }; send({ t: 'join', code: c, nick: nickFn ? nickFn() : nick }); });
+  };
+  api.start = () => send({ t: 'start' });
+  api.rematch = () => { state.final = null; state.result = null; return send({ t: 'rematch' }); };
+  api.leave = () => {
+    const wasIn = state.status === 'in_room';
+    if (wasIn) send({ t: 'leave' });
+    intentional = true; stopTimers();
+    const sock = ws; ws = null;
+    if (sock){ try { setT(() => { try { sock.close(); } catch (_) {} }, 50); } catch (_) {} }
+    resetRoom(); state.status = 'idle'; state.error = null; state.fallback = null; changed();
+  };
+  api.submitRun = (heat, score, ev) => { state.submitted = true; changed(); return send({ t: 'run', heat, score, ev }); };
+  // Own position for the room's relay: only when this heat's start advertised it (heat_start.pos.hz), at most once per 1000 / hz ms.
+  api.sendPos = (heat, step, x, y, score) => {
+    const h = state.heat;
+    if (!h || !h.pos || h.heat !== heat) return false;
+    const t = nowMs(), gapMs = Math.max(100, Math.min(250, Math.round(1000 / Math.max(1, Math.min(10, h.pos.hz | 0 || 5)))));
+    if (t - lastPosAt < gapMs) return false;
+    lastPosAt = t;
+    return send({ t: 'pos', heat, st: step | 0, x: Math.round(x), y: Math.round(y), sc: score | 0 });
+  };
+  api.close = () => { intentional = true; stopTimers(); const s = ws; ws = null; if (s){ try { s.close(); } catch (_) {} } };
+  api.dropSocketForTest = () => { if (ws){ try { ws.close(); } catch (_) {} } };
+  api.mySeat = () => state.room && state.room.players ? state.room.players.find(p => p.id === state.you) || null : null;
+  api.isHost = () => !!(state.room && state.room.host === state.you);
+  api.token = () => token.v;
+  return api;
+}
+/* ==== ORBIT-PARTY END ==== */
+
 const DUEL_B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 function duelB64Encode(bytes){
   let out = '';
@@ -9857,6 +10480,7 @@ function syncDailyGhostLabel(){
 }
 // Presentation only: reads the ghost's numbers and draws them. Calls nothing that changes the sim.
 function drawDailyGhost(){
+  if (partyRunning && partyRivals.length && partyClient) drawPartyRivals(); // B13: the room's rivals, under your comet
   for (let i = 0; i < duelExtras.length; i++){ const x = duelExtras[i]; if (x.gh) drawGhostComet(x.gh, x.color, 'extra'); } // B6: the chain's ghosts, under the rival (no per-frame allocation)
   const gh = dailyGhost;
   if (!gh || !(ghostShow || gh.duel)) return; // a duel's rival always shows: racing it is the point
@@ -10399,7 +11023,7 @@ function newBestNote(){
   } catch (e) {}
 }
 // F9 calm HUD. During play the top-left keeps the score and combo, a duel's clock and lead, and the void warning.
-// The two hints teach a new player and then retire: the ring hint ("tap while inside the glow") for the first
+// The two hints teach a new player and then retire: the ring hint ("tap anywhere while inside the glow") for the first
 // CALM_HUD.ringRuns finished runs, and "combo bonus fades" for the first CALM_HUD.decayRuns runs in which it showed.
 // Both counts are read once at the run's start (calmHudArm), so a hint never vanishes mid-run. Presentation only.
 const CALM_HUD = Object.freeze({ ringRuns: 3, decayRuns: 3, noteSecs: 4 });
@@ -10443,10 +11067,10 @@ function syncHud(){
   setHudText('height', hudKeyed('height', 'hud.height', 'score', formatScore(player.bestAlt || 0)));
   // Short cue while the combo-decay clock is visible; otherwise keep the catch-ring reminder.
   const showDecay = state === 'playing' && player && player.mode === 'orbit' && combo > 1;
-  setHudText('hint', tl(showDecay ? 'combo bonus fades' : 'tap while inside the glow'));
+  setHudText('hint', tl(showDecay ? 'combo bonus fades' : 'tap anywhere while inside the glow'));
   // T1d (Panels 12/12b): during the tutorial the HUD keeps only the score; the height and hint lines wait.
   const calm = !!tutorial;
-  // F6: while the inline arc label ("tap when the comet is in the glow") teaches the first orbit, the HUD's ring
+  // F6: while the inline arc label ("tap anywhere when the comet is in the glow") teaches the first orbit, the HUD's ring
   // hint would repeat it, so only the label shows; the hint returns with the first launch.
   // F9 calm HUD: each hint teaches only while the player is still learning it (calmHintShows), then retires.
   const quietHint = calm || (state === 'playing' && arcLabelShows()) || !calmHintShows(showDecay);
@@ -10575,6 +11199,7 @@ function runEnded(reason, previousBest){
   else runDustBanked = true;
   noteEventKeepsake();
   simFx.results(reason);
+  partyRunEnded(); // B13: a room's heat submits its run and brings the room screen back
 }
 // E4: a finished ranked Endless run that started during an event unlocks that event's keepsake (once; kept forever).
 // Never the Daily, a duel, a Checkpoint run, an unranked ?grace= run or the ghost frame. The results card names it
@@ -10716,6 +11341,7 @@ for (const [id, expected] of [['start', 'title'], ['retry', 'dead']]){
 }
 function press(){
   if (hangarOpen || settingsOpen || statsOpen || moreOpen) return;
+  if (ROOMS_ON && !partyLaunching && state !== 'playing' && (partyPanelOpen || partyInRoom())) return; // B13: a room's screen owns the next press
   if (Portal.busy) return; // B16: input waits while the portal's break runs
   if (WEB_PORTAL && !portalBreakPassed && (state === 'title' || (state === 'dead' && resultsShown && retryAccepts(performance.now())))){
     Portal.breakThen(() => {
@@ -10888,6 +11514,7 @@ canvas.addEventListener('pointerdown', (e)=>{
 // Escape is Back for Settings, Stats and Hangar, from any control inside them. During a run
 // it does nothing (Menu pauses); it is never a release.
 function closeTopOverlay(){
+  if (ROOMS_ON && partyPanelOpen && !partyRunning && state !== 'playing'){ partyBackAction(); return true; }
   if (settingsOpen){ closeSettings(); return true; }
   if (statsOpen){ closeStats(); return true; }
   if (hangarOpen && state === 'title'){ closeHangar(); return true; }
@@ -10937,6 +11564,7 @@ document.getElementById('returnTitle').addEventListener('click', e => {
   syncScreens();
   notifyNative('title');
   Portal.stop();
+  partyAfterEndRun(); // B13: ending a room's heat forfeits it and returns to the room screen
   document.getElementById('start').focus({preventScroll:true});
 });
 resumeButton.addEventListener('pointerdown', (e)=>{ e.stopPropagation(); });
@@ -11156,10 +11784,11 @@ function scenerySprite(s){
 function drawScenery(displayY){
   // Reduce Motion: the backdrop holds still instead of drifting with the camera.
   const camY = reducedMotion ? 0 : displayY;
+  const wallMs = performance.now();
   for (const s of scenery){
     const span = H + s.r * 2;
     const y = ((s.y - camY * s.depth) % span + span) % span - s.r;
-    ctx.globalAlpha = s.alpha;
+    ctx.globalAlpha = s.kind === 'nebula' ? s.alpha * livingBreath(wallMs, s.x * 0.013) : s.alpha; // J1
     if (s.kind === 'nebula'){
       const sprite = scenerySprite(s);
       if (sprite){
@@ -11182,6 +11811,149 @@ function drawScenery(displayY){
   ctx.globalAlpha = 1;
 }
 makeScenery();
+// J1: the living background. Slow motes, a few glints and a rare faint shooting star behind everything, plus the
+// nebulae breathing. Presentation only: positions come from depthHash (a fixed hash), the clock is wall time, and
+// nothing here reads or draws from fxRandom, the world RNG or the daily RNG. Pre-built typed arrays, no per-frame
+// allocation. Reduce Motion: the motes and glints hold still, no shooting star, no breathing. Low-power ("effects
+// off") skips the whole layer, as it does the nebulae.
+const LIVING = Object.freeze({ motes: 44, glints: 6, mote: Object.freeze([0.10, 0.17, 0.24]), driftPx: 9, riseSec: 90,
+  parallax: 0.18, breathSec: 14, breathAmt: 0.22, glintSec: 9, glintOn: 0.9, starEvery: 34, starOn: 1.1, starAlpha: 0.25, glintAlpha: 0.25 });
+let livingW = 0, livingH = 0;
+let livingMX = null, livingMY = null, livingMD = null, livingMR = null, livingMP = null;
+let livingGX = null, livingGY = null, livingGP = null;
+function makeLiving(){
+  livingW = W; livingH = H;
+  const n = LIVING.motes, g = LIVING.glints;
+  livingMX = new Float32Array(n); livingMY = new Float32Array(n); livingMD = new Float32Array(n);
+  livingMR = new Float32Array(n); livingMP = new Float32Array(n);
+  for (let i = 0; i < n; i++){
+    livingMX[i] = W * depthHash(i, 21); livingMY[i] = H * depthHash(i, 22);
+    livingMD[i] = 0.25 + 0.75 * depthHash(i, 23);          // depth: nearer motes drift and shift more
+    livingMR[i] = 0.7 + 1.3 * livingMD[i];
+    livingMP[i] = depthHash(i, 24) * Math.PI * 2;
+  }
+  livingGX = new Float32Array(g); livingGY = new Float32Array(g); livingGP = new Float32Array(g);
+  for (let i = 0; i < g; i++){
+    livingGX[i] = W * (0.06 + 0.88 * depthHash(i, 31)); livingGY[i] = H * (0.06 + 0.88 * depthHash(i, 32));
+    livingGP[i] = depthHash(i, 33) * LIVING.glintSec;
+  }
+}
+// The nebula alpha multiplier at wall time ms (1 = unchanged): a slow breath, out of step per nebula.
+function livingBreath(ms, phase){
+  if (reducedMotion) return 1;
+  return 1 + LIVING.breathAmt * Math.sin(ms / 1000 * (Math.PI * 2 / LIVING.breathSec) + phase);
+}
+// Shooting star progress 0..1 at sec, or -1 when none is on (one per starEvery-second cycle, at a hashed moment).
+function livingStarProgress(sec){
+  const cyc = Math.floor(sec / LIVING.starEvery), at = depthHash(cyc, 41) * (LIVING.starEvery - LIVING.starOn);
+  const u = (sec - cyc * LIVING.starEvery - at) / LIVING.starOn;
+  return u >= 0 && u < 1 ? u : -1;
+}
+function drawLiving(displayY, ms){
+  if (reducedEffects) return;
+  if (livingW !== W || livingH !== H || !livingMX) makeLiving();
+  const still = reducedMotion, sec = ms / 1000, camY = still ? 0 : displayY;
+  const n = LIVING.motes, span = H + 8;
+  ctx.fillStyle = '#CFC8FF';
+  for (let b = 0; b < 3; b++){
+    ctx.globalAlpha = LIVING.mote[b] * (still ? 1 : 0.75 + 0.25 * Math.sin(sec * 0.5 + b * 2.1));
+    ctx.beginPath();
+    for (let i = b; i < n; i += 3){
+      const d = livingMD[i];
+      const x = livingMX[i] + (still ? 0 : Math.sin(sec * 0.17 * d + livingMP[i]) * LIVING.driftPx * d);
+      const y = ((livingMY[i] - (still ? 0 : sec * H / LIVING.riseSec * d * 0.5) - camY * LIVING.parallax * d) % span + span) % span - 4;
+      const r = livingMR[i];
+      ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, Math.PI * 2);
+    }
+    ctx.fill();
+  }
+  if (!still){
+    ctx.strokeStyle = '#F3EFFF'; ctx.lineWidth = 1; ctx.lineCap = 'round';
+    for (let i = 0; i < LIVING.glints; i++){
+      const u = ((sec + livingGP[i]) % LIVING.glintSec) / LIVING.glintOn;
+      if (u >= 1) continue;
+      const k = Math.sin(u * Math.PI), len = 2.5 + 3.5 * k, x = livingGX[i], y = livingGY[i];
+      ctx.globalAlpha = LIVING.glintAlpha * k;
+      ctx.beginPath(); ctx.moveTo(x - len, y); ctx.lineTo(x + len, y); ctx.moveTo(x, y - len); ctx.lineTo(x, y + len); ctx.stroke();
+    }
+    const u = livingStarProgress(sec);
+    if (u >= 0){
+      const cyc = Math.floor(sec / LIVING.starEvery);
+      const x0 = W * (0.15 + 0.7 * depthHash(cyc, 42)), y0 = H * (0.05 + 0.4 * depthHash(cyc, 43));
+      const dx = 150 * (depthHash(cyc, 44) < 0.5 ? -1 : 1), dy = 90, fade = Math.sin(u * Math.PI);
+      const hx = x0 + dx * u, hy = y0 + dy * u;
+      for (let s = 0; s < 3; s++){
+        ctx.globalAlpha = LIVING.starAlpha * fade * (1 - s * 0.3);
+        ctx.lineWidth = 1.6 - s * 0.4;
+        ctx.beginPath(); ctx.moveTo(hx - dx * 0.12 * s, hy - dy * 0.12 * s); ctx.lineTo(hx - dx * 0.12 * (s + 1), hy - dy * 0.12 * (s + 1)); ctx.stroke();
+      }
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+// J2: PERFECT pop. On a PERFECT catch the planet's draw punches (1.0 > 1.18 > 0.96 > 1.0 over 180 ms, a little more
+// with combo, capped), a bright gold ring bursts outward from the catch ring and a few sparks fly. Draw only: a canvas
+// transform and extra strokes around the body, so planet.r, planet.capture and every hit or physics value are untouched,
+// and the sparks come from popRand (its own seeded generator), never fxRandom. Reduce Motion: a still gold ring flash,
+// no scale, no spark. Low-power: the punch and ring stay, no sparks. GOOD and ungraded catches get none of it.
+const PERFECT_POP = Object.freeze({ punchMs: 180, ringMs: 340, sparkMs: 420, flashMs: 220, peak: 1.18, peakCombo: 0.06, dip: 0.96,
+  ringFrom: 0.92, ringTo: 1.5, sparksMin: 6, sparksMax: 12, sparkDist: 46, color: '#FFE58A' });
+const perfectPop = { on: false, id: -1, at: 0, combo: 1, n: 0, ang: new Float32Array(12), spd: new Float32Array(12) };
+let popSeed = 0x9E3779B9;
+function popRand(){ // mulberry32 over its own state
+  popSeed = (popSeed + 0x6D2B79F5) | 0;
+  let t = Math.imul(popSeed ^ (popSeed >>> 15), 1 | popSeed);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+function armPerfectPop(p, wallNow, comboNow){
+  const on = rhythm.lastGrade === 'perfect';
+  perfectPop.on = on;
+  if (!on) return;
+  perfectPop.id = p.id; perfectPop.at = wallNow; perfectPop.combo = comboNow;
+  perfectPop.n = Math.min(PERFECT_POP.sparksMax, PERFECT_POP.sparksMin + Math.floor(Math.max(0, comboNow - 1) / 2));
+  for (let i = 0; i < perfectPop.n; i++){ perfectPop.ang[i] = popRand() * Math.PI * 2; perfectPop.spd[i] = 0.6 + 0.4 * popRand(); }
+}
+function popScale(e, comboNow){ // the punch scale at e ms (1 outside the window); the peak grows a little with combo, capped at 1.24
+  if (reducedMotion || !(e >= 0) || e >= PERFECT_POP.punchMs) return 1; // Reduce Motion: never scales, whoever calls
+  const peak = PERFECT_POP.peak + PERFECT_POP.peakCombo * Math.min(1, Math.max(0, comboNow - 1) / 11);
+  const u = e / PERFECT_POP.punchMs, sm = x => x * x * (3 - 2 * x);
+  if (u < 0.3) return 1 + (peak - 1) * sm(u / 0.3);
+  if (u < 0.7) return peak + (PERFECT_POP.dip - peak) * sm((u - 0.3) / 0.4);
+  return PERFECT_POP.dip + (1 - PERFECT_POP.dip) * sm((u - 0.7) / 0.3);
+}
+function perfectPopFor(p, now){ // elapsed ms while the pop is live for planet p, else -1
+  if (!perfectPop.on || perfectPop.id !== p.id || state !== 'playing') return -1;
+  const e = now - perfectPop.at;
+  return e >= 0 && e < PERFECT_POP.sparkMs ? e : -1;
+}
+function drawPerfectPop(p, e){
+  ctx.save();
+  ctx.setLineDash([]); ctx.shadowBlur = 0; ctx.strokeStyle = PERFECT_POP.color; ctx.fillStyle = PERFECT_POP.color;
+  if (reducedMotion){
+    if (e < PERFECT_POP.flashMs){ ctx.globalAlpha = 0.85; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(p.x, p.y, p.capture, 0, Math.PI * 2); ctx.stroke(); }
+  } else {
+    if (e < PERFECT_POP.ringMs){
+      const u = e / PERFECT_POP.ringMs, k = 1 - (1 - u) * (1 - u);
+      ctx.globalAlpha = 0.9 * (1 - u); ctx.lineWidth = 4 - 2.5 * u;
+      ctx.shadowColor = PERFECT_POP.color; ctx.shadowBlur = reducedEffects ? 0 : 12 * (1 - u);
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.capture * (PERFECT_POP.ringFrom + (PERFECT_POP.ringTo - PERFECT_POP.ringFrom) * k), 0, Math.PI * 2); ctx.stroke();
+    }
+    if (!reducedEffects){
+      const u = e / PERFECT_POP.sparkMs, k = 1 - (1 - u) * (1 - u), r0 = p.capture;
+      ctx.globalAlpha = 1 - u;
+      ctx.beginPath();
+      for (let i = 0; i < perfectPop.n; i++){
+        const a = perfectPop.ang[i], d = r0 + PERFECT_POP.sparkDist * perfectPop.spd[i] * k;
+        const sx = p.x + Math.cos(a) * d, sy = p.y + Math.sin(a) * d, sr = 2.2 * (1 - u) + 0.6;
+        ctx.moveTo(sx + sr, sy); ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+      }
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
 function drawPlanetWake(p, lit){
   if (!(lit > 0.004)) return;
   ctx.save();
@@ -11848,7 +12620,7 @@ function songAdvance(nowMs){
 // from the previous star grows while the note plays, and the star blooms (a glow and a ring that fade).
 // PERFECT blooms brighter than GOOD. elapsed = Infinity draws the finished constellation with no bloom
 // or growth (the final picture, and Reduce Motion).
-const SONG_PAINT = Object.freeze({ grow: 0.35, bloom: 0.6, pad: 14, minSpan: 60, mark: 4.5 });
+const SONG_PAINT = Object.freeze({ grow: 0.35, bloom: 0.6, pad: 14, minSpan: 60, mark: 4.5, head: 2.4, headBlur: 8 });
 const SONG_CANVAS = Object.freeze({ w: 128, h: 104 }); // logical size; the backing store is scaled by devicePixelRatio
 // Pure. The fit of the stars' bounding box into w x h: one scale for both axes, centred.
 function songBox(stars, w, h){
@@ -11906,6 +12678,22 @@ function paintSongFrame(plan, elapsed){
     tctx.moveTo(X(a.x), Y(a.y));
     tctx.lineTo(X(a.x + (b.x - a.x) * g), Y(a.y + (b.y - a.y) * g));
     tctx.stroke();
+  }
+  // G2: a bright head rides the growing line to the next star, so the song reads as a trip along your path. Only
+  // while a line grows (never at elapsed = Infinity, so the finished picture and Reduce Motion have none).
+  for (let i = 1; i < lit; i++){
+    const g = songGrow(elapsed - plan.stars[i].at);
+    if (!(g > 0 && g < 1)) continue;
+    const a = stars[i - 1], b = stars[i];
+    tctx.save();
+    tctx.globalAlpha = 1;
+    tctx.fillStyle = CONSTELLATION.star;
+    tctx.shadowColor = CONSTELLATION.star;
+    tctx.shadowBlur = SONG_PAINT.headBlur;
+    tctx.beginPath();
+    tctx.arc(X(a.x + (b.x - a.x) * g), Y(a.y + (b.y - a.y) * g), SONG_PAINT.head, 0, Math.PI * 2);
+    tctx.fill();
+    tctx.restore();
   }
   // The stars: a bloom on the hit (glow and ring), then the steady mark.
   for (let i = 0; i < lit; i++){
@@ -13690,7 +14478,7 @@ function draw(){
   ctx.setTransform(DPR * viewScale, 0, 0, DPR * viewScale, DPR * viewX, DPR * viewY);
   ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();
   // background gradient, tinted toward the current sector. The name banner is the non-color cue.
-  const sky = presentationSkyStops();
+  const sky = easedSkyStops();
   const g = ctx.createLinearGradient(0,0,0,H);
   g.addColorStop(0, sky[0]); g.addColorStop(.55, sky[1]); g.addColorStop(1, sky[2]);
   ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
@@ -13712,6 +14500,7 @@ function draw(){
     ctx.translate(-W / 2, -H * 0.55);
   }
   if (!reducedEffects) drawScenery(displayY);
+  drawLiving(displayY, performance.now()); // J1
   // Reduce Motion: stars hold still like the backdrop; planets still show the climb.
   const starCamY = reducedMotion ? 0 : displayY;
   for (const s of stars){
@@ -13830,7 +14619,11 @@ function draw(){
     ctx.globalAlpha = 1;
 
     const lit = lightAmount(p);
-    const land = perfectLand ? perfectLandView(p, performance.now()) : null; // F4
+    const nowMs = performance.now();
+    const popE = perfectPop.on ? perfectPopFor(p, nowMs) : -1; // J2
+    const popK = popE >= 0 ? popScale(popE, perfectPop.combo) : 1;
+    if (popK !== 1){ ctx.save(); ctx.translate(p.x, p.y); ctx.scale(popK, popK); ctx.translate(-p.x, -p.y); }
+    const land = perfectLand ? perfectLandView(p, nowMs) : null; // F4
     if (land && land.scale){
       ctx.save();
       ctx.translate(p.x, p.y); ctx.rotate(land.axis); ctx.scale(land.scale.along, land.scale.across);
@@ -13838,7 +14631,9 @@ function draw(){
       if (p.sun) drawSun(p); else paintPlanetBody(p, lit);
       ctx.restore();
     } else if (p.sun) drawSun(p); else paintPlanetBody(p, lit);
-    if (land && land.mark) drawPerfectMark(p, land.from);
+    if (land && land.mark && !(perfectPop.on && perfectPop.id === p.id)) drawPerfectMark(p, land.from); // J2: the gold flash replaces the arc
+    if (popK !== 1) ctx.restore();
+    if (popE >= 0) drawPerfectPop(p, popE);
     drawPlanetWake(p, lit);
     drawMoons(p);
     drawFrostArc(p);
@@ -13934,6 +14729,7 @@ function draw(){
       : q.c2 && fxFull ? (k < 0.34 ? q.color : k < 0.67 ? q.mid : q.c2) : q.color;
     const r = q.hot ? q.r * (1 - (1 - SPARK_END_SCALE) * k * (2 - k)) : q.r;
     ctx.beginPath(); ctx.arc(q.x, q.y, r, 0, Math.PI*2); ctx.fill();
+    if (q.shape) drawSparkAccent(q, r);
   }
   if (additive) ctx.globalCompositeOperation = 'source-over';
   ctx.globalAlpha = 1;
@@ -13941,6 +14737,9 @@ function draw(){
   // popups
   ctx.textAlign = 'center';
   ctx.font = '700 18px "Space Grotesk", ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+  laneBoxes.length = 0;
+  const wordBox = rhythmWordBox();
+  if (wordBox) laneBoxes.push(wordBox);
   for (const q of popups){
     const fade = 1 - q.t/1.1;
     const py = q.y - (reducedMotion ? 0 : q.t*36);
@@ -13962,6 +14761,10 @@ function draw(){
     }
     // Measure the live glyphs and keep the whole string inside the playfield.
     popupX = clampPopupTextX(popupX, half, sx - nudge.x, fitted || (camActive && fx));
+    let lane = popupLane.get(q);
+    if (lane === undefined){ lane = pickLabelLane(popupX, half, popupY, laneBoxes); popupLane.set(q, lane); }
+    popupY -= lane * LABEL_LANES.step;
+    laneBoxes.push(labelBox(popupX, half, popupY, LABEL_LANES.ascent, LABEL_LANES.descent));
     // Warp bonus text is #F3EFFF on #100C28 (about 17:1). The word is the cue.
     if (q.chip){
       ctx.save();
@@ -14018,6 +14821,7 @@ function draw(){
   drawFinishReveal(fitted);
   ctx.restore(); // shake
   drawRivalTag(fitted || (camActive && fx) || null, displayY); // F1: screen space
+  drawPartyTags(fitted || (camActive && fx) || null, displayY); // B13: the room's name tags, clear of your aim guide
   drawSectorBanner();
   drawConfetti();
   drawOverdriveEdge();
@@ -14287,6 +15091,7 @@ function rhythmIdAt(a){
 const PERFECT_STREAK_SHOWN = 99;
 const PERFECT_STREAK_LINE_FROM = 5; // Panel 15: the line starts at 5 in a row; 2-4 read as clutter
 let perfectStreak = 0, flashStreak = '', flashStreakW = -1;
+const STREAK_FONT = '700 12px "Space Grotesk", ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 function rhythmFlash(grade, x, y){
   // Sparingly: every PERFECT, but GOOD only when it ends a PERFECT streak.
   const prev = rhythm.lastGrade;
@@ -14443,11 +15248,11 @@ function drawRhythmSpans(near, lim){
     s = e + 1;
   }
 }
-// Arc v2 first-orbit label: "tap when the comet is in the glow", at the band's start. One time per profile: it shows
+// Arc v2 first-orbit label: "tap anywhere when the comet is in the glow", at the band's start. One time per profile: it shows
 // on the first orbit, before the first launch, and is never shown again once that launch is recorded
 // (localStorage, read and written in try/catch; without it the label shows until the first launch).
 const ARC_TAUGHT_KEY = 'slingshot-planet-arc-taught';
-const ARC_LABEL = 'tap when the comet is in the glow';
+const ARC_LABEL = 'tap anywhere when the comet is in the glow';
 let arcTaught = false;
 let arcLabelBox = null; // this frame's label rectangle (logical px), for the layout test only
 try {
@@ -14501,6 +15306,48 @@ function drawArcLabel(){
   ctx.restore();
 }
 // The PERFECT/GOOD word. Reduced motion: no rise, fade only.
+// G5: moments stay readable. Draw time only: a floating label that would land on the PERFECT word or on a label
+// already on screen moves up one lane at a time (older labels keep their place; at most LABEL_LANES.max lanes up). Its
+// lane is picked once, at its first frame, so nothing jumps. The popups array, the core and replays never see it.
+const LABEL_LANES = Object.freeze({ step: 24, max: 3, ascent: 16, descent: 5, gap: 1, wordHalf: 36 }); // step > ascent + descent + 2 gap
+const popupLane = new WeakMap();
+const laneBoxes = [];
+function labelBox(x, half, y, ascent, descent){
+  const g = LABEL_LANES.gap;
+  return { x0: x - half - g, x1: x + half + g, y0: y - ascent - g, y1: y + descent + g };
+}
+function labelsOverlap(a, b){ return a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1; }
+function pickLabelLane(x, half, y, boxes){
+  for (let lane = 0; lane < LABEL_LANES.max; lane++){
+    const box = labelBox(x, half, y - lane * LABEL_LANES.step, LABEL_LANES.ascent, LABEL_LANES.descent);
+    let hit = false;
+    for (const b of boxes) if (labelsOverlap(box, b)){ hit = true; break; }
+    if (!hit) return lane;
+  }
+  return LABEL_LANES.max;
+}
+// The PERFECT / GOOD word and its streak line, where drawRhythmFlash puts them this frame (or null).
+function rhythmWordBox(){
+  if (!rhythm.flash || state !== 'playing') return null;
+  const age = time - rhythm.flashAt;
+  if (!(age >= 0) || age >= RHYTHM.flash) return null;
+  const y = rhythm.flashY - (reducedMotion ? 0 : 10 * age / RHYTHM.flash);
+  const box = labelBox(rhythm.flashX, LABEL_LANES.wordHalf, y, 13, flashStreak ? 17 : 4);
+  if (!flashStreak) return box;
+  // The streak line under the word, at the edge-clamped x drawRhythmFlash draws it at (near a side wall the line
+  // shifts inward, past the word). Measured here too when this runs before the first draw of the streak.
+  if (flashStreakW < 0){
+    const font = ctx.font;
+    ctx.font = STREAK_FONT;
+    flashStreakW = ctx.measureText(flashStreak).width;
+    ctx.font = font;
+  }
+  const half = flashStreakW / 2, g = LABEL_LANES.gap;
+  const x = Math.min(Math.max(rhythm.flashX, 4 + half), W - 4 - half);
+  box.x0 = Math.min(box.x0, x - half - g);
+  box.x1 = Math.max(box.x1, x + half + g);
+  return box;
+}
 function drawRhythmFlash(){
   if (!rhythm.flash || state !== 'playing') return;
   const age = time - rhythm.flashAt;
@@ -14517,7 +15364,7 @@ function drawRhythmFlash(){
   // Under, not after: "PERFECT 3 in a row" on one line is ~150 px and would flip sides near the 480 edge. Kept
   // inside the playfield (4 px margin). Same rise as the word (none under reduced motion).
   if (flashStreak){ // only ever set by a PERFECT (a GOOD clears it)
-    ctx.font = '700 12px "Space Grotesk", ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+    ctx.font = STREAK_FONT;
     if (flashStreakW < 0) flashStreakW = ctx.measureText(flashStreak).width;
     const half = flashStreakW / 2;
     const x = Math.min(Math.max(rhythm.flashX, 4 + half), W - 4 - half);
@@ -14623,6 +15470,11 @@ function drawFlightPreview(duration, fromArrow, forecasts){
     }
     if (count - start < 2) return; // the arrow already covers a too-short exact prefix
   }
+  if (partyRunning){ // B13: the guide's box, for the name tags
+    let bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity;
+    for (let i = start; i < count; i++){ const q = pts[i]; if (q.x < bx0) bx0 = q.x; if (q.x > bx1) bx1 = q.x; if (q.y < by0) by0 = q.y; if (q.y > by1) by1 = q.y; }
+    partyAimAdd(bx0, by0, bx1, by1);
+  }
   ctx.save();
   ctx.setLineDash(NO_DASH);
   ctx.globalAlpha = 0.55;
@@ -14653,6 +15505,7 @@ function aimCaptureId(forecasts){
 }
 // dim: the arc-v2 alpha while the band is drawn (confirmation only); null keeps the full halo.
 function drawAimRing(p, dim){
+  if (partyRunning){ const rr = p.capture + AIM_RING_PAD + 8; partyAimAdd(p.x - rr, p.y - rr, p.x + rr, p.y + rr); } // B13
   ctx.save();
   ctx.setLineDash([]);
   ctx.globalAlpha = dim != null ? dim : (reducedMotion ? 0.7 : 0.62);
@@ -14687,6 +15540,7 @@ function drawReleaseArrow(){
   ctx.globalAlpha = 1;
 }
 function drawReleaseCue(){
+  partyAim.on = false; // B13: this frame's aim-guide box starts empty (the room's name tags keep clear of it)
   arcCometInside = false; arcBandShown = false; arcLabelAnchor = null; arcLabelBox = null; // this frame's arc flags
   if (state !== 'playing' || !player || player.mode !== 'orbit' || !player.planet) return;
   if (aimGuide !== 'off'){
@@ -14694,9 +15548,10 @@ function drawReleaseCue(){
     // One set of 4 forecasts per frame, shared by the guide line and the aim ring.
     const forecasts = guideForecasts(aimSpan());
     drawFlightPreview(aimSpan(), !firstReleaseDone, forecasts);
+    // G6 (#183 v4): the ring lights only a new planet ahead, like the band; a revisit or a passed planet gets none.
     const id = aimCaptureId(forecasts);
     let target = null;
-    if (id != null) for (let i = 0; i < planets.length; i++) if (planets[i].id === id){ target = planets[i]; break; }
+    if (id != null && rhythmIsNew(id, player.planet)) for (let i = 0; i < planets.length; i++) if (planets[i].id === id){ target = planets[i]; break; }
     // The band is the cue: while it is drawn, the catch ring is a dimmer confirmation.
     if (target) drawAimRing(target, arcBandShown ? RHYTHM.ringDim : null);
   }
@@ -14740,11 +15595,14 @@ function holdRun(){
   holdAudio();
   if (wasLive) Haptics.hold();
   syncResume();
+  try { syncMenuMusic(); } catch (e) {} // G7: tell the shell now; a hidden page draws no more frames
 }
 function revealWithoutResuming(){
   suspended = false;
   last = performance.now();
   syncResume();
+  menuTrackSent = undefined; // G7: the shell may have stopped the loop while hidden, so say it again
+  try { syncMenuMusic(); } catch (e) {}
   if (audioInterruptionEnded) recoverAudioQuietly();
 }
 document.addEventListener('visibilitychange', () => {
@@ -14762,6 +15620,7 @@ function loop(now){
   tickEventBanner(now); // Arc E: the title notices local midnight (about once a second)
   if (clipRecording && state !== 'dead') cancelShareClip('cancelled');
   try { musicTick(); } catch (e) {}
+  try { syncMenuMusic(); } catch (e) {}
   // Hidden time never steps gameplay, not even through the visible-gap clamp below.
   if (suspended || runHeld) {
     last = now;
@@ -14775,6 +15634,7 @@ function loop(now){
     // Real hit-stop: hold the simulation, not just the drawing. A held frame neither adds to nor clears the
     // Daily clock (runDailySteps), and the Endless held wall time is dropped, never replayed.
     if (!(performance.now() < hitStopUntil)) runDailySteps(dt);
+    if (partyRunning) partyStepTick(); // B13: position snapshot for the room (a no-op unless the heat's start advertised the relay)
     tutorialTick(dt);
     stepCameraFx(dt);
   } else {
@@ -14801,6 +15661,453 @@ function loop(now){
   stepPurchaseMoment(now);
   requestAnimationFrame(loop);
 }
+/* ---------- B13 Orbit Party: page glue ----------
+   The room client, names and layout math are in the ORBIT-PARTY region; this is the screen, the heat launch and the
+   drawing. A heat is a duel on the room's seed (the same DUEL_H playfield, 45 s sprint, the unchanged local sim): the
+   page arms the seed, presses Start at the room's start time, and submits the run log when the run ends. Nothing in the
+   sim, the score, the world RNG or the run log changes. Rooms are off in the app copies and in portal builds. */
+function partyEl(id){ return document.getElementById(id); }
+let partyRandSeq = 12345;
+function partyRand(){
+  try { const a = new Uint32Array(1); window.crypto.getRandomValues(a); return a[0] / 4294967296; }
+  catch (_) { partyRandSeq = (Math.imul(partyRandSeq, 1664525) + 1013904223 + Date.now()) >>> 0; return partyRandSeq / 4294967296; } // no crypto: a name only, never the sim
+}
+function partyLoadNick(){
+  let n = -1;
+  try { n = parseInt(localStorage.getItem(PARTY_NICK_KEY), 10); } catch (_) {}
+  if (!orbitNickOffered(n)) n = orbitRandomNick(partyRand);
+  partyNick = n;
+  partySaveNick();
+}
+function partySaveNick(){ try { localStorage.setItem(PARTY_NICK_KEY, String(partyNick)); } catch (_) {} } // this device only
+function partyInRoom(){ return !!partyClient && (partyClient.state.status === 'in_room' || partyClient.state.status === 'reconnecting'); }
+function partyEnsureClient(){
+  if (partyClient) return partyClient;
+  partyClient = createPartyClient({
+    url: ROOMS_URL, WebSocket: window.WebSocket, now: () => Date.now(),
+    setTimeout: (f, ms) => window.setTimeout(f, ms), clearTimeout: id => window.clearTimeout(id),
+    setInterval: (f, ms) => window.setInterval(f, ms), clearInterval: id => window.clearInterval(id)
+  });
+  partyClient.on(onPartyEvent);
+  return partyClient;
+}
+function onPartyEvent(type, data){
+  if (type === 'heat_start') partyOnHeatStart(data);
+  else if (type === 'closed' || type === 'fallback'){ clearTimeout(partyLaunchTimer); partyLaunchTimer = 0; }
+  else if (type === 'error' && data) { partyNote = data.message; partyNoteErr = true; }
+  partyRender();
+}
+function partyOnHeatStart(hs){
+  if (hs.rules !== GHOST_SIM_VERSION || hs.H !== DUEL_H){
+    partyNote = 'This room runs a different version of the game. Reload the page to update, then join again.'; partyNoteErr = true;
+    partyClient.leave();
+    return;
+  }
+  if (hs.heat <= partyHeatNo) return;
+  if (hs.submitted){ partyHeatNo = hs.heat; return; }
+  clearTimeout(partyLaunchTimer);
+  partyLaunchTimer = setTimeout(() => partyLaunch(hs), Math.max(0, hs.localStartAt - Date.now()));
+  partyPanelOpen = true;                                         // the countdown shows over whatever screen was up
+  if (state !== 'playing') syncScreens();
+}
+function partyBuildRivals(){
+  partyRivals.length = 0;
+  const room = partyClient && partyClient.state.room;
+  if (!room) return;
+  let k = 0;
+  for (const p of room.players){
+    if (p.id === partyClient.state.you || p.left) continue;
+    partyRivals.push({ id: p.id, nick: p.nick, label: orbitNickLabel(p.nick), color: PARTY_COLORS[k++ % PARTY_COLORS.length], visible: false, w: 0,
+      gh: { out: new Float64Array(6), trail: new Float64Array(GHOST_TRAIL_CAP * 2), tn: 0, fadeAt: 0, dead: false, diverged: false, duel: false, rec: null } });
+  }
+}
+// Starts the heat on the room's seed: the same path as a Duel Sprint (an armed duel on DUEL_H).
+function partyLaunch(hs){
+  partyLaunchTimer = 0;
+  if (!partyInRoom() || state === 'playing' || hs.heat <= partyHeatNo) return;
+  partyHeatNo = hs.heat;
+  partyBuildRivals();
+  clearTimeout(partyShowTimer); partyShowTimer = 0;
+  partyPanelOpen = false;
+  hangarOpen = false; settingsOpen = false; statsOpen = false; moreOpen = false;
+  checkpointActive = false; pendingDaily = false; dailyActive = false; runHeld = false;
+  clearDuel();
+  state = 'title';
+  duelArmed = { seed: hs.seed >>> 0 };
+  partyLaunching = true;
+  try { press(); } finally { partyLaunching = false; }
+  if (state === 'playing' && duelActive){
+    partyRunning = true; partyOwnScore = 0;
+    canvas.focus({ preventScroll: true });
+    if (!partyTickTimer) partyTickTimer = setInterval(partyHudTick, 250);
+    partyHudTick();
+  } else {
+    duelArmed = null;
+    partyNote = 'Could not start the heat. Try leaving and joining again.'; partyNoteErr = true;
+    partyPanelOpen = true; syncScreens();
+  }
+  partyRender();
+}
+// Called from runEnded: submits the finished run (inputs and score; the server replays it and decides) and brings
+// the room screen back after the death moment. A run the page marked unusable is not sent.
+function partyRunEnded(){
+  if (!partyRunning) return;
+  partyRunning = false;
+  const log = dailyRunLog;
+  partyOwnScore = cleanScore(death ? death.score : score);
+  if (partyInRoom() && log && !log.bad && Array.isArray(log.ev)) partyClient.submitRun(partyHeatNo, partyOwnScore, log.ev.slice());
+  else { partyNote = 'Your run could not be counted this heat.'; partyNoteErr = true; }
+  clearTimeout(partyShowTimer);
+  partyShowTimer = setTimeout(() => {
+    partyShowTimer = 0;
+    if (!partyInRoom() || state === 'playing') return;
+    partyPanelOpen = true; syncScreens(); partyRender();
+    const h = partyEl('partyHeading'); if (h) h.focus({ preventScroll: true });
+  }, reducedMotion ? 500 : 1700);
+  partyHudTick();
+}
+// End run from the pause menu during a heat: the heat is forfeited (the room marks it DNF at the deadline).
+function partyAfterEndRun(){
+  if (!ROOMS_ON || !partyRunning) return;
+  partyRunning = false;
+  partyNote = 'You left this heat. It counts as unfinished.'; partyNoteErr = false;
+  if (partyInRoom()){ partyPanelOpen = true; syncScreens(); partyRender(); }
+  partyHudTick();
+}
+function partyToTitle(){
+  if (state === 'playing') return;
+  checkpointActive = false; dailyActive = false; pendingDaily = false; runHeld = false;
+  clearDuel();
+  dailyRng = null;
+  state = 'title';
+  reset();
+  notifyNative('title');
+}
+function openParty(code){
+  if (!ROOMS_ON || state !== 'title' || partyPanelOpen || Portal.busy) return;
+  if (partyNick < 0) partyLoadNick();
+  partyFromMore = moreOpen;
+  hangarOpen = false; settingsOpen = false; statsOpen = false; moreOpen = false;
+  partyPanelOpen = true;
+  partyNote = ''; partyNoteErr = false;
+  if (code){ partyCodeText = code; partyEl('partyCode').value = code; }
+  partyRender();
+  syncScreens();
+  const target = code ? partyEl('partyJoin') : partyEl('partyHeading');
+  if (target) target.focus({ preventScroll: true });
+}
+function closeParty(){
+  if (partyClient) partyClient.leave();
+  clearTimeout(partyLaunchTimer); partyLaunchTimer = 0;
+  clearTimeout(partyShowTimer); partyShowTimer = 0;
+  partyRunning = false; partyHeatNo = 0; partyRivals.length = 0;
+  partyPanelOpen = false;
+  partyNote = ''; partyNoteErr = false;
+  if (state !== 'title' && state !== 'playing') partyToTitle();
+  moreOpen = partyFromMore && state === 'title';
+  partyFromMore = false;
+  syncScreens();
+  partyHudTick();
+  const next = moreOpen ? partyEl('openParty') : partyEl('start');
+  if (next && state === 'title') next.focus({ preventScroll: true });
+}
+function partyBackAction(){
+  if (partyRunning) return;
+  closeParty();
+}
+function partyInviteLink(code){ return location.href.split('#')[0].split('?')[0] + '?room=' + code; }
+function partyShare(){
+  const code = partyClient && partyClient.state.code;
+  if (!code) return;
+  const url = partyInviteLink(code);
+  const done = msg => { partyNote = msg; partyNoteErr = false; partyRender(); };
+  const copy = () => {
+    try { navigator.clipboard.writeText(url).then(() => done('Invite link copied.'), () => done('Copy this link: ' + url)); }
+    catch (_) { done('Copy this link: ' + url); }
+  };
+  if (typeof navigator.share === 'function' && window.matchMedia && window.matchMedia('(pointer:coarse)').matches){
+    navigator.share({ title: 'Zipwaltz Orbit Party', text: 'Race me in Zipwaltz. Room ' + code, url }).then(() => done('Invite sent.'), copy);
+  } else copy();
+}
+function partyDuelInstead(){
+  partyFromMore = false; // the duel starts from the bare title
+  closeParty();
+  if (state === 'title') startNewDuel();
+}
+function partyJoinNow(){
+  const code = partyNormalizeCode(partyEl('partyCode').value);
+  partyEl('partyCode').value = code;
+  if (code.length !== 5){ partyNote = PARTY_ERROR_TEXT.bad_code; partyNoteErr = true; partyRender(); return; }
+  partyNote = ''; partyNoteErr = false;
+  let first = true;
+  partyEnsureClient().join(code, () => { if (first){ first = false; return partyNick; } partyNick = orbitRandomNick(partyRand); partySaveNick(); partyRender(); return partyNick; });
+}
+function partyOrdinal(n){ const s = ['th', 'st', 'nd', 'rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
+// The small line at the bottom of the playfield during a heat: your name, the heat and, when rivals' positions
+// arrive, your place by live score. Never over the playfield's middle; hidden when the run ends.
+function partyHudTick(){
+  const el = partyEl('partyHud');
+  if (!el) return;
+  if (!ROOMS_ON || !partyRunning || !partyClient){ if (!el.hidden){ el.hidden = true; el.textContent = ''; } if (!partyRunning && partyTickTimer){ clearInterval(partyTickTimer); partyTickTimer = 0; } return; }
+  const st = partyClient.state, room = st.room;
+  let text = orbitNickLabel(partyNick) + ' · Heat ' + partyHeatNo + (room ? '/' + partyInt(room.heats) : '');
+  if (partyClient.tracks.size){
+    let ahead = 0;
+    for (const [, tr] of partyClient.tracks) if (tr.score() > cleanScore(score)) ahead++;
+    text += ' · ' + partyOrdinal(ahead + 1) + ' of ' + (partyClient.tracks.size + 1);
+  }
+  if (el.textContent !== text) el.textContent = text;
+  el.hidden = false;
+}
+// Per-step from the loop: send this player's position snapshot to the room's relay (a no-op unless this heat's start advertised it).
+function partyStepTick(){
+  if (!partyRunning || !partyClient || !dailyRunLog || !player) return;
+  partyClient.sendPos(partyHeatNo, dailyRunLog.n, player.x, player.y, cleanScore(score));
+}
+
+// ---- drawing -----------------------------------------------------------------------------------------------------
+// Rival comets (world space, under your comet): faint head and trail in the rival's colour, from the interpolated
+// snapshots. Without snapshots (a room server that does not relay positions) nothing is drawn. Presentation only.
+function drawPartyRivals(){
+  const now = Date.now(), cap = GHOST_TRAIL_CAP;
+  for (let i = 0; i < partyRivals.length; i++){
+    const r = partyRivals[i], tr = partyClient.tracks.get(r.id);
+    r.visible = false;
+    if (!tr || !tr.sample(now, partyPos)) continue;
+    const gh = r.gh;
+    gh.out[0] = partyPos.x; gh.out[1] = partyPos.y;
+    const slot = (gh.tn % cap) * 2;
+    gh.trail[slot] = partyPos.x; gh.trail[slot + 1] = partyPos.y;
+    gh.tn++;
+    if (drawGhostComet(gh, r.color, 'extra') === false) continue;
+    r.visible = true;
+  }
+}
+function partyAimAdd(x0, y0, x1, y1){
+  if (!partyAim.on){ partyAim.on = true; partyAim.x0 = x0; partyAim.y0 = y0; partyAim.x1 = x1; partyAim.y1 = y1; return; }
+  if (x0 < partyAim.x0) partyAim.x0 = x0;
+  if (y0 < partyAim.y0) partyAim.y0 = y0;
+  if (x1 > partyAim.x1) partyAim.x1 = x1;
+  if (y1 > partyAim.y1) partyAim.y1 = y1;
+}
+// Name tags in screen space after the camera (like the duel rival's tag): placed by partyPlaceTags so a tag never
+// covers your aim guide (the flight preview, the catch ring, your comet and its orbit) and fades when tags crowd.
+function drawPartyTags(view, displayY){
+  if (!partyRunning || !partyRivals.length) { if (partyTagDebug.tags.length) partyTagDebug.tags = PARTY_NO_TAGS; return; }
+  const vs = viewScale > 0 ? viewScale : 1, scale = view ? view.scale : 1, now = performance.now();
+  const leanO = nextLeanOffset(now);
+  const toX = x => (view ? view.tx + scale * x : x) - scale * leanO.x;
+  const toY = y => (view ? view.ty + scale * y : y - displayY) - scale * leanO.y;
+  const T = PARTY_TAG, px = Math.round(Math.max(T.px, T.px / vs)), pad = T.pad / vs, gap = T.gap / vs, th = px + 8 / vs;
+  const bounds = { l: T.sideCss / vs, t: T.topCss / vs, r: W - T.sideCss / vs, b: H - T.bottomCss / vs };
+  ctx.save();
+  ctx.font = '700 ' + px + 'px "Space Grotesk", ui-sans-serif, system-ui, sans-serif';
+  const items = [];
+  for (let i = 0; i < partyRivals.length; i++){
+    const r = partyRivals[i];
+    if (!r.visible) continue;
+    const hx = toX(r.gh.out[0]), hy = toY(r.gh.out[1]);
+    if (hy < 0 || hy > H || hx < -20 || hx > W + 20) continue;
+    if (r.wFont !== ctx.font){ r.wFont = ctx.font; r.w = ctx.measureText(r.label).width; }
+    items.push({ id: r.id, x: hx, y: hy, w: r.w + 2 * pad, h: th, r, d: player ? Math.hypot(r.gh.out[0] - player.x, r.gh.out[1] - player.y) : 0 });
+  }
+  items.sort((a, b) => a.d - b.d);                         // the nearest rival gets the best spot
+  // What a tag must never cover: the aim guide's box, your comet and its orbit, and the arc label.
+  const keeps = [];
+  const kp = T.keepPad / vs;
+  if (partyAim.on) keeps.push({ l: toX(partyAim.x0) - kp, t: toY(partyAim.y0) - kp, r: toX(partyAim.x1) + kp, b: toY(partyAim.y1) + kp });
+  if (player && state === 'playing'){
+    const hk = T.headKeep / vs * scale;
+    keeps.push({ l: toX(player.x) - hk, t: toY(player.y) - hk, r: toX(player.x) + hk, b: toY(player.y) + hk });
+    if (player.mode === 'orbit' && player.planet){
+      const pr = Math.hypot(player.x - player.planet.x, player.y - player.planet.y) + 14;
+      keeps.push({ l: toX(player.planet.x) - pr * scale, t: toY(player.planet.y) - pr * scale, r: toX(player.planet.x) + pr * scale, b: toY(player.planet.y) + pr * scale });
+    }
+  }
+  if (arcLabelBox) keeps.push({ l: arcLabelBox.x - kp, t: arcLabelBox.y - kp, r: arcLabelBox.x + arcLabelBox.w + kp, b: arcLabelBox.y + arcLabelBox.h + kp });
+  const placed = partyPlaceTags(items, keeps, bounds, gap);
+  partyTagDebug.tags = placed; partyTagDebug.keeps = keeps; partyTagDebug.bounds = bounds; partyTagDebug.vs = vs;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (let i = 0; i < placed.length; i++){
+    const p = placed[i], it = items[i];
+    if (!(p.alpha > 0)) continue;
+    const rr = p.h / 2;
+    ctx.globalAlpha = 0.86 * p.alpha;
+    ctx.fillStyle = '#120E2E';
+    ctx.beginPath();
+    ctx.moveTo(p.l + rr, p.t); ctx.lineTo(p.l + p.w - rr, p.t); ctx.arc(p.l + p.w - rr, p.t + rr, rr, -Math.PI / 2, Math.PI / 2);
+    ctx.lineTo(p.l + rr, p.t + p.h); ctx.arc(p.l + rr, p.t + rr, rr, Math.PI / 2, Math.PI * 1.5);
+    ctx.fill();
+    ctx.globalAlpha = p.alpha;
+    ctx.strokeStyle = it.r.color; ctx.lineWidth = 1.5 / vs; ctx.stroke();
+    ctx.fillStyle = '#F3EFFF';
+    ctx.fillText(it.r.label, p.l + p.w / 2, p.t + p.h / 2);
+  }
+  ctx.restore();
+}
+
+// ---- the room screen ---------------------------------------------------------------------------------------------
+function partyRow(parent, nick, opts){
+  const li = document.createElement('li');
+  if (opts.me) li.className = 'me';
+  if (opts.rank){ const rk = document.createElement('span'); rk.className = 'rk'; rk.textContent = opts.rank + '.'; li.appendChild(rk); }
+  const em = document.createElement('span'); em.className = 'em'; em.setAttribute('aria-hidden', 'true'); em.textContent = orbitNickEmoji(nick);
+  const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = orbitNickName(nick) + (opts.me ? ' (you)' : '');
+  li.appendChild(em); li.appendChild(nm);
+  for (const tag of opts.tags || []){
+    const s = document.createElement('span'); s.className = 'tag' + (tag.dim ? ' dim' : ''); s.textContent = tag.text; li.appendChild(s);
+  }
+  if (opts.pts != null){ const s = document.createElement('span'); s.className = 'pt'; s.textContent = opts.pts; li.appendChild(s); }
+  parent.appendChild(li);
+}
+function partyCountdownText(){
+  const hs = partyClient && partyClient.state.heat;
+  if (!hs) return '';
+  const left = Math.ceil((hs.localStartAt - Date.now()) / 1000);
+  return left > 0 ? String(left) : 'Go';
+}
+function partyRender(){
+  if (!ROOMS_ON) return;
+  const screen = partyEl('partyScreen');
+  if (!screen) return;
+  const st = partyClient ? partyClient.state : null;
+  const status = st ? st.status : 'idle';
+  const room = st && st.room;
+  const inRoom = partyInRoom();
+  const phase = inRoom && room ? room.phase : '';
+  if (phase === 'lobby') partyHeatNo = 0;
+  const fallback = !!(st && st.status === 'fallback');
+  const show = (id, on) => { const e = partyEl(id); if (e) e.hidden = !on; };
+  show('partyName', !inRoom && !fallback);
+  show('partyEntry', !inRoom && !fallback);
+  show('partyLobby', inRoom && phase === 'lobby');
+  show('partyRace', inRoom && phase === 'heat');
+  show('partyBoard', inRoom && (phase === 'between' || phase === 'final'));
+  show('partyFallback', fallback);
+  const statusEl = partyEl('partyStatus');
+  let text = partyNote, err = partyNoteErr;
+  if (status === 'connecting'){ text = 'Connecting…'; err = false; }
+  else if (status === 'reconnecting'){ text = 'Connection dropped. Rejoining…'; err = false; }
+  else if (!text && st && st.status === 'closed' && st.closedReason){
+    text = st.closedReason === 'idle' ? 'The room closed because it was quiet for a while.' : st.closedReason === 'empty' ? 'Everyone left, so the room closed.' :
+      st.closedReason === 'replaced' ? 'You joined this room from another tab.' : st.error ? st.error.message : 'The room closed.';
+  }
+  if (!text && invitedHint()) text = invitedHint();
+  if (statusEl){ statusEl.textContent = text; statusEl.className = err ? 'err' : ''; }
+  // name picker
+  if (partyNick >= 0){
+    const me = partyEl('partyMe');
+    if (me){ const label = orbitNickLabel(partyNick); if (me.textContent !== label) me.textContent = label; }
+    const p = orbitNickParts(partyNick);
+    if (p){
+      partyEl('partyEmoji').textContent = ORBIT_EMOJI[p.e];
+      partyEl('partyAdj').textContent = ORBIT_ADJ[p.a];
+      partyEl('partyNoun').textContent = ORBIT_NOUN[p.n];
+    }
+  }
+  const busy = status === 'connecting';
+  partyEl('partyCreate').disabled = busy; partyEl('partyJoin').disabled = busy;
+  partyEl('partyBack').textContent = inRoom ? 'Leave room' : 'Back';
+  partyEl('partyBack').hidden = partyRunning;
+  if (fallback){ partyEl('partyFallbackText').textContent = st.fallback.message; }
+  if (inRoom && room){
+    const me = st.you, host = room.host === me;
+    if (phase === 'lobby'){
+      partyEl('partyCodeShow').textContent = partyNormalizeCode(room.code);
+      const list = partyEl('partyPlayers'); list.textContent = '';
+      for (const p of room.players){
+        const tags = [];
+        if (p.host) tags.push({ text: 'Host' });
+        if (!p.connected) tags.push({ text: 'away', dim: true });
+        partyRow(list, p.nick, { me: p.id === me, tags });
+      }
+      const n = room.players.length, canStart = host && n >= 2;
+      const start = partyEl('partyStart');
+      start.hidden = !host; start.disabled = !canStart;
+      start.textContent = n >= 2 ? 'Start heat 1 of ' + partyInt(room.heats) + ' (' + n + ' players)' : 'Waiting for friends';
+      partyEl('partyLobbyHint').textContent = host ? (n >= 2 ? 'Start when everyone is here.' : 'Share the code or the invite link. You need 2 to 8 players.') : 'Waiting for the host to start the race.';
+    } else if (phase === 'heat'){
+      const total = partyInt(room.heats);
+      partyEl('partyHeatLine').textContent = 'Heat ' + partyInt(room.heat) + ' of ' + total;
+      const hs = st.heat, before = hs && hs.localStartAt > Date.now();
+      partyEl('partyCountdown').textContent = before ? partyCountdownText() : (st.submitted ? '✓' : '');
+      const list = partyEl('partyDone'); list.textContent = '';
+      for (const p of room.players){
+        if (p.left) continue;
+        partyRow(list, p.nick, { me: p.id === me, tags: [p.submitted ? { text: 'done' } : { text: before ? 'ready' : 'flying', dim: true }].concat(p.connected ? [] : [{ text: 'away', dim: true }]) });
+      }
+      if (before && !partyCountTimer){ partyCountTimer = setInterval(() => { if (partyPanelOpen) partyRender(); }, 200); }
+    } else {
+      partyRenderBoard(room, st, host, phase);
+    }
+  }
+  if (!(inRoom && phase === 'heat') && partyCountTimer){ clearInterval(partyCountTimer); partyCountTimer = 0; }
+  const body = partyEl('partyScreen').querySelector('.card-scroll');
+  if (body && typeof syncScrollFades === 'function') syncScrollFades();
+}
+function invitedHint(){
+  return partyCodeText && !partyInRoom() ? 'You are invited to room ' + partyCodeText + '. Pick a name and join.' : '';
+}
+function partyRenderBoard(room, st, host, phase){
+  const final = phase === 'final';
+  const names = new Map(room.players.map(p => [p.id, p]));
+  const list = partyEl('partyStandings'); list.textContent = '';
+  let title = '';
+  if (final && st.final){
+    const win = st.final.winners || [];
+    title = win.length > 1 ? 'A tie at the top' : win.length === 1 && names.get(win[0]) ? orbitNickName(names.get(win[0]).nick) + ' wins' : 'Final standings';
+    for (const s of st.final.standings){
+      partyRow(list, s.nick, { me: s.id === st.you, rank: partyInt(s.rank), tags: (win.indexOf(s.id) >= 0 ? [{ text: 'winner' }] : []).concat(s.left ? [{ text: 'left', dim: true }] : []), pts: partyInt(s.total) + ' pts' });
+    }
+  } else if (st.result){
+    title = 'Heat ' + partyInt(st.result.heat) + ' of ' + partyInt(room.heats) + ' results';
+    const total = new Map((st.result.standings || []).map(s => [s.id, s]));
+    for (const r of st.result.results.slice().sort((a, b) => a.rank - b.rank)){
+      const p = names.get(r.id);
+      if (!p) continue;
+      const tags = [];
+      if (r.status === 'flagged') tags.push({ text: 'not counted', dim: true });
+      else if (r.status === 'dnf') tags.push({ text: 'unfinished', dim: true });
+      const tt = total.get(r.id);
+      partyRow(list, p.nick, { me: r.id === st.you, rank: partyInt(r.rank), tags, pts: partyInt(r.score) + ' · +' + partyInt(r.points) + (tt ? ' = ' + partyInt(tt.total) : '') });
+    }
+  } else {
+    title = 'Standings';
+    for (const p of room.players.slice().sort((a, b) => partyInt(b.total) - partyInt(a.total))) partyRow(list, p.nick, { me: p.id === st.you, pts: partyInt(p.total) + ' pts' });
+  }
+  partyEl('partyBoardTitle').textContent = title;
+  const rematch = partyEl('partyRematch');
+  rematch.hidden = !(final && host);
+  partyEl('partyBoardHint').textContent = final ? (host ? 'Rematch keeps this room and everyone in it.' : 'Waiting for the host to start a rematch.') : 'The next heat starts in a few seconds.';
+}
+
+function initParty(){
+  if (!ROOMS_ON) return;
+  const open = partyEl('openParty');
+  if (open) open.hidden = false;
+  bindOverlayControl('openParty', () => openParty());
+  bindOverlayControl('partyBack', partyBackAction);
+  const bump = (part, dir) => { partyNick = orbitNickCycle(partyNick, part, dir); partySaveNick(); partyRender(); };
+  bindOverlayControl('partyEmoji', () => bump('e', 1));
+  bindOverlayControl('partyAdj', () => bump('a', 1));
+  bindOverlayControl('partyNoun', () => bump('n', 1));
+  bindOverlayControl('partyShuffle', () => { partyNick = orbitRandomNick(partyRand); partySaveNick(); partyRender(); });
+  bindOverlayControl('partyCreate', () => { partyNote = ''; partyNoteErr = false; partyEnsureClient().create(partyNick); });
+  bindOverlayControl('partyJoin', partyJoinNow);
+  bindOverlayControl('partyCopy', partyShare);
+  bindOverlayControl('partyStart', () => { if (partyClient) partyClient.start(); });
+  bindOverlayControl('partyRematch', () => { if (partyClient){ partyHeatNo = 0; partyClient.rematch(); } });
+  bindOverlayControl('partyDuel', partyDuelInstead);
+  const code = partyEl('partyCode');
+  code.addEventListener('pointerdown', e => e.stopPropagation());
+  code.addEventListener('input', () => { const c = partyNormalizeCode(code.value); if (c !== code.value) code.value = c; });
+  code.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') partyJoinNow(); });
+  // An invite link (?room=CODE) opens the screen with the code filled in; the player still taps Join.
+  let invited = '';
+  try { invited = partyCodeFromText(location.search); } catch (_) {}
+  if (invited && state === 'title' && !duelIncoming) openParty(invited);
+}
+initParty();
 applyStaticI18N();
 requestAnimationFrame(loop);
 // Test hooks (not used by the game). See endlessReplay and endlessRecord.
