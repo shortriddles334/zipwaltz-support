@@ -916,9 +916,9 @@ const WEB_DUEL_PAGE = true;
 // B16: web portal builds (tools/build-portal.cjs sets 'poki'). Null in the game, the app builds and the duel page, where
 // every Portal hook below does nothing. A portal build carries no outgoing link, store link, purchase UI or duel link.
 const WEB_PORTAL = null;
-// B13: Orbit Party rooms (browser-first). On for the web and duel-page builds; the iOS and Android copies turn it off
-// (ios/tools/prepare_html.py, and its --check enforces it) because rooms in the store apps need John's separate yes
-// (the privacy label). A portal build never shows rooms. ROOMS_URL is the room server's WebSocket address (no path; the client appends /v1/ws):
+// B13: Orbit Party rooms. On for the web and duel-page builds and, since John's yes of 2026-11-06 (privacy label and
+// data safety updated), in the iOS and Android copies too (ios/tools/prepare_html.py keeps the flag and its --check
+// enforces it). A portal build never shows rooms. ROOMS_URL is the room server's WebSocket address (no path; the client appends /v1/ws):
 // the live Worker, deployed 2026-11-06. Tests inject their own local URL and never contact it. Nothing connects until a player taps Create
 // or Join.
 const ROOMS_ENABLED = true;
@@ -9233,30 +9233,70 @@ function createRivalTrack(){
 // ---- name tag layout ---------------------------------------------------------------------------------------------
 // Pure geometry in screen px. items: [{ id, x, y (the rival's head), w, h (its tag) }], in priority order (the first
 // gets the best spot). keeps: [{ l, t, r, b }] rectangles a tag must never cover (the player's aim guide). bounds is
-// the playfield { l, t, r, b }. Each tag tries above, below, right, then left of its head, and takes the first spot that
-// is inside the bounds and clear of every keep rectangle and every tag already placed. If no spot is clear of the aim
-// guide the tag is hidden (alpha 0); if the only trouble is other tags it fades (alpha 0.3). Returns
-// [{ id, l, t, w, h, alpha }].
+// the playfield { l, t, r, b }. Each tag tries above, below, right, then left of its head, then farther out (2x and 3x
+// the offset above and below, then the four diagonals), and takes the first spot that is inside the bounds and clear of
+// every keep rectangle and every tag already placed. If every spot is blocked by the aim guide (a rival flying inside
+// the guide's box), it scans up and down the vertical line through the rival for the nearest spot clear of the guide
+// and draws the tag there at alpha 0.6, so the comet is never nameless. Only when no spot on that column is clear of
+// the aim guide (and not over the rival's own comet) is the tag hidden (alpha 0); if the only trouble is other tags it fades (alpha 0.3).
+// Returns [{ id, l, t, w, h, alpha }].
+const PARTY_TAG_SPOTS = 12, PARTY_TAG_SCAN = 4;
+const partyTagBox = { l: 0, t: 0, r: 0, b: 0 };            // scratch: no per-frame allocation in the search
+function partyTagSpot(k, it, g, bounds, box){
+  const hw = it.w / 2, hh = it.h / 2;
+  let l, t;
+  switch (k){
+    case 0: l = it.x - hw; t = it.y - g - it.h; break;
+    case 1: l = it.x - hw; t = it.y + g; break;
+    case 2: l = it.x + g; t = it.y - hh; break;
+    case 3: l = it.x - g - it.w; t = it.y - hh; break;
+    case 4: l = it.x - hw; t = it.y - 2 * (g + it.h); break;
+    case 5: l = it.x - hw; t = it.y + 2 * g + it.h; break;
+    case 6: l = it.x - hw; t = it.y - 3 * (g + it.h); break;
+    case 7: l = it.x - hw; t = it.y + 3 * g + 2 * it.h; break;
+    case 8: l = it.x + g; t = it.y - g - it.h; break;
+    case 9: l = it.x - g - it.w; t = it.y - g - it.h; break;
+    case 10: l = it.x + g; t = it.y + g; break;
+    default: l = it.x - g - it.w; t = it.y + g;
+  }
+  l = Math.max(bounds.l, Math.min(bounds.r - it.w, l));
+  t = Math.max(bounds.t, Math.min(bounds.b - it.h, t));
+  box.l = l; box.t = t; box.r = l + it.w; box.b = t + it.h;
+}
 function partyPlaceTags(items, keeps, bounds, gap){
-  const out = [], g = gap == null ? 8 : gap;
+  const out = [], g = gap == null ? 8 : gap, box = partyTagBox;
   const hit = (a, b) => a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t;
   for (let i = 0; i < items.length; i++){
     const it = items[i], hw = it.w / 2, hh = it.h / 2;
-    const cands = [[it.x - hw, it.y - g - it.h], [it.x - hw, it.y + g], [it.x + g, it.y - hh], [it.x - g - it.w, it.y - hh]];
-    let chosen = null, keepFree = null;
-    for (let c = 0; c < cands.length && !chosen; c++){
-      let l = cands[c][0], t = cands[c][1];
-      l = Math.max(bounds.l, Math.min(bounds.r - it.w, l));
-      t = Math.max(bounds.t, Math.min(bounds.b - it.h, t));
-      const box = { l, t, r: l + it.w, b: t + it.h };
-      if (keeps.some(k => hit(box, k))) continue;
-      if (!keepFree) keepFree = box;
-      if (out.some(o => o.alpha > 0 && hit(box, { l: o.l, t: o.t, r: o.l + o.w, b: o.t + o.h }))) continue;
-      chosen = box;
+    let chosen = false, alpha = 1, fl = 0, ft = 0, haveFree = false;
+    const steps = Math.ceil(Math.max(0, bounds.b - bounds.t) / PARTY_TAG_SCAN) + 1;   // reaches every row of the playfield
+    // spots 0..PARTY_TAG_SPOTS-1, then the column scan: alternate up and down by growing steps.
+    const total = PARTY_TAG_SPOTS + 2 * steps + 1;
+    for (let c = 0; c < total && !chosen; c++){
+      let a = 1;
+      if (c < PARTY_TAG_SPOTS) partyTagSpot(c, it, g, bounds, box);
+      else {
+        const n = c - PARTY_TAG_SPOTS, d = Math.ceil(n / 2) * PARTY_TAG_SCAN * (n % 2 ? -1 : 1);
+        let l = Math.max(bounds.l, Math.min(bounds.r - it.w, it.x - hw));
+        let t = Math.max(bounds.t, Math.min(bounds.b - it.h, Math.max(bounds.t, Math.min(bounds.b - it.h, it.y - hh)) + d));
+        box.l = l; box.t = t; box.r = l + it.w; box.b = t + it.h; a = 0.6;
+        if (it.x > box.l && it.x < box.r && it.y > box.t && it.y < box.b) continue;   // never over the rival's own comet
+      }
+      let blocked = false;
+      for (let k = 0; k < keeps.length; k++) if (hit(box, keeps[k])) { blocked = true; break; }
+      if (blocked) continue;
+      if (!haveFree){ haveFree = true; fl = box.l; ft = box.t; }
+      let crowded = false;
+      for (let k = 0; k < out.length; k++){
+        const o = out[k];
+        if (o.alpha > 0 && o.l < box.r && o.l + o.w > box.l && o.t < box.b && o.t + o.h > box.t) { crowded = true; break; }
+      }
+      if (crowded) continue;
+      chosen = true; alpha = a; fl = box.l; ft = box.t;
     }
-    if (chosen) out.push({ id: it.id, l: chosen.l, t: chosen.t, w: it.w, h: it.h, alpha: 1 });
-    else if (keepFree) out.push({ id: it.id, l: keepFree.l, t: keepFree.t, w: it.w, h: it.h, alpha: 0.3 });
-    else out.push({ id: it.id, l: cands[0][0], t: cands[0][1], w: it.w, h: it.h, alpha: 0 });
+    if (chosen) out.push({ id: it.id, l: fl, t: ft, w: it.w, h: it.h, alpha });
+    else if (haveFree) out.push({ id: it.id, l: fl, t: ft, w: it.w, h: it.h, alpha: 0.3 });
+    else out.push({ id: it.id, l: it.x - hw, t: it.y - g - it.h, w: it.w, h: it.h, alpha: 0 });
   }
   return out;
 }
@@ -15815,7 +15855,12 @@ function partyBackAction(){
   if (partyRunning) return;
   closeParty();
 }
-function partyInviteLink(code){ return location.href.split('#')[0].split('?')[0] + '?room=' + code; }
+// An app copy's own address (file:// on iOS, the private asset host on Android) opens nowhere for a friend, so the
+// store apps invite to the public duel page, which runs the same rooms. Web pages invite to themselves.
+function partyInviteLink(code){
+  const own = typeof location !== 'undefined' && /^https?:$/.test(location.protocol) && !ANDROID_SHELL;
+  return (own ? location.href.split('#')[0].split('?')[0] : DUEL_PAGE_URL) + '?room=' + code;
+}
 function partyShare(){
   const code = partyClient && partyClient.state.code;
   if (!code) return;
