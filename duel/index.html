@@ -84,6 +84,9 @@
   #dailyStrip{margin:8px auto 0;max-width:340px;padding:4px 8px;border-radius:8px;
     background:#120E2E;color:#F3EFFF;font-size:12px;line-height:1.35;font-weight:700;
     white-space:pre-line}
+  /* W1-3: today's sky done is a mint check, a rest day a periwinkle snowflake. Never red. No motion. */
+  #dailyStrip .strip-done{color:var(--mint)}
+  #dailyStrip .strip-rest,#dailyDetail .strip-rest{color:var(--peri)}
   #shareClip[hidden]{display:none}
   #clipStatus{font:600 14px/1.2 'Space Grotesk',sans-serif;text-align:center;margin-top:8px}
   #clipStatus[hidden]{display:none}
@@ -156,6 +159,23 @@
   /* B4c duel: the challenge line on the title and the sprint clock in the HUD. */
   #duelStrip{margin-top:8px;font-family:var(--font-body);font-weight:700;font-size:14px;line-height:1.3;color:#FFD2A8;
     text-align:center;overflow-wrap:anywhere}
+  /* W1-2: "Got it. Now race {name}." after the duel warm-up, in the tutorial's mint. A 240 ms fade and 4px lift;
+     Reduce Motion keeps the fade only, Reduced effects is instant. Start carries the warm-up offer in sentence case,
+     so a long rival name wraps inside the 240px button instead of shouting in capitals. */
+  #duelStrip[data-cue="ready"]{color:#6EE7C8;animation:warmupCueIn 240ms ease-out backwards}
+  @keyframes warmupCueIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  @keyframes warmupCueFade{from{opacity:0}to{opacity:1}}
+  @media (prefers-reduced-motion: reduce){ #duelStrip[data-cue="ready"]{animation-name:warmupCueFade} }
+  #gameUI.fx-reduced #duelStrip[data-cue="ready"]{animation:none}
+  #titleScreen #start[data-warmup]{text-transform:none;letter-spacing:.01em;line-height:1.2}
+  /* W1-2: for the title guard after a warm-up, Start looks not-ready, as Retry does after a death. */
+  #titleScreen #start.not-ready{opacity:.45}
+  /* W1-2: a short playfield (a duel link opened on a landscape phone) fits the warm-up offer as the title fits
+     without it: the long offer is set a size smaller and the column's gaps close up. Targets stay 44px. */
+  @container (max-height:420px){
+    #titleScreen #start[data-warmup]{margin-top:8px;font-size:14px;line-height:1.15}
+    #titleScreen #start[data-warmup] ~ .action{margin-top:4px}
+  }
   #duelLead{font-family:var(--font-body);font-weight:700;font-size:13px;color:#FF9FB0}
   #duelLead[data-ahead="1"]{color:#6EE7C8}
   /* D2c: the finish margin, one beat over the playfield as a received duel ends (opacity and scale set per frame);
@@ -516,6 +536,22 @@
   #gameOverScreen #shareClip{position:absolute;left:50%;bottom:96px;transform:translateX(-50%);width:min(220px,80%);margin:0;z-index:3}
   #gameOverScreen #shareClip[hidden]{display:none}
   #gameOverScreen #clipStatus{position:absolute;left:50%;bottom:62px;transform:translateX(-50%);margin:0;white-space:nowrap;z-index:3;font:600 13px/1.2 'Space Grotesk',sans-serif}
+  /* W1-4: while today's Daily is unplayed, one full-width Daily Orbit button sits just above the row, one 8 px gap
+     away (its -2 px bottom margin against the row's 10 px top margin). The row is grid row 3 on every card and the door
+     row 2 (empty when hidden), so Retry, Share and Settings never move under a thumb; the focus order (Retry first) is
+     unchanged. It has the title's quiet Daily look, so the gold Retry stays the first choice, and it dims with Retry
+     during the results guard. While the share chooser is open or a clip records it keeps its slot unseen (data-held),
+     under the chooser and Stop. It is drawn only where the card still fits with it (data-no-room, from
+     syncResultDaily) and never on a stacked or short card (below). While it is drawn the share toast sits just above
+     it: the toast is placed in the door's grid area (an absolute grid child), so it clears the door and the row
+     whatever their height in this language. */
+  #gameOverScreen #resultDaily{grid-column:1/-1;grid-row:2;width:100%;min-width:0;max-width:none;min-height:44px;margin:10px 0 -2px;padding:8px 4px;font-size:14px;align-self:stretch;
+    background:#211B3A;border-color:var(--dim);color:var(--text);box-shadow:none;text-transform:none;letter-spacing:.01em}
+  #gameOverScreen #retry,#gameOverScreen #share,#gameOverScreen #openSettingsResult{grid-row:3}
+  #gameOverScreen #resultDaily[data-held]{visibility:hidden}
+  #gameOverScreen #resultDaily[data-no-room]{display:none}
+  #gameOverScreen #resultDaily.not-ready{opacity:.45}
+  #gameOverScreen[data-daily-door] #shareToast{grid-row:2;grid-column:1/-1;bottom:100%}
   /* The score and the replay sit side by side on every card: a hero row. The replay is 120 px tall on tall
      cards and 96 px on short ones (below). */
   #gameOverScreen .result-hero{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:2px}
@@ -537,6 +573,8 @@
     .result-metric b{font-size:18px}
     #gameOverScreen .newbest{font-size:12px;padding:2px 6px}
     #gameOverScreen .blink{margin-top:6px}
+    #gameOverScreen #resultDaily{display:none}
+    #gameOverScreen[data-daily-door] #shareToast{grid-row:auto;grid-column:auto;bottom:max(72px,calc(env(safe-area-inset-bottom) + 60px))}
   }
   @container (max-height:280px){
     #gameOverScreen .go-title{font-size:12px}
@@ -556,6 +594,11 @@
   #gameOverScreen #retry,#gameOverScreen #share,#gameOverScreen #openSettingsResult{width:100%;min-width:0;max-width:none;margin:10px 0 0;padding:8px 4px;font-size:14px;white-space:nowrap;align-self:stretch}
   #gameOverScreen #share,#gameOverScreen #openSettingsResult{text-transform:none;letter-spacing:.01em}
   @container (max-width:260px){ #gameOverScreen{grid-template-columns:auto} }
+  @container (max-width:260px){
+    #gameOverScreen #resultDaily{display:none}
+    #gameOverScreen #retry,#gameOverScreen #share,#gameOverScreen #openSettingsResult{grid-row:auto}
+    #gameOverScreen[data-daily-door] #shareToast{grid-row:auto;grid-column:auto;bottom:max(72px,calc(env(safe-area-inset-bottom) + 60px))}
+  }
   /* Sound and Haptics sit centred as one pair on the title, Hangar and results (both hidden during a run). */
   #chips{position:absolute;left:0;right:0;bottom:max(12px,env(safe-area-inset-bottom));z-index:5;
     display:flex;justify-content:center;align-items:flex-end;gap:10px;pointer-events:none}
@@ -599,6 +642,8 @@
       .result-metric b{font-size:18px}
       #gameOverScreen .newbest{font-size:12px;padding:2px 6px}
       #gameOverScreen .blink{margin-top:6px}
+      #gameOverScreen #resultDaily{display:none}
+      #gameOverScreen[data-daily-door] #shareToast{grid-row:auto;grid-column:auto;bottom:max(72px,calc(env(safe-area-inset-bottom) + 60px))}
     }
     @media (max-height:280px),(max-width:168px){
       #gameOverScreen .go-title{font-size:12px}
@@ -649,9 +694,23 @@
   .party-list li .tag.dim{border-color:rgba(143,160,255,.4);color:var(--peri)}
   .party-list li .pt{flex:0 0 auto;font-variant-numeric:tabular-nums;color:var(--gold)}
   .party-list li.me{outline:1px solid rgba(168,255,96,.5)}
+  .party-list li .sw{flex:0 0 auto;width:10px;height:10px;border-radius:50%;box-shadow:0 0 0 1px rgba(243,239,255,.35)}
+  .party-list li .seen{display:block;margin-top:2px;font-weight:400;font-size:12px;color:var(--dim)}
+  .party-list li .seen b{font-weight:700}
   #partyHeatLine,#partyBoardTitle{margin-top:12px;font:700 15px/1.3 var(--font-body);color:var(--text)}
   #partyCountdown{margin:6px auto 0;font:400 clamp(44px,20vw,84px)/1 var(--font-display);color:var(--gold)}
   #partyFallbackText{margin:14px auto 0;max-width:300px;font:700 16px/1.4 var(--font-body);color:var(--text)}
+  #partyRetry{display:block;margin:10px auto 0!important;min-height:44px}
+  #partyRetry[hidden]{display:none}
+  /* W1-7 Heat Watch: the live race board after your run ends mid-heat */
+  #partyWatchHead{margin:8px auto 0;max-width:340px;font:700 16px/1.35 var(--font-body);color:var(--gold);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+  .party-watch{container-type:inline-size}
+  .party-watch li{border-left:4px solid var(--rc,var(--peri));padding-left:8px;flex-wrap:wrap;row-gap:2px}
+  .party-watch li .nm{flex:1 1 5em}
+  .party-watch li .pt{margin-left:auto;color:var(--rc,var(--gold));white-space:nowrap}
+  .party-watch li.landed .pt{opacity:.85}
+  .party-watch li .tag[hidden],.party-watch li .pt[hidden]{display:none}
+  @container (max-width:220px){ .party-watch li .rk{display:none} }
   #partyHud{position:absolute;left:8px;bottom:8px;max-width:calc(100% - 16px);z-index:3;pointer-events:none;padding:2px 8px;
     border-radius:999px;background:rgba(18,14,46,.5);color:rgba(243,239,255,.7);font:700 11px/1.5 var(--font-body);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
@@ -685,7 +744,7 @@
   <div class="title" role="heading" aria-level="1">ZIPWALTZ</div>
   <div id="eventBanner" class="event-banner" hidden></div>
   <div class="subtitle">Tap when the comet is in the glow</div>
-  <div id="dailyStrip" aria-live="polite">Daily #1 · streak 0</div>
+  <div id="dailyStrip" aria-live="polite">Daily #1 · a new sky every day</div>
   <div id="duelStrip" hidden aria-live="polite"></div>
   </div>
   <button class="action" id="start" type="button">Start</button>
@@ -701,8 +760,8 @@
     <div class="card-scroll">
       <div class="go-title" id="moreHeading" role="heading" aria-level="2" tabindex="-1">More</div>
       <div id="metaStrip" aria-live="polite">Rank 1 · ✦ 0</div>
-      <div id="dailyDetail">Daily #1 · best 0 · 0 attempts · streak 0</div>
-      <details class="flight-rules" id="flightRules"><summary id="rulesSummary">Scoring &amp; flight</summary><p>New planets score once. Revisits reset your combo.</p><p>Your starting height counts. Climb higher to score more. Gravity bends the flight.</p></details>
+      <div id="dailyDetail">Daily #1 · best 0 · 0 attempts</div>
+      <details class="flight-rules" id="flightRules"><summary id="rulesSummary">Scoring &amp; flight</summary><p>New planets score once. Revisits, and bounces off a wall or moon (↺), reset your combo.</p><p>Your starting height counts. Climb higher to score more. Gravity bends the flight.</p></details>
       <div class="how">Tap to launch from orbit.<br>The dashed ring catches you.<br>Stay ahead of the rising void.</div>
       <div class="blink keyboard-hint">Space / Enter / ↑ also work</div>
       <div class="more-actions">
@@ -712,7 +771,7 @@
         <button class="action" id="howToPlay" type="button">How to play</button>
         <button class="action" id="openParty" type="button" hidden>&#x2728; Orbit Party</button>
       </div>
-      <div id="versionLabel">v1.8.0</div>
+      <div id="versionLabel">v1.8.1</div>
     </div>
     </div>
   </div>
@@ -754,7 +813,9 @@
       </div>
       <div id="partyRace" hidden>
         <div id="partyHeatLine"></div>
+        <div id="partyWatchHead" aria-live="off" hidden></div>
         <div id="partyCountdown" aria-live="off"></div>
+        <ol id="partyWatchList" class="party-list party-watch" aria-label="Live race" hidden></ol>
         <ul id="partyDone" class="party-list" aria-label="Who has finished"></ul>
       </div>
       <div id="partyBoard" hidden>
@@ -764,8 +825,9 @@
         <div id="partyBoardHint" class="party-note"></div>
       </div>
       <div id="partyFallback" hidden>
-        <div id="partyFallbackText">Rooms are full right now. Play a duel instead</div>
+        <div id="partyFallbackText" tabindex="-1">Rooms are full right now. Play a duel instead</div>
         <button class="action" id="partyDuel" type="button">Play a duel instead</button>
+        <button class="action party-chip" id="partyRetry" type="button" hidden>Try again</button>
       </div>
     </div>
     </div>
@@ -843,6 +905,7 @@
   <button class="action" id="shareClip" type="button" hidden>Stop</button>
   <div id="clipStatus" role="status" aria-live="polite" hidden></div>
   <button class="action" id="openSettingsResult" type="button" aria-label="Settings">&#x2699;&#xFE0E; Settings</button>
+  <button class="action" id="resultDaily" type="button" hidden>Daily Orbit</button>
   <div id="shareToast" hidden>Copied!</div>
 </div>
 
@@ -931,7 +994,12 @@ const ROOMS_DEV_HOST = typeof location !== 'undefined' && (location.protocol ===
 const ROOMS_URL_OK = /^wss:\/\/[^\s/]+(\/.*)?$/i.test(ROOMS_URL) && !ROOMS_URL_LOCAL ? true : ROOMS_URL_LOCAL && ROOMS_DEV_HOST;
 const ROOMS_ON = ROOMS_ENABLED && ROOMS_URL_OK && !WEB_PORTAL && !(typeof window !== 'undefined' && !!window.__ghostMode); // never in a ghost frame
 const PARTY_NICK_KEY = 'zipwaltz-party-nick';
-const PARTY_COLORS = Object.freeze(['#7FE3FF', '#FFB38A', '#C9B8FF', '#9FFFC0', '#FF9EC4', '#F5E27A', '#8FA0FF']);
+// W1-6 seat colours: 8 pastel hues, one per seat (a player's place in the room's player list, the same order on every
+// phone), so everyone sees the same rival in the same colour. Every hue is at least 30 degrees from the duel rival's
+// lime and reads on every sky; every pair is at least 15 CIEDE2000 apart (tests/party-feel-w1-6.test.cjs). The first
+// seats differ most, so a two- or three-player room gets the clearest pair. The names let text say a colour.
+const PARTY_COLORS = Object.freeze(['#70E6FF', '#FFA58F', '#E384FF', '#F7DC6E', '#78F0B4', '#FFA6D0', '#76ABFF', '#C4B8FC']);
+const PARTY_COLOR_NAMES = Object.freeze(['aqua', 'coral', 'violet', 'yellow', 'mint', 'pink', 'blue', 'lavender']);
 const PARTY_TAG = Object.freeze({ px: 12, pad: 7, gap: 9, keepPad: 8, headKeep: 34, topCss: 132, bottomCss: 64, sideCss: 8 });
 let partyNick = -1;
 let partyClient = null;
@@ -946,7 +1014,7 @@ let partyNote = '', partyNoteErr = false;
 let partyCodeText = '';        // the invited room code from a link
 const partyRivals = [];        // { id, nick, label, color, visible, gh, w }
 const partyAim = { on: false, x0: 0, y0: 0, x1: 0, y1: 0 };
-const partyTagDebug = { tags: [], keeps: [], bounds: null, vs: 1 }; // last frame's layout, for the tests
+const partyTagDebug = { tags: [], keeps: [], bounds: null, vs: 1, edge: null, edgeBox: null, aim: null, pop: null }; // last frame's layout, for the tests
 const partyPos = { x: 0, y: 0 };
 const PARTY_NO_TAGS = Object.freeze([]);
 let partyCountTimer = 0;
@@ -1047,6 +1115,12 @@ const I18N = Object.freeze({
   "daily.number": Object.freeze({ "en": "Daily #{n}", "es": "Día #{n}", "de": "Tagesorbit #{n}", "fr": "Jour #{n}", "ja": "デイリー #{n}", "pt-BR": "Dia #{n}" }),
   "daily.reset": Object.freeze({ "en": "New sky at {time}", "es": "Cielo nuevo a las {time}", "de": "Neuer Himmel um {time}", "fr": "Nouveau ciel à {time}", "ja": "{time}に新しい空", "pt-BR": "Novo céu às {time}" }),
   "daily.streak": Object.freeze({ "en": "Daily #{n} · streak {streak}", "es": "Día #{n} · racha {streak}", "de": "Tagesorbit #{n} · Serie {streak}", "fr": "Jour #{n} · série {streak}", "ja": "デイリー #{n} · {streak}日連続", "pt-BR": "Dia #{n} · sequência {streak}" }),
+  "daily.newSky": Object.freeze({ "en": "Daily #{n} · a new sky every day", "es": "Día #{n} · un cielo nuevo cada día", "de": "Tagesorbit #{n} · jeden Tag neu", "fr": "Jour #{n} · un ciel neuf par jour", "ja": "デイリー #{n} · 毎日新しい空", "pt-BR": "Dia #{n} · um céu novo todo dia" }),
+  "daily.streakDone": Object.freeze({ "en": "Daily #{n} ✓ · streak {streak}", "es": "Día #{n} ✓ · racha {streak}", "de": "Tagesorbit #{n} ✓ · Serie {streak}", "fr": "Jour #{n} ✓ · série {streak}", "ja": "デイリー #{n} ✓ · {streak}日連続", "pt-BR": "Dia #{n} ✓ · sequência {streak}" }),
+  "daily.doneAria": Object.freeze({ "en": "today's Daily done", "es": "Órbita diaria de hoy completada", "de": "heutiger Tagesorbit geschafft", "fr": "Orbite du jour terminée", "ja": "今日のデイリー完了", "pt-BR": "Órbita diária de hoje concluída" }),
+  "daily.restAria": Object.freeze({ "en": "one rest day used this week", "es": "un día de descanso usado esta semana", "de": "ein Ruhetag diese Woche genutzt", "fr": "un jour de repos utilisé cette semaine", "ja": "今週の休息日を1日使用", "pt-BR": "um dia de descanso usado nesta semana" }),
+  "daily.restRule": Object.freeze({ "en": "Miss a day and your streak rests, once a week", "es": "Si faltas un día, tu racha descansa, una vez por semana", "de": "Verpasst du einen Tag, ruht deine Serie, einmal pro Woche", "fr": "Si tu manques un jour, ta série se repose, une fois par semaine", "ja": "1日逃しても連続は途切れません（週1回まで）", "pt-BR": "Se perder um dia, sua sequência descansa, uma vez por semana" }),
+  "daily.lineNew": Object.freeze({ "en": "Daily #{n} · best {best} · {attempts} {noun}", "es": "Día #{n} · mejor {best} · {attempts} {noun}", "de": "Tagesorbit #{n} · Rekord {best} · {attempts} {noun}", "fr": "Jour #{n} · record {best} · {attempts} {noun}", "ja": "デイリー #{n} · ベスト {best} · {attempts}{noun}", "pt-BR": "Dia #{n} · melhor {best} · {attempts} {noun}" }),
   "flick.announce": Object.freeze({ "en": "Tap again mid-flight to steer", "es": "Toca otra vez en pleno vuelo para girar", "de": "Im Flug nochmal tippen zum Lenken", "fr": "Touche à nouveau en vol pour diriger", "ja": "飛行中にもう一度タップで軌道修正", "pt-BR": "Toque de novo durante o voo para direcionar" }),
   "tut.watch": Object.freeze({ "en": "Watch the comet reach the glow", "es": "Mira cómo el cometa llega al resplandor", "de": "Sieh zu, wie der Komet das Leuchten erreicht", "fr": "Regarde la comète atteindre la lueur", "ja": "彗星が光に届くのを見よう", "pt-BR": "Veja o cometa chegar ao brilho" }),
   "tut.catch": Object.freeze({ "en": "The ring around the next planet catches you", "es": "El anillo del siguiente planeta te atrapa", "de": "Der Ring um den nächsten Planeten fängt dich", "fr": "L'anneau de la planète suivante t'attrape", "ja": "次の惑星の輪がキャッチしてくれる", "pt-BR": "O anel do próximo planeta pega você" }),
@@ -1143,7 +1217,7 @@ const I18N = Object.freeze({
   "meta.unlockedInHangar": Object.freeze({ "en": "Unlocked in Hangar: {names}", "es": "Desbloqueado en el Hangar: {names}", "de": "Im Hangar freigeschaltet: {names}", "fr": "Débloqué dans le Hangar\u00a0: {names}", "ja": "ハンガーで解放：{names}", "pt-BR": "Desbloqueado no Hangar: {names}" }),
   "more.how": Object.freeze({ "en": "Tap to launch from orbit.<br>The dashed ring catches you.<br>Stay ahead of the rising void.", "es": "Toca para salir de la órbita.<br>El anillo punteado te atrapa.<br>Adelántate al vacío que sube.", "de": "Tippe, um aus der Umlaufbahn zu starten.<br>Der gestrichelte Ring fängt dich.<br>Bleib der steigenden Leere voraus.", "fr": "Touche pour quitter l'orbite.<br>L'anneau pointillé te capture.<br>Reste au-dessus du vide qui monte.", "ja": "タップで軌道から発射。<br>点線のリングがキャッチしてくれる。<br>迫りくる虚無に追いつかれるな。", "pt-BR": "Toque para sair da órbita.<br>O anel tracejado captura você.<br>Fique acima do vazio que sobe." }),
   "more.keys": Object.freeze({ "en": "Space / Enter / ↑ also work", "es": "Espacio / Intro / ↑ también funcionan", "de": "Leertaste / Enter / ↑ funktionieren auch", "fr": "Espace / Entrée / ↑ fonctionnent aussi", "ja": "スペース / Enter / ↑ でも操作できます", "pt-BR": "Espaço / Enter / ↑ também funcionam" }),
-  "more.rules1": Object.freeze({ "en": "New planets score once. Revisits reset your combo.", "es": "Los planetas nuevos puntúan una vez. Volver a uno reinicia tu combo.", "de": "Neue Planeten zählen einmal. Rückkehr setzt deine Combo zurück.", "fr": "Les nouvelles planètes rapportent une fois. Y revenir remet ton combo à zéro.", "ja": "新しい惑星は一度だけ得点。再訪するとコンボがリセットされます。", "pt-BR": "Planetas novos pontuam uma vez. Revisitas zeram seu combo." }),
+  "more.rules1": Object.freeze({ "en": "New planets score once. Revisits, and bounces off a wall or moon (↺), reset your combo.", "es": "Los planetas nuevos puntúan una vez. Volver a uno, o rebotar en un muro o una luna (↺), reinicia tu combo.", "de": "Neue Planeten zählen einmal. Rückkehr oder ein Abpraller an Wand oder Mond (↺) setzt deine Combo zurück.", "fr": "Les nouvelles planètes rapportent une fois. Y revenir, ou rebondir sur un mur ou une lune (↺), remet ton combo à zéro.", "ja": "新しい惑星は一度だけ得点。再訪や、壁や月での跳ね返り（↺）でコンボがリセットされます。", "pt-BR": "Planetas novos pontuam uma vez. Revisitas e ricochetes em paredes ou luas (↺) zeram seu combo." }),
   "more.rules2": Object.freeze({ "en": "Your starting height counts. Climb higher to score more. Gravity bends the flight.", "es": "Cuenta tu altura inicial. Sube más para puntuar más. La gravedad curva el vuelo.", "de": "Deine Starthöhe zählt. Steig höher, um mehr zu punkten. Die Schwerkraft krümmt die Flugbahn.", "fr": "Ta hauteur de départ compte. Monte plus haut pour marquer plus. La gravité courbe le vol.", "ja": "開始時の高さも得点になります。高く登るほど得点が増えます。重力で飛行が曲がります。", "pt-BR": "Sua altura inicial conta. Suba mais para pontuar mais. A gravidade curva o voo." }),
   "more.rulesSummary": Object.freeze({ "en": "Scoring & flight", "es": "Puntuación y vuelo", "de": "Punkte & Flug", "fr": "Score et vol", "ja": "スコアと飛行", "pt-BR": "Pontuação e voo" }),
   "music.key.frost": Object.freeze({ "en": "F lydian", "es": "Fa lidio", "de": "F-Lydisch", "fr": "Fa lydien", "ja": "ヘ・リディア旋法", "pt-BR": "Fá lídio" }),
@@ -1216,6 +1290,9 @@ const I18N = Object.freeze({
   "duel.watchLead": Object.freeze({ "en": "Watch the lead change", "es": "Ver el cambio de líder", "de": "Führungswechsel ansehen", "fr": "Revoir le changement de tête", "ja": "逆転の瞬間を見る", "pt-BR": "Ver a virada na liderança" }),
   "duel.leadChangedOne": Object.freeze({ "en": "Lead changed once", "es": "El liderato cambió una vez", "de": "Die Führung wechselte einmal", "fr": "La tête a changé une fois", "ja": "リードが1回入れ替わった", "pt-BR": "A liderança mudou uma vez" }),
   "duel.leadChanged": Object.freeze({ "en": "Lead changed {n} times", "es": "El liderato cambió {n} veces", "de": "Die Führung wechselte {n}-mal", "fr": "La tête a changé {n} fois", "ja": "リードが{n}回入れ替わった", "pt-BR": "A liderança mudou {n} vezes" }),
+  "duel.learnFirst": Object.freeze({ "en": "Learn the tap, then race {name}", "es": "Aprende el toque y luego corre contra {name}", "de": "Erst das Tippen lernen, dann gegen {name} antreten", "fr": "Apprends le geste, puis affronte {name}", "ja": "タップを覚えてから{name}とレース", "pt-BR": "Aprenda o toque e depois enfrente {name}" }),
+  "duel.raceNow": Object.freeze({ "en": "Race now", "es": "Correr ya", "de": "Sofort antreten", "fr": "Courir tout de suite", "ja": "今すぐレース", "pt-BR": "Correr agora" }),
+  "duel.nowRace": Object.freeze({ "en": "Got it. Now race {name}.", "es": "¡Listo! Ahora corre contra {name}.", "de": "Geschafft. Jetzt gegen {name} antreten.", "fr": "C'est bon. Maintenant, affronte {name}.", "ja": "よし、次は{name}とレース。", "pt-BR": "Pronto! Agora enfrente {name}." }),
   "results.death.daily": Object.freeze({ "en": "DAILY COMPLETE", "es": "ÓRBITA DIARIA COMPLETADA", "de": "TAGESORBIT GESCHAFFT", "fr": "ORBITE DU JOUR TERMINÉE", "ja": "デイリー完了", "pt-BR": "ÓRBITA DIÁRIA CONCLUÍDA" }),
   "results.cause.void": Object.freeze({ "en": "Ended in the void", "es": "Terminó en el vacío", "de": "Endete in der Leere", "fr": "Fini dans le vide", "ja": "虚無で終了", "pt-BR": "Terminou no vazio" }),
   "results.death.void": Object.freeze({ "en": "CAUGHT BY THE VOID", "es": "ATRAPADO POR EL VACÍO", "de": "VON DER LEERE ERWISCHT", "fr": "AVALÉ PAR LE VIDE", "ja": "虚無に飲み込まれた", "pt-BR": "ENGOLIDO PELO VAZIO" }),
@@ -1384,6 +1461,15 @@ const I18N = Object.freeze({
   "mission.t3-sec-2": Object.freeze({ "en": "Sectors: clear Gas Giants", "es": "Sectores: supera los Gigantes gaseosos", "de": "Sektoren: schaffe die Gasriesen", "fr": "Secteurs\u00a0: termine les Géantes gazeuses", "ja": "セクター：ガス惑星群をクリア", "pt-BR": "Setores: conclua os Gigantes gasosos" }),
   "mission.t3-sec-5": Object.freeze({ "en": "clear Frost and Gas again", "es": "supera el Anillo de escarcha y los Gigantes gaseosos otra vez", "de": "schaffe Frostring und Gasriesen erneut", "fr": "termine l'Anneau de givre et les Géantes gazeuses à nouveau", "ja": "氷の環とガス惑星群をもう一度クリア", "pt-BR": "conclua o Anel de gelo e os Gigantes gasosos de novo" }),
   "mission.t3-sec-8": Object.freeze({ "en": "clear a third Gas Giants", "es": "supera los Gigantes gaseosos por tercera vez", "de": "schaffe die Gasriesen ein drittes Mal", "fr": "termine une troisième fois les Géantes gazeuses", "ja": "ガス惑星群を3周目でクリア", "pt-BR": "conclua os Gigantes gasosos pela terceira vez" }),
+  "party.watchRun": Object.freeze({ "en": "Your run: {score} · {clock} left", "es": "Tu partida: {score} · quedan {clock}", "de": "Dein Lauf: {score} · noch {clock}", "fr": "Ta partie\u00a0: {score} · encore {clock}", "ja": "今回のプレイ：{score} · 残り{clock}", "pt-BR": "Sua partida: {score} · faltam {clock}" }),
+  "party.watchRunWaiting": Object.freeze({ "en": "Your run: {score} · waiting for the last scores", "es": "Tu partida: {score} · esperando las últimas puntuaciones", "de": "Dein Lauf: {score} · warte auf die letzten Punkte", "fr": "Ta partie\u00a0: {score} · en attente des derniers scores", "ja": "今回のプレイ：{score} · 最後のスコアを待っています", "pt-BR": "Sua partida: {score} · esperando as últimas pontuações" }),
+  "party.aboutScore": Object.freeze({ "en": "about {score}", "es": "unos {score}", "de": "etwa {score}", "fr": "environ {score}", "ja": "約{score}", "pt-BR": "cerca de {score}" }),
+  "party.passedYou": Object.freeze({ "en": "{name} passed you", "es": "{name} te superó", "de": "{name} hat dich überholt", "fr": "{name} t'a dépassé", "ja": "{name}に抜かれた", "pt-BR": "{name} passou você" }),
+  "party.watchLabel": Object.freeze({ "en": "Live race", "es": "Carrera en vivo", "de": "Live-Rennen", "fr": "Course en direct", "ja": "ライブレース", "pt-BR": "Corrida ao vivo" }),
+  "party.tryAgain": Object.freeze({ "en": "Try again", "es": "Intentar de nuevo", "de": "Erneut versuchen", "fr": "Réessayer", "ja": "もう一度試す", "pt-BR": "Tentar de novo" }),
+  "party.fallbackOffline": Object.freeze({ "en": "You're offline. Rooms need a connection; solo runs and duels work offline.", "es": "Estás sin conexión. Las salas necesitan conexión; las partidas en solitario y los duelos funcionan sin ella.", "de": "Du bist offline. Räume brauchen eine Verbindung; Solo-Läufe und Duelle gehen auch offline.", "fr": "Tu es hors ligne. Les salons ont besoin d'une connexion. Les parties en solo et les duels marchent hors ligne.", "ja": "オフラインです。ルームには接続が必要です。ソロとデュエルはオフラインでも遊べます。", "pt-BR": "Você está offline. As salas precisam de conexão; partidas solo e duelos funcionam offline." }),
+  "party.fallbackUnreachable": Object.freeze({ "en": "Can't reach rooms right now. Try again, or play a duel.", "es": "No se puede conectar con las salas ahora. Reintenta o juega un duelo.", "de": "Räume sind gerade nicht erreichbar. Versuch es erneut oder spiel ein Duell.", "fr": "Impossible de joindre les salons pour l'instant. Réessaie ou joue un duel.", "ja": "いまルームに接続できません。もう一度試すか、デュエルで遊んでください。", "pt-BR": "Não foi possível acessar as salas agora. Tente de novo ou jogue um duelo." }),
+  "party.fallbackRateLimited": Object.freeze({ "en": "Too many tries from this network for now. Play a duel, or try again later.", "es": "Demasiados intentos desde esta red por ahora. Juega un duelo o vuelve a intentarlo más tarde.", "de": "Gerade zu viele Versuche aus diesem Netzwerk. Spiel ein Duell oder versuch es später erneut.", "fr": "Trop de tentatives depuis ce réseau pour l'instant. Joue un duel ou réessaie plus tard.", "ja": "このネットワークからの試行が多すぎます。デュエルで遊ぶか、あとでもう一度試してください。", "pt-BR": "Tentativas demais desta rede por enquanto. Jogue um duelo ou tente de novo mais tarde." }),
 });
 const I18N_EN_INDEX = (function(){ const idx = Object.create(null); for (const k of Object.keys(I18N)){ const en = I18N[k].en; if (!(en in idx)) idx[en] = k; } return idx; })();
 // tl(en): translation of an English literal the source keeps as written (tests pin those literals).
@@ -1412,7 +1498,7 @@ function comboAriaText(combo, tier){
 
 // Static text on the page is English in the markup (the no-script copy). For a non-English language the
 // page text and accessibility labels are replaced from the table; English is left exactly as written.
-const I18N_STATIC_TEXT = Object.freeze([[".subtitle", "title.subtitle"], ["#start", "btn.start"], ["#daily", "btn.daily"], ["#duelNew", "duel.new"], ["#more", "btn.more"], ["#moreHeading", "btn.more"], ["#moreScreen .keyboard-hint", "more.keys"], ["#rulesSummary", "more.rulesSummary"], ["#flightRules p:nth-of-type(1)", "more.rules1"], ["#flightRules p:nth-of-type(2)", "more.rules2"], ["#hangar", "btn.hangar"], ["#openStats", "btn.stats"], ["#moreBack", "btn.back"], ["#hangarBack", "btn.back"], ["#retry", "btn.retry"], ["#share", "btn.share"], ["#shareCardOption", "btn.shareCard"], ["#shareClipOption", "btn.shareClip"], ["#shareClip", "btn.stop"], ["#shareToast", "toast.copied"], ["#newBest", "results.newBest"], ["#supporterBadge", "supporter.badge"], ["#supporterThanks", "supporter.thanks"], ["#finalBestLabel", "best.session"], ["#pause", "btn.menu"], ["#returnTitle", "btn.endRun"], ["#resume", "btn.resume"], ["#pausedHeading", "pause.heading"], ["#settingsHeading", "btn.settings"], ["#settingsBack", "btn.back"], ["#statsHeading", "btn.stats"], ["#statsBack", "btn.back"], ["#voidCue", "hud.void"], ["#flickHint", "flick.hint"], ["#tutorialSkip", "tut.skip"], ["#duelSkip", "duel.skip"], ["#howToPlay", "btn.howToPlay"], ["#checkpointHud", "hud.checkpoint"], ["#checkpointResult", "hud.checkpoint"]]);
+const I18N_STATIC_TEXT = Object.freeze([[".subtitle", "title.subtitle"], ["#start", "btn.start"], ["#daily", "btn.daily"], ["#duelNew", "duel.new"], ["#more", "btn.more"], ["#moreHeading", "btn.more"], ["#moreScreen .keyboard-hint", "more.keys"], ["#rulesSummary", "more.rulesSummary"], ["#flightRules p:nth-of-type(1)", "more.rules1"], ["#flightRules p:nth-of-type(2)", "more.rules2"], ["#hangar", "btn.hangar"], ["#openStats", "btn.stats"], ["#moreBack", "btn.back"], ["#hangarBack", "btn.back"], ["#retry", "btn.retry"], ["#share", "btn.share"], ["#shareCardOption", "btn.shareCard"], ["#shareClipOption", "btn.shareClip"], ["#shareClip", "btn.stop"], ["#shareToast", "toast.copied"], ["#newBest", "results.newBest"], ["#supporterBadge", "supporter.badge"], ["#supporterThanks", "supporter.thanks"], ["#finalBestLabel", "best.session"], ["#pause", "btn.menu"], ["#returnTitle", "btn.endRun"], ["#resume", "btn.resume"], ["#pausedHeading", "pause.heading"], ["#settingsHeading", "btn.settings"], ["#settingsBack", "btn.back"], ["#statsHeading", "btn.stats"], ["#statsBack", "btn.back"], ["#voidCue", "hud.void"], ["#flickHint", "flick.hint"], ["#tutorialSkip", "tut.skip"], ["#duelSkip", "duel.skip"], ["#howToPlay", "btn.howToPlay"], ["#checkpointHud", "hud.checkpoint"], ["#checkpointResult", "hud.checkpoint"], ["#resultDaily", "btn.daily"]]);
 const I18N_STATIC_HTML = Object.freeze([[".how", "more.how", null], ["#gameOverScreen .blink", "results.retryHtml", "results.retryTouch"]]);
 const I18N_STATIC_ATTR = Object.freeze([["#game", "aria-label", "aria.game", "aria.gameTouch"], ["#moreScreen", "aria-label", "aria.more", null], ["#hangarScreen", "aria-label", "aria.hangar", null], ["#gameOverScreen", "aria-label", "aria.results", null], ["#settingsScreen", "aria-label", "aria.settings", null], ["#statsScreen", "aria-label", "aria.stats", null], ["#resumeScreen", "aria-label", "aria.paused", null], ["#shareChooser", "aria-label", "aria.share", null], ["#mute", "aria-label", "aria.sound", null], ["#haptics", "aria-label", "aria.haptics", null], ["#pause", "aria-label", "aria.menu", null], ["#returnTitle", "aria-label", "aria.endRun", null], ["#tutorialSkip", "aria-label", "aria.skipTutorial", null], ["#openStats", "aria-label", "btn.stats", null], ["#openSettings", "aria-label", "aria.settings", null], ["#openSettingsResult", "aria-label", "aria.settings", null], ["#constellationThumb", "title", "results.skipReplay", null]]);
 function applyStaticI18N(){
@@ -2226,7 +2312,7 @@ const RELEASE_GRACE = Object.freeze({
 });
 let releaseGraceWindow = RELEASE_GRACE.seconds; // a run input: the page reads ?grace= at load (graceFromSearch)
 const graceRing = Array.from({ length: RELEASE_GRACE.ring }, () => ({ t: 0, x: 0, y: 0, angle: 0, planet: null }));
-const graceRes = { kind: 'horizon', t: 0, step: 0, planetId: null, depth: 1 };
+const graceRes = { kind: 'horizon', t: 0, step: 0, planetId: null, depth: 1, bounces: 0 };
 let voidBrushCool = 0;
 let launchedThisSession = false; // any launch since the app opened: ends the 45 s look
 let caughtThisSession = false;   // any catch since the app opened: ends fresh-player status
@@ -3209,7 +3295,7 @@ const FC = {
   bx: null, by: null, bw: null, ba0: null,
   mCap: 0, mPi: null, mA0: null, mSD: null, mOrb: null, mHit: null, mPX: null,
   n: 0, k: 0, ri: -1, knownTop: Infinity, vMult: 1, ox: 0,
-  res: { kind: 'horizon', t: 0, step: 0, planetId: null, depth: 1 }
+  res: { kind: 'horizon', t: 0, step: 0, planetId: null, depth: 1, bounces: 0 }
 };
 function fcEnsure(n, nm){
   if (FC.cap < n){
@@ -3332,6 +3418,7 @@ function fcRun(angle, odir, relCap, x, y, ovx, ovy, t0, simVoid0, simCam0, durat
   if (pts) pts.push({ x, y });
   const steps = Math.max(0, Math.round(duration / dt));
   res.kind = 'horizon'; res.t = 0; res.step = 0; res.planetId = null; res.depth = 1;
+  res.bounces = 0; // output only (W1-1 bank arc): wall and moon bounces flown before the result; nothing in the core reads it
   let done = 0;
   for (let step = 0; step < steps; step++){
     if (step > 0){
@@ -3393,8 +3480,8 @@ function fcRun(angle, odir, relCap, x, y, ovx, ovy, t0, simVoid0, simCam0, durat
       vy = vy / sp * target;
     }
     // bounceX
-    if (x < 0){ x = -x; vx = Math.abs(vx); }
-    else if (x > W){ x = 2 * W - x; vx = -Math.abs(vx); }
+    if (x < 0){ x = -x; vx = Math.abs(vx); res.bounces++; }
+    else if (x > W){ x = 2 * W - x; vx = -Math.abs(vx); res.bounces++; }
     if (x < 0){ x = 0; vx = Math.abs(vx); }
     else if (x > W){ x = W; vx = -Math.abs(vx); }
     // deflectMoons over moonBodies(t, xs): the first swept hit, ties to the lower index.
@@ -3422,6 +3509,7 @@ function fcRun(angle, odir, relCap, x, y, ovx, ovy, t0, simVoid0, simCam0, durat
         if (bestJ < 0 || s < bestS){ bestS = s; bestJ = j; bmx = cx; bmy = cy; bhit = radius; }
       }
       if (bestJ >= 0){
+        res.bounces++; // any swept hit, as deflectMoons().bounced: update() resets the combo on it
         const hx = fromX + (x - fromX) * bestS, hy = fromY + (y - fromY) * bestS;
         let nx = hx - bmx, ny = hy - bmy, nd = hyp2(nx, ny);
         if (!(nd > 1e-4)){ nx = x - bmx; ny = y - bmy; nd = hyp2(nx, ny); }
@@ -3511,8 +3599,11 @@ const rA = new Float64Array(RHYTHM_CAP), rT = new Float64Array(RHYTHM_CAP), rAge
 const rVoid = new Float64Array(RHYTHM_CAP), rCam = new Float64Array(RHYTHM_CAP), rDepth = new Float64Array(RHYTHM_CAP);
 const rEdge = new Float64Array(RHYTHM_CAP), rEdgeF = new Float64Array(RHYTHM_CAP);
 const rId = new Int32Array(RHYTHM_CAP);
+// W1-1: bounces flown before the catch (the rate-0 forecast's res.bounces). Draw only: the core never reads it. At most
+// two per 60 Hz step over RHYTHM.span (150), so it fits a byte.
+const rBn = new Uint8Array(RHYTHM_CAP);
 const rCT = new Float64Array(RHYTHM_CAP); // 60 Hz flight time to the catch (draw filter only)
-const rRes = { kind: 'horizon', t: 0, step: 0, planetId: null, depth: 1 };
+const rRes = { kind: 'horizon', t: 0, step: 0, planetId: null, depth: 1, bounces: 0 };
 const rhythm = {
   planet: null, n: 0, head: 0, len: -1, first: -1, last: -1, caps: -1, magnet: -1, dir: 0, ramp: NaN, cycle: 0,
   sector: -1, within: 0,
@@ -3544,9 +3635,9 @@ function rhythmIsNew(id, origin, t = time){
   return false;
 }
 // Forecasts from a release at (angle, t), one per RHYTHM.rates entry, stopping at the first that
-// disagrees. Returns the new-planet id every rate catches, or -1. rDepthOut and rCatchTOut are the
-// 60 Hz catch depth and flight time; rhythm.cost counts the forecasts this call ran.
-let rDepthOut = 1, rCatchTOut = Infinity;
+// disagrees. Returns the new-planet id every rate catches, or -1. rDepthOut, rCatchTOut and rBnOut are the
+// 60 Hz catch depth, flight time and bounce count; rhythm.cost counts the forecasts this call ran.
+let rDepthOut = 1, rCatchTOut = Infinity, rBnOut = 0;
 function rhythmProbe(angle, t, simVoid, simCam, live){
   const origin = player.planet;
   const rates = RHYTHM.rates;
@@ -3556,7 +3647,7 @@ function rhythmProbe(angle, t, simVoid, simCam, live){
     const r = forecastCore(angle, origin, t, live, simVoid, simCam, RHYTHM.span, rates[i], rRes, null);
     rhythm.steps += r.step;
     if (r.kind !== 'capture' || !rhythmIsNew(r.planetId, origin, t)) return -1;
-    if (i === 0){ id = r.planetId; rDepthOut = r.depth; rCatchTOut = r.t; }
+    if (i === 0){ id = r.planetId; rDepthOut = r.depth; rCatchTOut = r.t; rBnOut = r.bounces; }
     else if (r.planetId !== id) return -1;
   }
   return id;
@@ -3574,6 +3665,7 @@ function rhythmRebuild(){
   rA[0] = player.angle; rT[0] = time; rAge[0] = orbitTime; rVoid[0] = voidY; rCam[0] = cam.y;
   rId[0] = rhythmProbe(player.angle, time, voidY, cam.y, true);
   rDepth[0] = rId[0] >= 0 ? rDepthOut : 1;
+  rBn[0] = rId[0] >= 0 ? rBnOut : 0;
   rCT[0] = rId[0] >= 0 ? rCatchTOut : Infinity;
   rEdge[0] = NaN; rEdgeF[0] = NaN;
 }
@@ -3605,7 +3697,7 @@ function rhythmExtend(){
   const v1 = rhythmVoidAt(rVoid[k], t1, st, y1);
   const c1 = rhythmCamAt(rCam[k], y1, st);
   const id1 = rhythmProbe(a1, t1, v1, c1, false);
-  const depth1 = id1 >= 0 ? rDepthOut : 1, ct1 = id1 >= 0 ? rCatchTOut : Infinity;
+  const depth1 = id1 >= 0 ? rDepthOut : 1, ct1 = id1 >= 0 ? rCatchTOut : Infinity, bn1 = id1 >= 0 ? rBnOut : 0;
   rEdge[k] = NaN; rEdgeF[k] = NaN;
   if (id1 !== rId[k]){
     // Bisect where the answer flips, then finish the step at the new speed.
@@ -3623,7 +3715,7 @@ function rhythmExtend(){
     a1 = rEdge[k] + orbitAngleDelta(p, rAge[k] + f * st, (1 - f) * st, scale1);
   }
   rA[j] = a1; rT[j] = t1; rAge[j] = age1; rVoid[j] = v1; rCam[j] = c1;
-  rId[j] = id1; rDepth[j] = depth1; rCT[j] = ct1; rEdge[j] = NaN; rEdgeF[j] = NaN;
+  rId[j] = id1; rDepth[j] = depth1; rBn[j] = bn1; rCT[j] = ct1; rEdge[j] = NaN; rEdgeF[j] = NaN;
   rhythm.n++;
 }
 // Signed progress of angle a past sample k, in the orbit's own direction.
@@ -3966,7 +4058,7 @@ simFx = {
     for (const q of particles){ q.t += dt; q.x += q.vx*move; q.y += q.vy*move; q.vx *= damp; q.vy *= damp; }
     particles = particles.filter(q => q.t < q.life);
     for (const q of popups) q.t += dt;
-    popups = popups.filter(q => q.t < 1.1);
+    popups = popups.filter(q => q.t < 1.1).concat(popups.filter(q => q.t >= 1.1 && q.t < q.life)); // W1-6: a pass pop's longer life
     if (sectorBanner){
       sectorBanner.t += dt;
       if (sectorBanner.t >= sectorBanner.life) sectorBanner = null;
@@ -4510,19 +4602,88 @@ function applyRunTheme(){
 // scoring, save, world RNG or presentation-stream read reaches any of it, and nothing here lives in the ZW-CORE region.
 // Daily, duel and the ghost frame never take an event (a duel link sounds and looks the same for both players).
 const EVENTS_ON = true; // the one off switch for every event
-// One row per event per year, dates inclusive (local). No recurrence rule: next year's rows are added explicitly.
+// W1-5: one row per event, each with a yearly rule, so every event comes back each year with no new build. Dates are
+// local and inclusive. md: 'MM-DD' is the first day; nth: [n, weekday 0 Sun..6 Sat, month 1..12] is the nth such
+// weekday of that month, moved `from` days; len is the number of days. A window may run into the next year (Winter
+// Lights ends on Jan 1), so activeEvent also looks at the previous year's window. Rows never overlap in any year
+// (tests/events-recur-w15.test.cjs checks every day of 2026-2032), so a date has at most one event.
 const EVENTS = Object.freeze([
-  Object.freeze({ id: 'harvest', first: '2026-11-23', last: '2026-11-29', music: 'harvest', sky: '#C8742E',
-    decor: 'leaves', title: 'event.harvest.title' }),
-  // E3: a cool teal glow under a night-blue middle; New Year's Eve and Day (local) add one burst on the title.
-  Object.freeze({ id: 'winter', first: '2026-12-18', last: '2027-01-01', music: 'snowfall', sky: '#4FA8C8', mid: '#1B2A4A',
+  // E2 Harvest Week: Monday to Sunday of the week with the 4th Thursday of November (2026: Nov 23-29).
+  Object.freeze({ id: 'harvest', rule: Object.freeze({ nth: Object.freeze([4, 4, 11]), from: -3, len: 7 }), music: 'harvest',
+    sky: '#C8742E', decor: 'leaves', title: 'event.harvest.title' }),
+  // E3 Winter Lights, Dec 18 to Jan 1: a cool teal glow under a night-blue middle; New Year's Eve and Day (local) add
+  // one burst on the title.
+  Object.freeze({ id: 'winter', rule: Object.freeze({ md: '12-18', len: 15 }), music: 'snowfall', sky: '#4FA8C8', mid: '#1B2A4A',
     decor: 'snow', title: 'event.winter.title', burst: Object.freeze(['12-31', '01-01']) })
 ]);
 const ISO_DATE_RE = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
-// Pure: the event on this local ISO date (YYYY-MM-DD), or null. ISO dates compare as strings.
+// Proleptic Gregorian calendar in whole days since 1970-01-01 and back (H. Hinnant's days_from_civil and
+// civil_from_days): pure integers, no Date object and no time zone, correct for every 4-digit year.
+function eventDayNumber(y, m, d){
+  const yy = m <= 2 ? y - 1 : y;
+  const era = Math.floor(yy / 400), yoe = yy - era * 400;
+  const doy = Math.floor((153 * (m > 2 ? m - 3 : m + 9) + 2) / 5) + d - 1;
+  return era * 146097 + yoe * 365 + Math.floor(yoe / 4) - Math.floor(yoe / 100) + doy - 719468;
+}
+// The date of a day number as one sortable integer, YYYYMMDD (so 2026-11-23 is 20261123).
+function eventDayKey(days){
+  const z = days + 719468, era = Math.floor(z / 146097), doe = z - era * 146097;
+  const yoe = Math.floor((doe - Math.floor(doe / 1460) + Math.floor(doe / 36524) - Math.floor(doe / 146096)) / 365);
+  const doy = doe - (365 * yoe + Math.floor(yoe / 4) - Math.floor(yoe / 100));
+  const mp = Math.floor((5 * doy + 2) / 153), d = doy - Math.floor((153 * mp + 2) / 5) + 1, m = mp < 10 ? mp + 3 : mp - 9;
+  return (yoe + era * 400 + (m <= 2 ? 1 : 0)) * 10000 + m * 100 + d;
+}
+// A matched ISO date as the same YYYYMMDD integer, read digit by digit (no substring, no allocation).
+function eventIsoKey(iso){
+  let k = 0;
+  for (let i = 0; i < 10; i++) if (i !== 4 && i !== 7) k = k * 10 + iso.charCodeAt(i) - 48;
+  return k;
+}
+function eventKeyIso(k){
+  const y = Math.floor(k / 10000), md = k - y * 10000;
+  return (y < 0 ? '-' + String(-y).padStart(4, '0') : String(y).padStart(4, '0')) + '-' + String(Math.floor(md / 100)).padStart(2, '0') + '-' + String(md % 100).padStart(2, '0');
+}
+// The first day of a row's window in a year, as a day number, or NaN for a rule this code does not know.
+function eventRuleStart(rule, year){
+  if (!rule || !(rule.len >= 1)) return NaN;
+  if (typeof rule.md === 'string' && /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(rule.md)){
+    return eventDayNumber(year, +rule.md.slice(0, 2), +rule.md.slice(3));
+  }
+  if (Array.isArray(rule.nth) && rule.nth.length === 3){
+    const [n, weekday, month] = rule.nth;
+    const first = eventDayNumber(year, month, 1);
+    const firstWeekday = ((first + 4) % 7 + 7) % 7; // 1970-01-01 was a Thursday (4)
+    return first + (weekday - firstWeekday + 7) % 7 + (n - 1) * 7 + (rule.from | 0);
+  }
+  return NaN;
+}
+// One row's window in one year: { lo, hi } as YYYYMMDD integers and ev, the frozen event that readers get:
+// { ...row, first, last, year } with first and last as 'YYYY-MM-DD'. Built once per row and year, then reused, so
+// activeEvent allocates nothing per call and the same day always returns the same object. Readers still compare
+// events by id, never by object (the banner, the keepsake, the sky cache, the decor and the burst all do).
+const eventWindowCache = new Map(); // row -> { [year]: window, or null for a row without a usable rule }
+function eventWindow(row, year){
+  let byYear = eventWindowCache.get(row);
+  if (!byYear) eventWindowCache.set(row, byYear = Object.create(null));
+  const hit = byYear[year];
+  if (hit !== undefined) return hit;
+  const start = eventRuleStart(row.rule, year);
+  if (!Number.isFinite(start)) return (byYear[year] = null);
+  const lo = eventDayKey(start), hi = eventDayKey(start + row.rule.len - 1);
+  return (byYear[year] = Object.freeze({ lo, hi,
+    ev: Object.freeze(Object.assign({}, row, { first: eventKeyIso(lo), last: eventKeyIso(hi), year })) }));
+}
+// Pure: the event on this local ISO date (YYYY-MM-DD), or null. Each row's window in the date's year, then in the
+// year before (a window that started last December is still on in early January).
 function activeEvent(iso, on = EVENTS_ON){
   if (!on || typeof iso !== 'string' || !ISO_DATE_RE.test(iso)) return null;
-  for (const ev of EVENTS) if (iso >= ev.first && iso <= ev.last) return ev;
+  const key = eventIsoKey(iso), year = Math.floor(key / 10000);
+  for (let i = 0; i < EVENTS.length; i++){
+    for (let y = year; y >= year - 1; y--){
+      const w = eventWindow(EVENTS[i], y);
+      if (w && key >= w.lo && key <= w.hi) return w.ev;
+    }
+  }
   return null;
 }
 // Today's local date. Tests (and a review build) can fake it with window.__eventDate, as __skyDailyDate fakes the Daily.
@@ -4546,6 +4707,12 @@ function captureRunEvent(){
 // The event song for this run, or null (then the sector song plays, as always).
 function runEventMusic(){
   return runEvent && typeof MUSIC !== 'undefined' && Object.prototype.hasOwnProperty.call(MUSIC, runEvent.music) ? runEvent.music : null;
+}
+// W1-5: the event's name for the share text ("I scored 900 in Zipwaltz Harvest Week."), or '' for no event. English
+// whatever the menu language, like the rest of the share text (shareMessageText), so the sentence never mixes languages.
+function eventShareName(ev){
+  const row = ev && typeof ev.title === 'string' && Object.prototype.hasOwnProperty.call(I18N, ev.title) ? I18N[ev.title] : null;
+  return row && typeof row.en === 'string' ? row.en : '';
 }
 // Sky: a dusk palette per sector, built once per event from the sector's own stops (skyStopsFor, as the run theme
 // palette is). The top stays near the night indigo, the middle leans plum, and the event colour glows only from
@@ -6339,6 +6506,17 @@ let duelRaceRival = null;   // the rival's ghost state while (and after) it race
 let duelFinalPlace = null;  // { place, of, best } at the run's end, against every racer's final checked score
 let duelArmed = null;
 let duelRunSeed = 0;
+// W1-2 Learn the tap, then race: a fresh player who opens a ready duel link plays the calm T1 tutorial first.
+// warmupNext is a one-shot that Start's own input sets just before press() (press() never decides it, so every other
+// caller of press() is unchanged); warmupForDuel marks the warm-up run; duelReadyCue keeps "Got it. Now race {name}."
+// on the title strip after it until the next run starts. The warm-up ends while the player is still tapping, so for
+// the title guard (warmupTitleUntil, RETRY_DEATH_GUARD_MS) the title ignores input, as Retry does after a death.
+let warmupNext = false;
+let warmupForDuel = false;
+let duelReadyCue = null;  // the armed duel the cue is for, else null
+let warmupTitleUntil = 0; // performance.now() until which the title after a warm-up ignores input
+let warmupTitleTimer = 0;
+const WARMUP_LAND_WAIT_S = 3; // the longest a warm-up's end waits past beat 3 for the comet to land
 // Leaves duel mode for good: the title's Start plays Endless again.
 // Puts DUEL_H in place for a duel and gives back exactly the height it replaced afterwards. It never touches an
 // H it did not swap: a replay (the Daily ghost, endlessReplay, duelReplay) sets H on purpose before press().
@@ -6960,7 +7138,9 @@ function armCapturePunch(p){
   syncOverdrive(state === 'playing' && combo >= 12);
 }
 function popup(x, y, text, color, chip){
-  popups.push({ x, y, text: tl(text), color, t: 0, chip: !!chip });
+  // W1-1: only a bounce (a wall or a gas moon) says "combo reset"; it carries the bank arc's ↺ bead, so the symbol on
+  // the dashed glow is tied to what it costs. The text itself is unchanged.
+  popups.push({ x, y, text: tl(text), color, t: 0, chip: !!chip, bank: text === 'combo reset' });
 }
 // Sector name on entry. Screen space, so the camera does not carry it away.
 // Reduced motion keeps it still; the words are the non-color cue for the sky tint.
@@ -7088,6 +7268,7 @@ function endTutorial(skipped){
   // A hidden Skip must not keep keyboard focus: the game's keys ignore a focused button.
   const skip = document.getElementById('tutorialSkip');
   if (state === 'playing' && skip && document.activeElement === skip) canvas.focus({ preventScroll: true });
+  if (warmupForDuel) finishDuelWarmup(); // W1-2: a duel warm-up ends with its tutorial (finished or skipped)
 }
 // Beat 1 ignores a tap until the comet is held in the glow, so the first launch always catches.
 function tutorialWaitsForGlow(){
@@ -7116,7 +7297,9 @@ function tutorialTick(dt){
   if (tu.beat === 2 && captureCount >= 2){ tu.beat = 3; tu.voidLeft = TUTORIAL_VOID_SECONDS; tu.missLeft = 0; syncTutorial(true); }
   if (tu.beat === 3 && !runHeld && !suspended){
     tu.voidLeft -= Math.max(0, dt);
-    if (tu.voidLeft <= 0) endTutorial(false);
+    // W1-2: a duel warm-up ends on the title, so it waits for the comet to be in orbit (the next catch) rather than
+    // cut a flight; WARMUP_LAND_WAIT_S caps the wait. Presentation only: the void is not held in beat 3.
+    if (tu.voidLeft <= 0 && (!warmupForDuel || !player || player.mode === 'orbit' || tu.voidLeft <= -WARMUP_LAND_WAIT_S)) endTutorial(false);
   }
 }
 function tutorialLine(){
@@ -8545,11 +8728,14 @@ function bindOverlayControl(id, onClick){
 bindOverlayControl('openSettings', openSettings);
 bindOverlayControl('openSettingsResult', openSettings);
 bindOverlayControl('openStats', openStats);
-bindOverlayControl('more', openMore);
+bindOverlayControl('more', () => { if (!warmupTitleGuarded()) openMore(); }); // W1-2: not a stray tap after a warm-up
 bindOverlayControl('moreBack', closeMore);
 bindOverlayControl('tutorialSkip', () => endTutorial(true));
-bindOverlayControl('duelNew', startNewDuel);
-bindOverlayControl('duelSkip', () => { clearDuel(); const b = document.getElementById('start'); if (b) b.focus({ preventScroll: true }); });
+bindOverlayControl('duelNew', duelNewAction); // W1-2: Race now while Start offers the warm-up
+bindOverlayControl('duelSkip', () => {
+  if (warmupTitleGuarded()) return; // W1-2: a stray tap after a warm-up does not throw the friend's duel away
+  clearDuel(); const b = document.getElementById('start'); if (b) b.focus({ preventScroll: true });
+});
 // B4d: a fresh Duel Sprint from the title. A new seed each time; Retry replays it, its results Share sends the
 // link, and End run leaves it like a received duel. The seed is drawn outside the sim, so no run stream moves.
 let newDuelSeedCount = 0;
@@ -8775,35 +8961,62 @@ function dailyS2BestFor(iso){
 function dailyRunCrossedMidnight(){
   return !!dailyActive && !!dailyRunIso && dailyTodayIso() !== dailyRunIso;
 }
-function dailyStreakAsOf(record, todayIso){
+// W1-3 Kind streak: the Monday of the UTC week (Monday to Sunday) that holds iso. Rest days are counted per week.
+function utcWeekKey(iso){
+  const ms = isoToUtcMs(iso);
+  if (!Number.isFinite(ms)) return '';
+  return shiftIso(iso, -((new Date(ms).getUTCDay() + 6) % 7));
+}
+// W1-3 Kind streak. Miss one UTC day and the streak rests instead of breaking: a single missing day is bridged
+// only if no other day in its Monday-Sunday UTC week has been bridged. It is automatic, at most once a week, and
+// never sold. Two missing days in a row end the streak, a rest day does not count toward it, and an unplayed today
+// is never missing. The walk goes forward over finished days, so a rest day the player has already seen never
+// moves when later days are added. restedThisWeek: a rest day falls in today's UTC week.
+function dailyStreakInfo(record, todayIso){
+  const info = { streak: 0, restedThisWeek: false, playedToday: false };
   const days = record && record.days ? record.days : {};
   const today = isoToUtcMs(todayIso);
-  if (!Number.isFinite(today)) return 0;
+  if (!Number.isFinite(today)) return info;
   const dates = Object.keys(days).filter(key => days[key] && days[key].finished && days[key].attempts > 0 && isoToUtcMs(key) <= today);
-  if (!dates.length) return 0;
+  if (!dates.length) return info;
   dates.sort();
-  const end = dates[dates.length - 1];
-  const gapDays = Math.floor((today - isoToUtcMs(end)) / 86400000);
-  if (gapDays > 1) return 0;
-  const have = Object.create(null);
-  for (let i = 0; i < dates.length; i++) have[dates[i]] = true;
+  const restWeeks = Object.create(null);
+  const rest = (missingIso) => {
+    const week = utcWeekKey(missingIso);
+    if (restWeeks[week]) return false;
+    restWeeks[week] = missingIso;
+    return true;
+  };
   let streak = 0;
-  let cursor = end;
-  while (have[cursor]){
-    streak++;
-    cursor = shiftIso(cursor, -1);
-    if (streak > 100000) break;
+  let last = NaN;
+  for (let i = 0; i < dates.length; i++){
+    const at = isoToUtcMs(dates[i]);
+    const missing = Math.round((at - last) / 86400000) - 1;
+    if (missing === 0 || (missing === 1 && rest(shiftIso(dates[i], -1)))) streak++;
+    else streak = 1;
+    last = at;
   }
-  return streak;
+  // Up to today: -1 when today is played, 0 when yesterday was. A missing yesterday may still rest.
+  const missing = Math.round((today - last) / 86400000) - 1;
+  info.playedToday = missing === -1;
+  if (missing <= 0 || (missing === 1 && rest(shiftIso(todayIso, -1)))) info.streak = streak;
+  info.restedThisWeek = !!restWeeks[utcWeekKey(todayIso)];
+  return info;
 }
-function dailyStatusLine(){
+function dailyStreakAsOf(record, todayIso){
+  return dailyStreakInfo(record, todayIso).streak;
+}
+// W1-3: info is today's dailyStreakInfo when the caller already has it. With no streak the line leaves the streak
+// out rather than say "streak 0".
+function dailyStatusLine(info){
   const iso = dailyTodayIso();
   const row = dailyRow(iso);
   const best = row ? row.best : 0;
   const attempts = row ? row.attempts : 0;
-  const streak = dailyStreakAsOf(ensureDailyRecord(), iso);
+  const streak = (info || dailyStreakInfo(ensureDailyRecord(), iso)).streak;
   const noun = tn('word.attempt', attempts);
-  return t('daily.line', { n: dailyNumberForDate(iso), best: formatScore(best), attempts: attempts, noun: noun, streak: streak });
+  const params = { n: dailyNumberForDate(iso), best: formatScore(best), attempts: attempts, noun: noun, streak: streak };
+  return t(streak > 0 ? 'daily.line' : 'daily.lineNew', params);
 }
 // The Daily day is UTC so everyone shares one sky; the title says when it turns over locally.
 function dailyResetLine(){
@@ -8816,22 +9029,77 @@ function dailyResetLine(){
   }
 }
 // 1.3: the title's Daily line is the number and the streak; More keeps best, attempts and the reset.
-function dailyStreakLine(){
+// W1-3: four states, never red, never a countdown, never loss copy. No streak (new or lapsed): a new sky every day.
+// Played today: a check after the number. Not played yet: the plain streak. A rest day used this UTC week: a
+// snowflake at the end. The UTC week is not the player's local week, so no copy names a deadline.
+const DAILY_DONE_MARK = '✓';
+const DAILY_REST_MARK = '❄︎';
+function dailyStreakLine(info){
   const iso = dailyTodayIso();
-  const streak = dailyStreakAsOf(ensureDailyRecord(), iso);
-  return t('daily.streak', { n: dailyNumberForDate(iso), streak: streak });
+  const n = dailyNumberForDate(iso);
+  if (!info) info = dailyStreakInfo(ensureDailyRecord(), iso);
+  if (info.streak <= 0) return t('daily.newSky', { n: n });
+  const line = info.playedToday ? t('daily.streakDone', { n: n, streak: info.streak }) : t('daily.streak', { n: n, streak: info.streak });
+  return info.restedThisWeek ? line + ' ' + DAILY_REST_MARK : line;
+}
+// W1-3: writes a line whose marks ({ glyph: { say, cls } }) are hidden from screen readers, each followed by what it
+// means in a visually hidden span (none when say is empty, for a line that already says it in words), and tinted by
+// its class. The strip is aria-live, so it is rewritten only when the line has changed (data-line holds the last one).
+function setMarkedLine(el, line, glyphs){
+  if (!el || el.getAttribute('data-line') === line) return;
+  el.setAttribute('data-line', line);
+  const marks = Object.keys(glyphs).filter(mark => line.indexOf(mark) >= 0);
+  if (!marks.length || typeof document.createElement !== 'function'){
+    el.textContent = line;
+    return;
+  }
+  el.textContent = '';
+  if (typeof el.replaceChildren === 'function') el.replaceChildren();
+  const add = (text, className, hidden) => {
+    if (!text) return;
+    const span = document.createElement('span');
+    if (className) span.className = className;
+    if (hidden) span.setAttribute('aria-hidden', 'true');
+    span.textContent = text;
+    el.appendChild(span);
+  };
+  let left = line;
+  for (;;){
+    let at = -1, mark = '';
+    for (let i = 0; i < marks.length; i++){
+      const found = left.indexOf(marks[i]);
+      if (found >= 0 && (at < 0 || found < at)){ at = found; mark = marks[i]; }
+    }
+    if (at < 0){ add(left); break; }
+    add(left.slice(0, at));
+    add(mark, glyphs[mark].cls, true);
+    if (glyphs[mark].say) add(' (' + glyphs[mark].say + ')', 'sr-only', false);
+    left = left.slice(at + mark.length);
+  }
+}
+// W1-3: More spells out what the title only marks: the rest rule for every player, and once a rest day is used this
+// week (while the streak lives), the snowflake with its meaning in words.
+function dailyRestUsedLine(info){
+  if (!info || !info.restedThisWeek || info.streak <= 0) return '';
+  const say = String(t('daily.restAria'));
+  return DAILY_REST_MARK + ' ' + say.charAt(0).toUpperCase() + say.slice(1);
 }
 function syncDailyStrip(){
-  const text = dailyStatusLine();
+  const info = dailyStreakInfo(ensureDailyRecord(), dailyTodayIso());
+  const text = dailyStatusLine(info);
   const reset = dailyResetLine();
-  const titleText = dailyStreakLine();
-  const detailText = reset ? text + '\n' + reset : text;
+  const titleText = dailyStreakLine(info);
+  const detailText = [text, reset, t('daily.restRule'), dailyRestUsedLine(info)].filter(Boolean).join('\n');
   const title = document.getElementById('dailyStrip');
   const detail = document.getElementById('dailyDetail');
   const result = document.getElementById('dailyResult');
-  if (title && title.textContent !== titleText) title.textContent = titleText;
-  if (detail && detail.textContent !== detailText) detail.textContent = detailText;
+  setMarkedLine(title, titleText, {
+    [DAILY_DONE_MARK]: { say: t('daily.doneAria'), cls: 'strip-done' },
+    [DAILY_REST_MARK]: { say: t('daily.restAria'), cls: 'strip-rest' },
+  });
+  setMarkedLine(detail, detailText, { [DAILY_REST_MARK]: { say: '', cls: 'strip-rest' } });
   if (result && result.textContent !== text) result.textContent = text;
+  syncResultDaily(); // W1-4: a new UTC day under an open results card offers its Daily
 }
 function noteDailyFinish(runScore){
   if (!dailyActive || duelActive) return null;
@@ -9230,6 +9498,70 @@ function createRivalTrack(){
   return tr;
 }
 
+// ---- party feel (W1-6) -------------------------------------------------------------------------------------------
+// A seat's colour slot: the player's place in the room's player list, which the server sends in the same order to every
+// client (lobby leavers are removed; mid-session leavers keep their row), so every phone agrees with no new message.
+// n is the page's colour count. -1 when the id is not seated.
+function partySeatHue(players, id, n){
+  if (!Array.isArray(players) || !(n > 0)) return -1;
+  for (let i = 0; i < players.length; i++) if (players[i] && players[i].id === id) return i % n;
+  return -1;
+}
+// Honest pass pops. A rival counts as ahead once a fresh track (two or more snapshots, the newest not stale, or the
+// rival's run already finished) shows a higher relayed score than yours; you pass them when you are strictly ahead by
+// `margin` on `ticks` HUD ticks in a row. A one-tick flicker, a track that just arrived and a stale track never pop; nor
+// does anything in the heat's first `quietMs`, and pops are at least `gapMs` apart (wall clock). A pass inside the gap is
+// spent, but if it put you first, "You lead!" still pops once the gap is over, unless someone is level or ahead again by
+// then. Being passed back only puts the rival in the ahead set.
+const PARTY_PASS = Object.freeze({ margin: 1, ticks: 2, quietMs: 5000, gapMs: 3000 });
+function createPassWatch(){
+  const ahead = new Set(), streak = new Map();
+  let lastPopAt = -Infinity, pendingLead = false;
+  const w = { ahead, streak };
+  w.reset = function(){ ahead.clear(); streak.clear(); lastPopAt = -Infinity; pendingLead = false; };
+  // now: wall ms; age: ms since the heat started; mine: your live score; rows: [{ id, score, fresh }] for each rival with
+  // a track. Returns null, or { passed: [ids, the highest score first], lead } when a pop is due (lead: you are now
+  // strictly ahead of every rival with a track, so the pop says you lead; passed is empty for a lead held over the gap).
+  w.step = function(now, age, mine, rows){
+    const passed = [];
+    for (const id of ahead) if (!rows.some(r => r.id === id)) { ahead.delete(id); streak.delete(id); }
+    for (const r of rows){
+      if (!r.fresh){ ahead.delete(r.id); streak.delete(r.id); continue; }
+      if (r.score > mine){ ahead.add(r.id); streak.delete(r.id); continue; }
+      if (!ahead.has(r.id) || mine - r.score < PARTY_PASS.margin){ streak.delete(r.id); continue; }
+      const k = (streak.get(r.id) || 0) + 1;
+      if (k < PARTY_PASS.ticks){ streak.set(r.id, k); continue; }
+      ahead.delete(r.id); streak.delete(r.id);
+      passed.push(r);
+    }
+    const lead = rows.length > 0 && rows.every(r => r.score < mine), wait = now - lastPopAt < PARTY_PASS.gapMs;
+    if (!lead) pendingLead = false;                              // level or passed back before the gap ended: no "You lead!"
+    if (!passed.length){
+      if (!pendingLead || wait) return null;
+      pendingLead = false; lastPopAt = now;
+      return { passed: [], lead: true };
+    }
+    if (!(age >= PARTY_PASS.quietMs)) return null;               // the quiet start: spent, not saved for later
+    if (wait){ pendingLead = pendingLead || lead; return null; }  // throttled: the pass is spent; a lead waits for the gap
+    lastPopAt = now; pendingLead = false;
+    passed.sort((a, b) => b.score - a.score);
+    return { passed: passed.map(r => r.id), lead };
+  };
+  return w;
+}
+// The heat's countdown beats: 3, 2 and 1 seconds before the start and GO at it, in local ms. A beat more than `lateMs`
+// in the past is skipped (a late or resumed heat start); one just past still plays at once.
+const PARTY_COUNT = Object.freeze({ beats: Object.freeze([3, 2, 1, 0]), lateMs: 150, leadMs: 120 });
+function partyCountdownBeats(startAt, now){
+  const out = [];
+  if (!Number.isFinite(startAt) || !Number.isFinite(now)) return out;
+  for (const n of PARTY_COUNT.beats){
+    const at = startAt - n * 1000;
+    if (at >= now - PARTY_COUNT.lateMs) out.push({ n, at, go: n === 0 });
+  }
+  return out;
+}
+
 // ---- name tag layout ---------------------------------------------------------------------------------------------
 // Pure geometry in screen px. items: [{ id, x, y (the rival's head), w, h (its tag) }], in priority order (the first
 // gets the best spot). keeps: [{ l, t, r, b }] rectangles a tag must never cover (the player's aim guide). bounds is
@@ -9304,6 +9636,11 @@ function partyPlaceTags(items, keeps, bounds, gap){
 // ---- room client -------------------------------------------------------------------------------------------------
 const PARTY_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const PARTY_FULL_MESSAGE = 'Rooms are full right now. Play a duel instead';
+// W1-7: say what actually happened. "Full" is only for a server that said so (rooms_full, rooms_closed, close 1013, the kill
+// switch); a socket that never got through is offline or unreachable, and a refused create or join is too many tries.
+const PARTY_OFFLINE_MESSAGE = "You're offline. Rooms need a connection; solo runs and duels work offline.";
+const PARTY_UNREACHABLE_MESSAGE = "Can't reach rooms right now. Try again, or play a duel.";
+const PARTY_RATE_MESSAGE = 'Too many tries from this network for now. Play a duel, or try again later.';
 function partyInt(v){ return Number.isFinite(+v) ? Math.trunc(+v) : 0; } // a number from the server, shown only as an integer
 function partyNormalizeCode(s){
   let out = '';
@@ -9340,15 +9677,24 @@ const PARTY_ERROR_TEXT = Object.freeze({
 const PARTY_RUN_REFUSED_TEXT = 'Your run could not be counted this heat. The next heat is a fresh start.';
 const PARTY_FALLBACK_CODES = Object.freeze(['rooms_closed', 'rooms_full']);
 const PARTY_RECONNECT_DELAYS = Object.freeze([0, 400, 1000, 2000, 3000, 4000, 4000, 4000]);
+// W1-7: how long the client keeps trying to take its seat back. A heat (and an old server that does not advertise its window)
+// holds a seat 20 s, so the client gives up at 19 s after the eight quick tries above. A lobby that advertises a longer window
+// (room.graceMs, 120 s on the current server) is tried until 5 s before it closes, at most 115 s, with a slower try every
+// 15 s after the quick ones (about 10 socket opens in the first minute, inside the per-address open limit). Coming back to
+// the page (resumeNow) or back online tries at once, whatever the backoff says.
+const PARTY_RESUME = Object.freeze({ heatMs: 19000, lobbyMaxMs: 115000, lobbyMarginMs: 5000, slowMs: 15000, probeMs: 4000 });
 // deps: { url (ws base, no path), WebSocket (constructor), now (ms clock), setTimeout, clearTimeout, setInterval,
-// clearInterval }. Nothing is read from a global. Listeners get (type, data); the snapshot is client.state.
+// clearInterval, online? (() => false when the device knows it is offline), fetch? (for the one GET /v1/status after a
+// socket that never got through) }. Nothing is read from a global. Listeners get (type, data); the snapshot is client.state.
 function createPartyClient(deps){
   const WS = deps.WebSocket, nowMs = deps.now, setT = deps.setTimeout, clearT = deps.clearTimeout, setI = deps.setInterval, clearI = deps.clearInterval;
   const base = String(deps.url || '').replace(/\/+$/, '').replace(/\/v1\/ws$/, '');
-  const connectTimeoutMs = deps.connectTimeoutMs || 6000;
+  const connectTimeoutMs = deps.connectTimeoutMs || 6000, statusTimeoutMs = deps.statusTimeoutMs || 3000;
+  const offline = () => { try { return !!deps.online && deps.online() === false; } catch (_) { return false; } };
   const listeners = [];
   let ws = null, intentional = false, pingTimer = null, pingN = 0, connectTimer = null, resumeTimer = null, resumeTry = 0, resumeStart = 0;
-  let lastPosAt = -Infinity, nameRetries = 0, pendingNick = null, pendingJoin = null;
+  let lastPosAt = -Infinity, nameRetries = 0, pendingNick = null, pendingJoin = null, lastAttempt = null, lastHeardAt = 0, probeTimer = null;
+  let statusTimer = null, statusAsk = 0;
   const state = {
     status: 'idle',            // idle | connecting | open | in_room | reconnecting | closed | fallback
     code: '', you: 0, created: false, room: null,
@@ -9379,6 +9725,30 @@ function createPartyClient(deps){
     if (pingTimer){ clearI(pingTimer); pingTimer = null; }
     if (connectTimer){ clearT(connectTimer); connectTimer = null; }
     if (resumeTimer){ clearT(resumeTimer); resumeTimer = null; }
+    if (probeTimer){ clearT(probeTimer); probeTimer = null; }
+    if (statusTimer){ clearT(statusTimer); statusTimer = null; }
+    statusAsk++;                                              // a status answer still on its way is for nobody now
+  }
+  // A socket that never got through (W1-7). Offline when the device says so. Otherwise the live Worker may have refused the
+  // upgrade itself (503 or 429 rooms_closed: the kill switch or the day's budget), which a browser cannot tell from a dead
+  // host, so ask GET /v1/status once (3 s; CORS-open, and answered without waking the room hub when closed): "full" only
+  // when it says closed, else "can't reach". The status reads 'connecting' while it asks. Never a loop: one ask per failure.
+  function connectFailed(){
+    if (offline()){ setFallback('offline', PARTY_OFFLINE_MESSAGE); return; }
+    const unreachable = () => setFallback('connect_failed', PARTY_UNREACHABLE_MESSAGE);
+    if (typeof deps.fetch !== 'function' || !/^wss?:\/\//.test(base)){ unreachable(); return; }
+    stopTimers();
+    const ask = statusAsk;
+    if (state.status !== 'connecting'){ state.status = 'connecting'; changed(); }
+    const finish = closed => {
+      if (ask !== statusAsk || state.status !== 'connecting') return;   // left, gave up, or already answered
+      stopTimers();
+      if (closed) setFallback('rooms_closed', PARTY_FULL_MESSAGE); else unreachable();
+    };
+    statusTimer = setT(() => { statusTimer = null; finish(false); }, statusTimeoutMs);
+    let req = null;
+    try { req = deps.fetch(base.replace(/^ws/, 'http') + '/v1/status', { cache: 'no-store', credentials: 'omit' }); } catch (_) { finish(false); return; }
+    Promise.resolve(req).then(r => (r && r.ok ? r.json() : null)).then(j => finish(!!(j && j.rooms === 'closed')), () => finish(false));
   }
   function startPing(){
     if (pingTimer) clearI(pingTimer);
@@ -9388,6 +9758,7 @@ function createPartyClient(deps){
     let m = null;
     try { m = JSON.parse(typeof ev.data === 'string' ? ev.data : String(ev.data)); } catch (_) { return; }
     if (!m || typeof m !== 'object' || m.v !== 1) return;
+    lastHeardAt = nowMs();                                    // the socket is alive (resumeNow's probe waits for this)
     switch (m.t){
       case 'joined':
         if (!validSeat(m) || typeof m.token !== 'string' || !/^[A-Za-z0-9]{8,64}$/.test(m.token)){ badReply(); break; }
@@ -9396,7 +9767,7 @@ function createPartyClient(deps){
         startPing(); changed(); break;
       case 'resumed':
         if (!validSeat(m)){ badReply(); break; }
-        state.code = m.code; state.you = m.you; state.status = 'in_room'; state.error = null; resumeTry = 0;
+        state.code = m.code; state.you = m.you; state.status = 'in_room'; state.error = null; resumeTry = 0; resumeStart = 0;
         if (resumeTimer){ clearT(resumeTimer); resumeTimer = null; }
         startPing(); changed(); break;
       case 'room':
@@ -9406,11 +9777,14 @@ function createPartyClient(deps){
         changed(); emit('room', m); break;
       case 'heat_start': {
         if (![m.heat, m.seed, m.startAt, m.now].every(Number.isInteger)) break;
-        // The server clock aligned to ours (one-way delay ignored); a start further off than 15 s is clamped.
-        const startAt = nowMs() + Math.max(0, Math.min(15000, m.startAt - m.now));
+        // The server clock aligned to ours (one-way delay ignored); a start further off than 15 s is clamped. A resume
+        // mid-heat sends the same heat again with its start in the past: keep the start we aligned when it began (the clamp
+        // would move it to now, and the clock to the horn with it) and the rivals' tracks (W1-7).
+        const same = !!(state.heat && state.heat.heat === m.heat && state.heat.seed === m.seed && state.heat.startAt === m.startAt);
+        const startAt = same ? state.heat.localStartAt : nowMs() + Math.max(0, Math.min(15000, m.startAt - m.now));
         state.heat = Object.assign({}, m, { localStartAt: startAt });
         state.submitted = !!m.submitted; state.ack = null; state.result = null;
-        tracks.clear(); lastPosAt = -Infinity;
+        if (!same){ tracks.clear(); lastPosAt = -Infinity; }
         changed(); emit('heat_start', state.heat); break;
       }
       case 'run_ack': state.ack = m; state.submitted = true; changed(); emit('run_ack', m); break;
@@ -9444,7 +9818,7 @@ function createPartyClient(deps){
     const code = String(m.code || '');
     const setup = m.ref === 'create' || m.ref === 'join' || m.ref === 'resume' || state.status !== 'in_room';
     if (PARTY_FALLBACK_CODES.indexOf(code) >= 0 || (code === 'rate_limited' && setup)){
-      setFallback(code, PARTY_FULL_MESSAGE); return;
+      setFallback(code, code === 'rate_limited' ? PARTY_RATE_MESSAGE : PARTY_FULL_MESSAGE); return;
     }
     // A run the server refused for the rate limit or because it is busy was NOT recorded: the heat will close without it (DNF).
     // Do not leave the heat screen showing a submitted tick and waiting: say so, once. A rate_limited with no `ref` is the
@@ -9486,23 +9860,47 @@ function createPartyClient(deps){
     // 1013 is the server saying rooms are off (the daily budget tripped or the kill switch): the duel fallback at once, no reconnects.
     if (ev && ev.code === 1013){ setFallback('rooms_closed', PARTY_FULL_MESSAGE); return; }
     if ((state.status === 'in_room' || state.status === 'reconnecting') && token.v){ scheduleResume(); return; }
-    if (state.status === 'connecting' || state.status === 'open'){ setFallback('connect_failed', PARTY_FULL_MESSAGE); }
+    if (state.status === 'connecting' || state.status === 'open') connectFailed();
   }
-  // Takes the seat back with the token inside the server's 20 s grace window (docs/multiplayer/room_protocol.md).
+  // How long to keep trying (PARTY_RESUME): the room's advertised lobby window, or 19 s in a heat or against an old server.
+  function resumeCapMs(){
+    const r = state.room, g = r && r.phase === 'lobby' && Number.isInteger(r.graceMs) ? r.graceMs : 0;
+    return g - PARTY_RESUME.lobbyMarginMs > PARTY_RESUME.heatMs ? Math.min(PARTY_RESUME.lobbyMaxMs, g - PARTY_RESUME.lobbyMarginMs) : PARTY_RESUME.heatMs;
+  }
+  // Takes the seat back with the token inside the server's grace window (docs/multiplayer/room_protocol.md): 20 s in a
+  // heat, 120 s in the lobby.
   function scheduleResume(){
     if (!resumeStart) resumeStart = nowMs();
     if (state.status !== 'reconnecting'){ state.status = 'reconnecting'; changed(); emit('reconnecting', null); }
-    if (nowMs() - resumeStart > 19000 || resumeTry >= PARTY_RECONNECT_DELAYS.length){
+    const cap = resumeCapMs(), quick = PARTY_RECONNECT_DELAYS.length;
+    // Bounded by time from the drop (resumeStart is reset only by 'resumed', never by a socket that merely opened) and by a
+    // count: the eight quick tries in a heat, those plus the slow ones in the lobby window (a socket that opens and is closed
+    // at once, by a flapping network or an address over its daily allowance, must not keep the client trying for ever).
+    const maxTries = cap <= PARTY_RESUME.heatMs ? quick : quick + Math.ceil((cap - PARTY_RECONNECT_DELAYS.reduce((a, b) => a + b, 0)) / PARTY_RESUME.slowMs) + 1;
+    if (nowMs() - resumeStart > cap || resumeTry >= maxTries){
       resumeStart = 0; stopTimers(); intentional = true; resetRoom(); state.status = 'closed'; state.closedReason = 'lost';
       state.error = { code: 'lost', message: 'Lost the connection to the room.' };
       changed(); emit('closed', { reason: 'lost' }); return;
     }
-    const delay = PARTY_RECONNECT_DELAYS[resumeTry++];
-    resumeTimer = setT(() => {
-      resumeTimer = null;
-      openSocket(() => { send({ t: 'resume', code: state.code, token: token.v }); resumeStart = 0; },
-        () => { if (state.status === 'reconnecting') scheduleResume(); });
-    }, delay);
+    // The last try lands at the end of the window, never after it (the server will have given the seat away by then).
+    const delay = Math.min(resumeTry < quick ? PARTY_RECONNECT_DELAYS[resumeTry] : PARTY_RESUME.slowMs, Math.max(0, resumeStart + cap - nowMs()));
+    resumeTry++;
+    if (resumeTimer) clearT(resumeTimer);
+    resumeTimer = setT(tryResume, delay);
+  }
+  function tryResume(){
+    resumeTimer = null;
+    if (state.status !== 'reconnecting' || ws) return;            // a try is already opening its socket
+    openSocket(() => { send({ t: 'resume', code: state.code, token: token.v }); },
+      () => { if (state.status === 'reconnecting') scheduleResume(); });
+  }
+  // The socket is gone without a close event yet (a page frozen in the background): forget it and take the seat back.
+  function dropDeadSocket(){
+    const dead = ws; ws = null;
+    if (pingTimer){ clearI(pingTimer); pingTimer = null; }
+    if (probeTimer){ clearT(probeTimer); probeTimer = null; }
+    if (dead){ dead.onmessage = null; try { dead.close(); } catch (_) {} }   // deaf from now on; its late onclose is ignored (not `ws`)
+    scheduleResume();
   }
   function openSocket(onOpen, onFail){
     let sock = null, done = false;
@@ -9517,12 +9915,13 @@ function createPartyClient(deps){
   }
   function begin(first){
     if (state.status === 'connecting' || state.status === 'in_room' || state.status === 'reconnecting') return;
+    lastAttempt = first;
     if (state.status === 'open' && ws && ws.readyState === 1){ state.error = null; first(); changed(); return; } // a refused try reuses the socket
     intentional = false; resetRoom(); resumeStart = 0; resumeTry = 0; nameRetries = 0;
     state.error = null; state.fallback = null; state.closedReason = ''; state.final = null;
     state.status = 'connecting'; changed();
     openSocket(() => { state.status = 'open'; changed(); first(); },
-      () => { if (state.status === 'connecting') setFallback('connect_failed', PARTY_FULL_MESSAGE); });
+      () => { if (state.status === 'connecting') connectFailed(); });
   }
   api.on = fn => { listeners.push(fn); };
   api.off = fn => { const i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); };
@@ -9555,11 +9954,91 @@ function createPartyClient(deps){
     return send({ t: 'pos', heat, st: step | 0, x: Math.round(x), y: Math.round(y), sc: score | 0 });
   };
   api.close = () => { intentional = true; stopTimers(); const s = ws; ws = null; if (s){ try { s.close(); } catch (_) {} } };
+  // W1-7: the page is back (visible again, pageshow, the native shell's reveal, back online). Timers did not run while it was
+  // hidden, so do not wait for the backoff: a seat being taken back is tried now; a socket that is closed without having said
+  // so is dropped and resumed; one that claims to be open is pinged, and dropped and resumed if nothing comes back within
+  // PARTY_RESUME.probeMs. Returns true when it started something. Never opens a socket for a player who is not in a room.
+  api.resumeNow = () => {
+    if (!token.v || !state.code) return false;
+    if (state.status === 'reconnecting'){
+      if (ws) return false;                                       // a try is already opening
+      if (resumeTimer){ clearT(resumeTimer); resumeTimer = null; }
+      if (nowMs() - (resumeStart || nowMs()) > resumeCapMs()){ scheduleResume(); return true; } // past the window: give up now, honestly
+      tryResume(); return true;
+    }
+    if (state.status !== 'in_room') return false;
+    if (!ws || ws.readyState > 1){ dropDeadSocket(); return true; }
+    if (ws.readyState !== 1 || probeTimer) return false;
+    const sock = ws, askedAt = nowMs();
+    send({ t: 'ping', n: ++pingN });
+    probeTimer = setT(() => {
+      probeTimer = null;
+      if (ws === sock && state.status === 'in_room' && lastHeardAt < askedAt) dropDeadSocket();
+    }, PARTY_RESUME.probeMs);
+    return true;
+  };
+  // W1-7: "Try again" on the offline / unreachable fallback repeats the last Create or Join. Not for a server that said full.
+  api.retry = () => {
+    if (state.status !== 'fallback' || !lastAttempt || !state.fallback || (state.fallback.reason !== 'offline' && state.fallback.reason !== 'connect_failed')) return false;
+    state.status = 'idle';
+    begin(lastAttempt);
+    return true;
+  };
   api.dropSocketForTest = () => { if (ws){ try { ws.close(); } catch (_) {} } };
   api.mySeat = () => state.room && state.room.players ? state.room.players.find(p => p.id === state.you) || null : null;
   api.isHost = () => !!(state.room && state.room.host === state.you);
   api.token = () => token.v;
   return api;
+}
+
+// ---- Heat Watch (W1-7) ------------------------------------------------------------------------------------------
+// After your run ends mid-heat, the heat screen is a live race board: everyone still seated, sorted by live score. Pure:
+// the room snapshot, the rival tracks (each rival's last relayed score), your own score and the heat_result in; rows out.
+// Display only, like the tracks themselves: nothing here reaches scoring or the standings, and the server's heat_result
+// replaces every live number with the official one. Returns null when no rival has a track (a heat that did not advertise
+// positions, a server that sheds them, or none relayed yet), so the page keeps the plain "who has finished" list.
+// Row: { id, nick, me, score, state, connected }; state is 'flying' (live), 'landed' (submitted, last relayed score, shown
+// as approximate), 'done' (submitted with no relayed position: score null, shown without a number), 'waiting' (no position
+// yet), 'you', or after heat_result 'ok' / 'flagged' / 'dnf' (official). `counted` false (your run was not sent, or the
+// server refused it) makes your own row 'flagged' at 0 before the result says so: it ranks nobody.
+function partyHeatWatchRows(room, you, ownScore, tracks, result, heatNo, counted){
+  if (!room || !Array.isArray(room.players) || !tracks || !tracks.size) return null;
+  const official = result && result.heat === heatNo && Array.isArray(result.results) ? new Map(result.results.map(r => [r.id, r])) : null;
+  const rows = [];
+  for (const p of room.players){
+    if (!p || p.left) continue;
+    const me = p.id === you, off = official ? official.get(p.id) : null, tr = me ? null : tracks.get(p.id);
+    let score, state;
+    if (off){ score = off.status === 'ok' ? Math.max(0, partyInt(off.score)) : 0; state = off.status === 'ok' || off.status === 'flagged' || off.status === 'dnf' ? off.status : 'dnf'; }
+    else if (me){ score = counted === false ? 0 : Math.max(0, partyInt(ownScore)); state = counted === false ? 'flagged' : 'you'; }
+    else if (tr){ score = Math.max(0, partyInt(tr.score())); state = p.submitted ? 'landed' : 'flying'; }
+    else { score = p.submitted ? null : 0; state = p.submitted ? 'done' : 'waiting'; }
+    rows.push({ id: p.id, nick: p.nick, me, score, state, connected: p.connected !== false });
+  }
+  // Highest first (a score nobody relayed last); on a tie you stay ahead (a rival passes you only by beating your score),
+  // then by seat.
+  const key = r => (r.score == null ? -1 : r.score);
+  rows.sort((a, b) => (key(b) - key(a)) || ((b.me ? 1 : 0) - (a.me ? 1 : 0)) || (a.id - b.id));
+  return rows;
+}
+// Who passed you since the last look. `prev` is the last call's `ahead` (null on the first look, which only records):
+// a rival counts once, when it goes from not ahead of your score to ahead. A rival with no position yet is not known to be
+// behind, so its first number is never a pass. Official rows (after heat_result) never count: a replayed score can differ
+// from your own claim, and that is not a pass.
+function partyWatchPasses(rows, ownScore, prev){
+  const ahead = new Map(), passed = [];
+  for (const r of rows || []){
+    if (r.me || r.score == null || r.state === 'waiting' || r.state === 'done' || r.state === 'ok' || r.state === 'flagged' || r.state === 'dnf') continue;   // unknown or official
+    const now = r.score > ownScore;
+    ahead.set(r.id, now);
+    if (now && prev && prev.get(r.id) === false) passed.push(r.id);
+  }
+  return { ahead, passed };
+}
+// The time to the horn as m:ss, from the heat's local start and the sprint length; '0:00' once it has sounded.
+function partyHornClock(localStartAt, now, sprintSeconds){
+  const raw = Math.ceil((sprintSeconds * 1000 - (now - localStartAt)) / 1000), left = Number.isFinite(raw) ? Math.max(0, raw) : 0;
+  return Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
 }
 /* ==== ORBIT-PARTY END ==== */
 
@@ -9854,22 +10333,77 @@ function syncDuelStrip(){
   const show = !!(duelArmed && inc && inc.status === 'ready' && duelRaceReady()); // C20: offered once its rival can race
   const failed = !!inc && inc.status === 'failed';
   const waiting = !!inc && !show && !failed;
+  const learn = show && warmupWanted(); // W1-2: Start offers the warm-up first; Race now is today's direct accept
+  const cue = show && !!duelReadyCue && duelReadyCue === duelArmed; // W1-2: "Got it. Now race {name}." after the warm-up
   if (strip){
     let text = '';
-    if (show) text = t('duel.challenge', { name: duelNickName(inc.rival.nick), score: formatScore(inc.rival.score) });
+    if (cue) text = t('duel.nowRace', { name: duelNickName(inc.rival.nick) });
+    else if (show) text = t('duel.challenge', { name: duelNickName(inc.rival.nick), score: formatScore(inc.rival.score) });
     else if (waiting) text = t('duel.checking');
     else if (failed) text = t('duel.failed');
     else if (!inc && duelVersionNotice) text = t(duelVersionNotice); // C23b: Start still plays Endless, as it says
     strip.hidden = !text;
     if (strip.textContent !== text) strip.textContent = text;
+    if (cue) strip.setAttribute('data-cue', 'ready'); else strip.removeAttribute('data-cue');
   }
   if (skip) skip.hidden = !inc; // Play Endless declines a duel that is offered, still checking, or failed
   const fresh = document.getElementById('duelNew'); // B4d: a new duel is offered only when no link is waiting
-  if (fresh) fresh.hidden = !!WEB_PORTAL || (!!inc && inc.status !== 'failed'); // a link that failed its check is no offer; a portal has no duel links
+  if (fresh){
+    // A link that failed its check is no offer; a portal has no duel links. W1-2: while Start offers the warm-up,
+    // this button is Race now and accepts the duel at once.
+    fresh.hidden = !!WEB_PORTAL || (!!inc && inc.status !== 'failed' && !learn);
+    const freshLabel = learn ? t('duel.raceNow') : t('duel.new');
+    if (fresh.textContent !== freshLabel) fresh.textContent = freshLabel;
+  }
   // Start says what it does: the duel while one is armed, waits while it is checked, retries one that failed.
   const start = document.getElementById('start');
-  const label = show ? t('duel.accept') : waiting ? t('duel.wait') : failed ? t('duel.retry') : t('btn.start');
+  const label = learn ? t('duel.learnFirst', { name: duelNickName(inc.rival.nick) }) : show ? t('duel.accept') :
+    waiting ? t('duel.wait') : failed ? t('duel.retry') : t('btn.start');
   if (start && start.textContent !== label) start.textContent = label;
+  if (start){ if (learn) start.setAttribute('data-warmup', ''); else start.removeAttribute('data-warmup'); }
+  // W1-2: while Start offers the warm-up, Daily steps aside (it is back once the warm-up is done). The title keeps
+  // four buttons, so it still fits a landscape phone, and Race now sits under Start as the other way into this duel.
+  const daily = document.getElementById('daily');
+  if (daily && daily.hidden !== learn) daily.hidden = learn;
+}
+// W1-2: Race now. The title's second duel button while Start offers the warm-up: today's Accept duel, no tutorial.
+function duelNewAction(){
+  if (state !== 'title' || !warmupWanted()){ startNewDuel(); return; }
+  press(); // warmupNext stays false: the armed duel starts as Accept duel does today
+  if (state === 'playing') canvas.focus({ preventScroll: true });
+}
+// W1-2: the warm-up is over (its tutorial finished or was skipped, End run, or the comet fell). Back to the title
+// with the duel and its loaded race frames kept, "Got it. Now race {name}." on the strip until the next run starts,
+// and focus on Start, which now reads Accept duel. A warm-up is practice: no results card, best, Game Center post,
+// mission or stardust (runEnded returns before any of them).
+function finishDuelWarmup(){
+  if (!warmupForDuel) return;
+  warmupForDuel = false;
+  duelReadyCue = duelArmed;
+  syncDuelStrip(); // while the title is still hidden, so its live strip stays quiet and announce() speaks the cue once
+  armWarmupTitleGuard(); // before Start takes focus, so it is announced not-ready
+  abortRunToTitle({ keepDuel: true });
+  const inc = duelIncoming;
+  if (duelArmed && inc && inc.status === 'ready') announce(t('duel.nowRace', { name: duelNickName(inc.rival.nick) }));
+}
+// W1-2: the warm-up ends while the player is still tapping (beat 3's timer, a fall, or Skip, which sits in the tap
+// zone), so their next tap or key would land on the title: Start races at once, Daily starts, Play Endless throws the
+// duel away. For RETRY_DEATH_GUARD_MS (the #170 death guard) the title's buttons, its playfield and its keys ignore
+// input, and Start shows not-ready until then, as Retry does after a death.
+function armWarmupTitleGuard(){
+  warmupTitleUntil = performance.now() + RETRY_DEATH_GUARD_MS;
+  setStartReady(false);
+  if (warmupTitleTimer) clearTimeout(warmupTitleTimer);
+  warmupTitleTimer = setTimeout(() => { warmupTitleTimer = 0; setStartReady(true); }, RETRY_DEATH_GUARD_MS);
+}
+function warmupTitleGuarded(){
+  return state === 'title' && performance.now() < warmupTitleUntil;
+}
+function setStartReady(ready){
+  const btn = document.getElementById('start');
+  if (!btn) return;
+  if (ready){ btn.classList.remove('not-ready'); btn.removeAttribute('aria-disabled'); }
+  else { btn.classList.add('not-ready'); btn.setAttribute('aria-disabled', 'true'); }
 }
 // D2: the last seconds of the sprint (0:05..0:01) get larger digits and one soft tick per whole second.
 // Presentation only: it reads the live run time like the clock, never the RNG, and changes no sim state.
@@ -10669,7 +11203,9 @@ function rivalEdgeHudBoxes(now, vs){
   }
   return rivalEdgeHud;
 }
-function drawRivalEdge(hx, above, topEdge, hudTop, bottom, px, fade, vs, now){
+// W1-6: `color` (optional) is the marker's hue: an Orbit Party leader passes its seat colour; the duel passes nothing
+// and keeps the lime, so its marker is drawn exactly as before.
+function drawRivalEdge(hx, above, topEdge, hudTop, bottom, px, fade, vs, now, color = RIVAL_GHOST.color){
   const R = RIVAL_GHOST, side = R.sideCss / vs;
   const cw = px * 0.8, ch = px * 0.5, gr = cw * 2.2;       // chevron half-width and height, glow cap radius
   const cx = Math.max(side + gr, Math.min(W - side - gr, hx));
@@ -10681,12 +11217,12 @@ function drawRivalEdge(hx, above, topEdge, hudTop, bottom, px, fade, vs, now){
   const d = above ? 1 : -1;                                // into the playfield
   // The glow cap: a circle centred beyond the edge, so only a shallow cap shows inside.
   ctx.globalAlpha = 0.22 * fade;
-  ctx.fillStyle = R.color;
+  ctx.fillStyle = color;
   ctx.beginPath(); ctx.arc(cx, ey - d * gr * 0.45, gr, 0, Math.PI * 2); ctx.fill();
   // The chevron: its tip at the edge, its arms reaching into the playfield.
   const tipY = ey + d * 2 / vs, armY = tipY + d * ch;
   ctx.globalAlpha = fade;
-  ctx.strokeStyle = R.color; ctx.lineWidth = 3 / vs; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.strokeStyle = color; ctx.lineWidth = 3 / vs; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   ctx.beginPath(); ctx.moveTo(cx - cw, armY); ctx.lineTo(cx, tipY); ctx.lineTo(cx + cw, armY); ctx.stroke();
 }
 // D2b: a racing rival's head brightens while it is close to your comet. 0 at GHOST_GLOW_FAR world px or more,
@@ -11156,13 +11692,17 @@ function drawVoidDangerGlow(){
   ctx.restore();
 }
 function setRetryReady(ready){
-  const btn = document.getElementById('retry');
-  if (ready){
-    btn.classList.remove('not-ready');
-    btn.removeAttribute('aria-disabled');
-  } else {
-    btn.classList.add('not-ready');
-    btn.setAttribute('aria-disabled', 'true');
+  // W1-4: the card's Daily door keeps the same guard, so it looks and reads as ready exactly when Retry does.
+  for (const id of ['retry', 'resultDaily']){
+    const btn = document.getElementById(id);
+    if (!btn) continue;
+    if (ready){
+      btn.classList.remove('not-ready');
+      btn.removeAttribute('aria-disabled');
+    } else {
+      btn.classList.add('not-ready');
+      btn.setAttribute('aria-disabled', 'true');
+    }
   }
 }
 // One-tap retry (1.2). Retry is the button (or Space, Enter, Up); the card body never retries.
@@ -11195,6 +11735,8 @@ function armRetryReady(){
 // B11 step 5: the end of a run outside the ZW-CORE region (die, through simFx.runEnd): the tutorial, the duel place,
 // the death effects, the bests, missions and stardust, and the results card. None of it changes the run's simulation.
 function runEnded(reason, previousBest){
+  // W1-2: a fall in the duel warm-up ends it quietly, as its tutorial's end does: back to the title, duel ready.
+  if (warmupForDuel){ endDuelWarmup(); return; }
   endTutorial(false);
   if (duelIncoming) simFx.prepareDuel(); // B5: a missing race instance loads now, for the Retry (B6: and the chain's)
   // B6: your finishing place is against every racer's final checked score (a ghost that would still have scored
@@ -11240,6 +11782,7 @@ function runEnded(reason, previousBest){
   noteEventKeepsake();
   simFx.results(reason);
   partyRunEnded(); // B13: a room's heat submits its run and brings the room screen back
+  syncResultDaily(); // W1-4: the card offers today's Daily when every gate holds
 }
 // E4: a finished ranked Endless run that started during an event unlocks that event's keepsake (once; kept forever).
 // Never the Daily, a duel, a Checkpoint run, an unranked ?grace= run or the ghost frame. The results card names it
@@ -11371,15 +11914,23 @@ for (const [id, expected] of [['start', 'title'], ['retry', 'dead']]){
     // Enter clicks on keydown; a held key must not outlast the retry debounce.
     // event.key also covers NumpadEnter. Space retains native keyup activation.
     if (e.repeat && e.key === 'Enter') e.preventDefault();
+    // W1-2: in the title guard after a warm-up, Space and Enter on Start do nothing. Cancelling the keydown also
+    // stops Space's keyup activation, so a key pressed inside the guard never starts the race on its release.
+    if (id === 'start' && warmupTitleGuarded() && (e.key === ' ' || e.key === 'Enter' || e.code === 'Space' ||
+        e.code === 'Enter' || e.code === 'NumpadEnter')) e.preventDefault();
   });
   button.addEventListener('click', (e)=>{
     e.stopPropagation();
     if (state !== expected) return;
+    if (id === 'start' && warmupTitleGuarded()) return; // W1-2: a stray tap of the warm-up is not Accept duel
+    if (id === 'start') warmupNext = warmupWanted(); // W1-2: decided on the input that starts the run
     press();
     if (state === 'playing') canvas.focus({ preventScroll: true });
   });
 }
 function press(){
+  const warmupNow = warmupNext; // W1-2: one-shot, set only by Start's own input just before this call
+  warmupNext = false;
   if (hangarOpen || settingsOpen || statsOpen || moreOpen) return;
   if (ROOMS_ON && !partyLaunching && state !== 'playing' && (partyPanelOpen || partyInRoom())) return; // B13: a room's screen owns the next press
   if (Portal.busy) return; // B16: input waits while the portal's break runs
@@ -11401,10 +11952,16 @@ function press(){
     if (!pendingDaily && duelHoldsStart()) return;
     const wantDaily = pendingDaily;
     pendingDaily = false;
+    duelReadyCue = null; // W1-2: "Got it. Now race {name}." lasts until a run starts
+    // W1-2: a fresh player's Start on a ready duel plays the calm T1 tutorial in Endless first. The duel stays armed
+    // and its race frames stay loaded (no parkDuelFrames), so the Start after the warm-up races at once.
+    const warmup = warmupNow && !wantDaily && !!duelArmed;
+    warmupForDuel = warmup;
+    if (warmup) tutorialNext = true;
     // B4b: Start plays the armed duel; the Daily button still plays the Daily.
-    duelActive = !wantDaily && !!duelArmed;
+    duelActive = !wantDaily && !warmup && !!duelArmed;
     if (duelActive) duelRunSeed = duelArmed.seed >>> 0;
-    else if (duelGhostInst || duelExtras.some(x => x.inst)) parkDuelFrames(); // B6: no race frames under a Daily
+    else if (!warmup && (duelGhostInst || duelExtras.some(x => x.inst))) parkDuelFrames(); // B6: no race frames under a Daily
     dailyActive = !!wantDaily || duelActive;
     syncDuelPlayfield();
     // 1.3 cut: the checkpoint entry is gone, so no run starts at a saved gate (its data is kept).
@@ -11489,8 +12046,80 @@ dailyButton.addEventListener('keydown', (e)=>{
 dailyButton.addEventListener('click', (e)=>{
   e.stopPropagation();
   if (state !== 'title' || hangarOpen || settingsOpen || statsOpen) return;
+  if (warmupTitleGuarded()) return; // W1-2: a stray tap after a duel warm-up does not start the Daily
   pendingDaily = true;
   press();
+  if (state === 'playing') canvas.focus({ preventScroll: true });
+});
+// W1-4: the results card's way into today's Daily. Retry stays the first, focused, instant choice, in the same place on
+// every card; just above the row a full-width Daily Orbit button shows only while today's Daily is unplayed, on a plain Endless card of a player past the
+// first runs (the calm ring hint's CALM_HUD.ringRuns finished runs), outside a room, a recording, the ghost frame and a
+// replay. Presentation only: the run it starts is the title's Daily, through the same press() path as a deep link.
+function resultDailyDue(){
+  let ghost = false;
+  try { ghost = !!window.__ghostMode; } catch (_) {}
+  const runs = readStoredNumber(RUNS_KEY);
+  return dailyRow(dailyTodayIso()) === null &&
+    !dailyActive && !duelActive && !partyInRoom() && !checkpointActive && !calmRun && !tutorialRun &&
+    (runs === null ? 0 : runs) >= CALM_HUD.ringRuns &&
+    !ghost && !endlessReplaying;
+}
+// Pure: every gate, the recording included. A recording or the open share chooser holds the button in place, unseen.
+function resultDailyShows(){
+  return resultDailyDue() && !clipRecording;
+}
+// The door is drawn only where the card still fits with it. Where it would make the card scroll (or scroll further) it
+// gives way (data-no-room), as on the stacked and short cards whose CSS has no room for it. Measured with Details
+// closed (every new card starts closed); while Details is open the last answer holds, so opening it never takes the
+// door away. Returns whether the door has a box. Without layout (the test VM) the door always has room.
+function fitResultDaily(btn){
+  if (typeof btn.getClientRects !== 'function' || typeof document.querySelector !== 'function') return !btn.hidden;
+  const scroller = document.querySelector('#gameOverScreen .card-scroll');
+  if (btn.hidden || !scroller || scroller.getClientRects().length === 0){
+    btn.removeAttribute('data-no-room'); // the card is not up: it is measured when it comes up
+    return false;
+  }
+  const details = document.getElementById('resultDetails');
+  if (!(details && details.open)){
+    btn.removeAttribute('data-no-room');
+    if (btn.getClientRects().length > 0 && scroller.scrollHeight > scroller.clientHeight + 1) btn.setAttribute('data-no-room', '');
+  }
+  return btn.getClientRects().length > 0;
+}
+function syncResultDaily(){
+  const btn = document.getElementById('resultDaily');
+  if (!btn) return false;
+  const due = state === 'dead' && resultDailyDue();
+  const chooser = document.getElementById('shareChooser');
+  const held = due && (clipRecording || !!(chooser && !chooser.hidden));
+  if (btn.hidden !== !due) btn.hidden = !due;
+  if (held) btn.setAttribute('data-held', ''); else btn.removeAttribute('data-held');
+  const hadRoom = btn.getAttribute('data-no-room') === null;
+  const drawn = fitResultDaily(btn);
+  // data-daily-door: the door has its box on the card, so the share toast sits above it.
+  const screen = document.getElementById('gameOverScreen');
+  if (screen){ if (drawn) screen.setAttribute('data-daily-door', ''); else screen.removeAttribute('data-daily-door'); }
+  if (hadRoom !== (btn.getAttribute('data-no-room') === null)) syncScrollFades();
+  return drawn && !held;
+}
+window.addEventListener('resize', () => { syncResultDaily(); }); // a turned phone or a resized window refits the door
+document.getElementById('resultDetails').addEventListener('toggle', () => { syncResultDaily(); });
+const resultDailyButton = document.getElementById('resultDaily');
+resultDailyButton.addEventListener('pointerdown', (e)=> e.stopPropagation());
+resultDailyButton.addEventListener('keydown', (e)=>{
+  if (e.repeat && e.key === 'Enter') e.preventDefault();
+});
+resultDailyButton.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  if (Portal.busy) return; // a break already started for another choice
+  // The Retry guard: a stray launch tap inside it does nothing, and nothing is left armed.
+  if (state !== 'dead' || !resultsShown || !retryAccepts(performance.now())) return;
+  if (!syncResultDaily() || !resultDailyShows()) return;
+  pendingDaily = true;
+  press();
+  // A start that did not happen leaves nothing armed, so a later Retry never plays a Daily nobody chose. A portal
+  // break (B16) keeps it: the break's own press() starts the Daily.
+  if (state !== 'playing' && !Portal.busy) pendingDaily = false;
   if (state === 'playing') canvas.focus({ preventScroll: true });
 });
 const shareButton = document.getElementById('share');
@@ -11510,6 +12139,7 @@ function setShareChooser(open){
   if (!chooser) return;
   chooser.hidden = !open;
   shareButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+  syncResultDaily(); // W1-4: the Daily button is held unseen while the chooser is open
 }
 const shareCardOption = document.getElementById('shareCardOption');
 if (shareCardOption){
@@ -11548,7 +12178,9 @@ canvas.addEventListener('pointerdown', (e)=>{
   // Behind the results card the playfield is not Retry (1.2: Retry is the button only). During
   // the reveal a tap still opens the card.
   if (state === 'dead' && resultsShown) return;
+  if (warmupTitleGuarded()){ e.preventDefault(); return; } // W1-2: a stray tap after a warm-up; Start keeps focus
   canvas.focus({ preventScroll: true });
+  if (state === 'title') warmupNext = warmupWanted(); // W1-2: a playfield tap on the title starts what Start says
   press();
 });
 // Escape is Back for Settings, Stats and Hangar, from any control inside them. During a run
@@ -11573,7 +12205,12 @@ window.addEventListener('keydown', (e)=>{
   }
   if (e.repeat || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey ||
       isControlTarget(e.target) || isControlTarget(document.activeElement)) return;
-  if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'Enter' || e.code === 'NumpadEnter'){ e.preventDefault(); press(); }
+  if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'Enter' || e.code === 'NumpadEnter'){
+    e.preventDefault();
+    if (warmupTitleGuarded()) return; // W1-2: a key still in the warm-up's rhythm is not a Start
+    if (state === 'title') warmupNext = warmupWanted(); // W1-2: the title's keys start what Start says
+    press();
+  }
 });
 const resumeButton = document.getElementById('resume');
 document.getElementById('pause').addEventListener('click', e => {
@@ -11591,11 +12228,18 @@ document.getElementById('pause').addEventListener('click', e => {
 document.getElementById('returnTitle').addEventListener('click', e => {
   e.stopPropagation();
   if (!runHeld || suspended || state !== 'playing') return;
+  if (warmupForDuel){ endDuelWarmup(); return; } // W1-2: End run in a duel warm-up keeps the duel
   endTutorial(false); // leaving mid-tutorial counts as seen; More > How to play replays it
+  abortRunToTitle();
+});
+// End run, and (W1-2, keepDuel) the end of a duel warm-up: the playing run is left for the title.
+// keepDuel keeps the armed duel with its loaded race frames, and a room's heat (a warm-up never is one).
+function abortRunToTitle(opts){
+  const keepDuel = !!(opts && opts.keepDuel);
   // Abandoning a run is explicit; saved best and purchase ownership are untouched.
   checkpointActive = false;
   dailyActive = false;
-  clearDuel(); // End run leaves a duel; the link can be opened again
+  if (!keepDuel) clearDuel(); // End run leaves a duel; the link can be opened again
   pendingDaily = false;
   dailyRng = null;
   state = 'title';
@@ -11604,9 +12248,14 @@ document.getElementById('returnTitle').addEventListener('click', e => {
   syncScreens();
   notifyNative('title');
   Portal.stop();
-  partyAfterEndRun(); // B13: ending a room's heat forfeits it and returns to the room screen
+  if (!keepDuel) partyAfterEndRun(); // B13: ending a room's heat forfeits it and returns to the room screen
   document.getElementById('start').focus({preventScroll:true});
-});
+}
+// W1-2: ends a duel warm-up from End run or a fall. The tutorial counts as seen (as End run does for any tutorial).
+function endDuelWarmup(){
+  endTutorial(false); // with a tutorial up this already finishes the warm-up
+  finishDuelWarmup();
+}
 resumeButton.addEventListener('pointerdown', (e)=>{ e.stopPropagation(); });
 resumeButton.addEventListener('keydown', (e)=>{
   // Keep Space/Enter on this control from falling through into the gameplay key handler.
@@ -11648,6 +12297,13 @@ function fallingWhistle(){
 // Fresh player (isFreshPlayer semantics): no catch saved (lifetime) and no catch this session.
 function isFreshPlayer(){
   return lifetime.captures === 0 && !caughtThisSession;
+}
+// W1-2: Start offers "Learn the tap, then race {name}" (the T1 tutorial first) to a fresh player who has not seen
+// the tutorial, on a duel that is checked and ready to race. Read by the title's labels and by Start's own input
+// (click, the title's keys, a playfield tap), never inside press(): a replay, a ghost instance, a portal, a room's
+// heat, Race now, the Daily button and every test that calls press() start exactly as before.
+function warmupWanted(){
+  return isFreshPlayer() && !tutorialSeen && !window.__ghostMode && !WEB_PORTAL && !!duelArmed && duelRaceReady() && !partyInRoom();
 }
 
 /* ---------- light and dark (presentation only; update never reads this) ---------- */
@@ -12390,7 +13046,12 @@ function resultsAnnouncement(){
   const scoreLabel = document.getElementById('finalScore').getAttribute('aria-label') || '';
   const goal = (document.getElementById('nextGoal').textContent || '').replace(/\n/g, '. '); // C14: the moment line
   const unlocked = rankUnlockText();
-  return reason + '. ' + scoreLabel + (runWasBest ? '. ' + t('announce.newBest') : '.') + (goal ? ' ' + goal + '.' : '') + (unlocked ? ' ' + unlocked + '.' : '');
+  // W1-4: the Daily button is named only when it shows (a stacked or short card has no room for it: no box).
+  const dailyBtn = document.getElementById('resultDaily');
+  const daily = !!dailyBtn && !dailyBtn.hidden && dailyBtn.getAttribute('data-held') === null &&
+    (typeof dailyBtn.getClientRects !== 'function' || dailyBtn.getClientRects().length > 0);
+  return reason + '. ' + scoreLabel + (runWasBest ? '. ' + t('announce.newBest') : '.') + (goal ? ' ' + goal + '.' : '') + (unlocked ? ' ' + unlocked + '.' : '') +
+    (daily ? ' ' + t('btn.daily') + '.' : '');
 }
 function paintConstellationMark(context, x, y, s){
   context.beginPath();
@@ -13025,18 +13686,25 @@ function duelVersusPhrase(you){
   const pl = state === 'playing' ? null : duelFinalPlace; // B6
   return pl ? vs + ', finished #' + pl.place + ' of ' + pl.of : vs;
 }
+// W1-5: where the run was played, for every share surface (the glyph line, the sentence and the card text):
+// "Zipwaltz Duel Sprint", "Zipwaltz Daily #42", "Zipwaltz Harvest Week" for an Endless run with an event, else "Zipwaltz".
+function shareWhere(){
+  const evName = eventShareName(runEvent); // a duel and the Daily keep their own name, even with an event left over
+  return duelActive ? 'Zipwaltz Duel Sprint' : dailyActive ? 'Zipwaltz Daily #' + dailyNumberForDate(dailyRunIso || dailyTodayIso()) : evName ? 'Zipwaltz ' + evName : 'Zipwaltz';
+}
 function shareCardText(){
   const scored = death && Number.isFinite(death.score) ? death.score : score;
   const comboPeak = death && Number.isFinite(death.maxCombo) ? death.maxCombo : maxCombo;
   const name = constellationName(constellationStars.length, scored, captureIds);
   const body = '✦ ' + name + ' · ' + starsText(litStars()) + ' · x' + comboPeak + ' · ' + formatShareScore(scored);
   const badge = supporterActive() ? ' · Supporter' : '';
+  const where = shareWhere();
   if (duelActive){
     const vs = duelVersusPhrase(scored);
-    return 'Zipwaltz Duel Sprint · ' + body + (vs ? ' · ' + vs : '') + badge; // the card headline carries "BEAT MY <score>"
+    return where + ' · ' + body + (vs ? ' · ' + vs : '') + badge; // the card headline carries "BEAT MY <score>"
   }
-  if (dailyActive) return 'Zipwaltz Daily #' + dailyNumberForDate(dailyRunIso || dailyTodayIso()) + ' · ' + body + badge;
-  return 'Zipwaltz · ' + body + (runWasBest ? ' New best!' : '') + badge;
+  if (dailyActive) return where + ' · ' + body + badge;
+  return where + ' · ' + body + (runWasBest ? ' New best!' : '') + badge;
 }
 function fillWrapped(context, text, x, y, maxWidth, lineHeight){
   const words = String(text).split(' ');
@@ -13202,15 +13870,15 @@ function shareGlyphString(){
   const shown = runGlyphLog.slice(0, SHARE_GLYPH_MAX).map(function(k){ return SHARE_GLYPH[k]; }).join('');
   return total > SHARE_GLYPH_MAX ? shown + '…+' + (total - SHARE_GLYPH_MAX) : shown;
 }
-// The share line: "Zipwaltz Daily #42 <glyphs> x9 1,840 ♪", or the same without the Daily number.
+// The share line: "Zipwaltz Daily #42 <glyphs> x9 1,840 ♪", or the same with shareWhere()'s other heads ("Zipwaltz",
+// "Zipwaltz Harvest Week", "Zipwaltz Duel Sprint").
 // Empty when the run recorded no catch or flick, so a starless run's share text is unchanged.
 function shareGlyphLine(){
   const glyphs = shareGlyphString();
   if (!glyphs) return '';
   const scored = death && Number.isFinite(death.score) ? death.score : score;
   const comboPeak = death && Number.isFinite(death.maxCombo) ? death.maxCombo : maxCombo;
-  const head = duelActive ? 'Zipwaltz Duel Sprint' : dailyActive ? 'Zipwaltz Daily #' + dailyNumberForDate(dailyRunIso || dailyTodayIso()) : 'Zipwaltz';
-  return head + ' ' + glyphs + ' x' + comboPeak + ' ' + formatShareScore(scored) + ' ♪';
+  return shareWhere() + ' ' + glyphs + ' x' + comboPeak + ' ' + formatShareScore(scored) + ' ♪';
 }
 // Screen-reader text for the same run: counts, never glyph characters ("9 perfect, 3 good").
 function announceShareGlyphs(){
@@ -13229,7 +13897,7 @@ function shareGlyphSpeech(){
 function shareMessageText(){
   const scored = death && Number.isFinite(death.score) ? death.score : score;
   const lit = litStars();
-  const where = duelActive ? 'Zipwaltz Duel Sprint' : dailyActive ? 'Zipwaltz Daily #' + dailyNumberForDate(dailyRunIso || dailyTodayIso()) : 'Zipwaltz';
+  const where = shareWhere(); // W1-5: an Endless run names its event; the Daily and a duel keep their own
   const vs = duelVersusPhrase(scored); // B6a: a duel says how it went
   const lead = lit > 0
     ? 'I drew ' + constellationName(constellationStars.length, scored, captureIds) + ' (' + starsText(lit) + ') in ' +
@@ -13321,7 +13989,7 @@ const CLIP_START_GUARD_MS = 60000;                  // the system prompt may wai
 const CLIP_WATCHDOG_MS = (CLIP_SECONDS + 8) * 1000; // runs from clipStarted, never from the tap
 const SHARE_CLIP_FAILED = "Couldn't record clip";
 // Card controls that go inert while a clip records, so only the replay can be captured.
-const CLIP_LOCK_IDS = ['retry', 'share', 'shareCardOption', 'shareClipOption', 'constellationThumb', 'leadReplay', 'openSettingsResult', 'more', 'daily', 'hangar', 'openStats', 'openSettings', 'resultDetailsToggle'];
+const CLIP_LOCK_IDS = ['retry', 'share', 'shareCardOption', 'shareClipOption', 'constellationThumb', 'leadReplay', 'openSettingsResult', 'resultDaily', 'more', 'daily', 'hangar', 'openStats', 'openSettings', 'resultDetailsToggle'];
 let clipRecording = false, clipCapturing = false;
 // Session ids are unique across page loads: a random base per load, then a counter. Native rejects
 // nothing by id, so a reloaded page can never collide with a clip native still remembers.
@@ -14781,10 +15449,12 @@ function draw(){
   const wordBox = rhythmWordBox();
   if (wordBox) laneBoxes.push(wordBox);
   for (const q of popups){
+    if (q.pop) continue;                                       // W1-6: an Orbit Party pass pop is drawn in screen space (drawPartyTags)
     const fade = 1 - q.t/1.1;
     const py = q.y - (reducedMotion ? 0 : q.t*36);
     const metrics = ctx.measureText(q.text);
-    const half = metrics.width / 2;
+    const bead = q.bank ? BANK_ARC.popupBadge : 0; // W1-1: the bounce's ↺ bead goes left of its text (4 px apart)
+    const half = metrics.width / 2 + (bead ? bead + 2 : 0);
     let popupX = q.x, popupY = py;
     // A lower-planet return can leave its message below the upward-only camera.
     // Keep that feedback inside the view and above the 44px sound control.
@@ -14828,7 +15498,12 @@ function draw(){
     }
     ctx.globalAlpha = fade;
     ctx.fillStyle = q.color;
-    ctx.fillText(q.text, popupX, popupY);
+    ctx.fillText(q.text, popupX + (bead ? bead + 2 : 0), popupY);
+    if (bead){
+      ctx.save();
+      drawBankGlyph(popupX - half + bead, popupY - 6, bead, fade, fade, 0);
+      ctx.restore();
+    }
   }
   ctx.globalAlpha = 1;
 
@@ -15160,7 +15835,170 @@ function rhythmFlash(grade, x, y){
 // read once per sim state, before the frame is drawn (the interpolated draw never moves it), into its own result
 // object; no allocation, world RNG or fxRandom.
 const RING_DEPTH = Object.freeze({ good0: 0.25, good1: 0.6, alpha: 0.38, width: 1.6, perfectAlpha: 0.22, perfectWidth: 0.8, perfectTint: 0.5 });
-const ringRes = { kind: 'horizon', t: 0, step: 0, planetId: null, depth: 1 };
+const ringRes = { kind: 'horizon', t: 0, step: 0, planetId: null, depth: 1, bounces: 0 };
+// W1-1 honest bank arc (draw only). A stretch of the band whose release would bounce off a side wall or a gas moon
+// before the catch (rBn > 0, the rate-0 forecast's bounce count) is drawn dashed: update() resets the combo on any
+// bounce, so that catch starts again from x1 even when it grades PERFECT. Shown once the flick is unlocked (the
+// first-orbit tutorial stays clean) and only while there is a combo to lose: at x1 a bounce resets nothing.
+// - Colour, alpha and glow stay the band's, so brightness is still the in-window cue. The PERFECT core stays solid
+//   over a bank stretch: the grade still counts there.
+// - The dashes are [14, 10] pieces with butt caps on a grid pinned to the planet (a dash from every 24 px of arc
+//   length along the orbit), so they never crawl as the comet uses a stretch up. Only a stretch's own ends differ: an
+//   end that borders no band keeps ink on it (the window's extent shows), an end that meets a clean stretch of the
+//   same planet leaves a gap there (and that clean stretch's round cap stops at the boundary), and no end piece is a
+//   sliver.
+// - A near bank stretch still ahead of the comet gets one ↺ bead just outside the band, at the stretch's start: a cue
+//   in shape, not colour alone, that covers none of the window. It never moves, and it hides for good once the comet
+//   reaches the stretch. The bounce's "combo reset" popup carries the same bead, so the symbol names its cost.
+// All of it is static, so Reduce Motion and Reduced effects draw it the same. Frozen and preallocated: a frame
+// allocates nothing for it.
+const BANK_ARC = Object.freeze({
+  dash: Object.freeze([14, 10]), period: 24, // butt caps: round caps at bandWidth 20 would fill the 10 px gaps
+  glyph: '↺',          // the symbol the bead shows, drawn as a path so every platform shows the same shape
+  badge: 9,            // bead radius (world px), and never under minCss CSS px on screen
+  minCss: 8,           // the bead's radius floor in CSS px: 16 CSS px across on a 320 px wide screen
+  lift: 2,             // px between the band's outer edge and the bead
+  ink: '#100C28',      // the arc label chip's ink: 4.5:1 or better on the bead over every sector sky
+  arrowR: 4.6, arrowWidth: 2, head: 2.9, headHalf: 2.7, // the ↺ on a bead of radius `badge`, scaled with the bead
+  minPiece: 4,         // px: no piece of dash at a stroke's end is shorter than this
+  joinGap: 6,          // px: the gap a bank stroke leaves where it meets a clean stretch of the same planet
+  popupBadge: 8        // the bead beside the bounce's "combo reset" popup (world px)
+});
+const BANK_NO_DASH = Object.freeze([]);
+// How each end of a bank stroke meets what is next to it (see bankPieces).
+const BANK_END = Object.freeze({ cut: 0, free: 1, joined: 2 });
+// The ↺ around the bead centre, worked out once for a bead of radius BANK_ARC.badge: an open circle from the
+// top-left, anticlockwise on screen, to the top-right, where the head points on along the turn.
+const BANK_GLYPH = (function(){
+  const r = BANK_ARC.arrowR, gap = 0.62;
+  const s = -Math.PI / 2 - gap, e = -Math.PI / 2 + gap - 2 * Math.PI;
+  const ex = Math.cos(e) * r, ey = Math.sin(e) * r;
+  const dx = Math.sin(e), dy = -Math.cos(e), nx = Math.cos(e), ny = Math.sin(e);
+  const h = BANK_ARC.head, w = BANK_ARC.headHalf;
+  return Object.freeze({ s, e, tx: ex + dx * h, ty: ey + dy * h,
+    lx: ex - dx * 0.6 + nx * w, ly: ey - dy * 0.6 + ny * w, rx: ex - dx * 0.6 - nx * w, ry: ey - dy * 0.6 - ny * w });
+})();
+// The ink pieces of a bank stroke from s0 to s1 px along the orbit (s = angle x settled orbit radius x orbit direction,
+// so s grows the way the comet goes and the grid never slides while the orbit snaps in after a catch), written to bankPc as [start, end] pairs; returns how many. They are the [14, 10] grid pinned to
+// the planet (a dash from every multiple of 24 px) cut to the stroke, and then each end follows its kind:
+// - cut (the comet's own place, or the end of the forecast): a sliver of dash there is dropped.
+// - free (no band next to it): ink on the end itself. A gap there is filled from the dash next to it (one piece of up
+//   to 24 px), and a sliver is lengthened to minPiece.
+// - joined (a clean stretch of the same planet next to it): joinGap px of gap next to it, and no sliver after that.
+// A stretch with two real ends that would keep no piece gets one centred piece, so a short stretch never vanishes.
+const bankPc = new Float64Array(128);
+function bankPieces(s0, s1, k0, k1){
+  const P = BANK_ARC.period, D = BANK_ARC.dash[0], m = BANK_ARC.minPiece, G = BANK_ARC.joinGap, eps = 1e-9;
+  const lo = k0 === BANK_END.joined ? s0 + G : s0, hi = k1 === BANK_END.joined ? s1 - G : s1;
+  let n = 0;
+  if (hi - lo > eps){
+    for (let q = Math.floor(lo / P) * P; q < hi && n < 64; q += P){
+      const x0 = q > lo ? q : lo, x1 = q + D < hi ? q + D : hi;
+      if (x1 - x0 > eps){ bankPc[2 * n] = x0; bankPc[2 * n + 1] = x1; n++; }
+    }
+  }
+  let i0 = 0, i1 = n - 1;
+  if (i0 <= i1){ // the start
+    if (k0 === BANK_END.free){
+      if (bankPc[0] > lo + eps) bankPc[0] = lo;
+      else if (bankPc[1] - bankPc[0] < m) bankPc[1] = Math.min(hi, lo + m);
+    } else if (bankPc[1] - bankPc[0] < m - eps) i0++;
+  }
+  if (i0 <= i1){ // the end
+    const a = 2 * i1, b = a + 1;
+    if (k1 === BANK_END.free){
+      if (bankPc[b] < hi - eps) bankPc[b] = hi;
+      else if (bankPc[b] - bankPc[a] < m){
+        // Lengthened back to minPiece; if that leaves under 6 px of gap (both ends slivers on a short stretch), the
+        // piece before reaches on to the end instead.
+        if (i1 > i0 && hi - m - bankPc[a - 1] < BANK_ARC.dash[1] - m){ bankPc[a - 1] = hi; i1--; }
+        else bankPc[a] = Math.max(lo, hi - m);
+      }
+    } else if (bankPc[b] - bankPc[a] < m - eps) i1--;
+  }
+  n = i1 >= i0 ? i1 - i0 + 1 : 0;
+  if (i0 > 0) for (let i = 0; i < 2 * n; i++) bankPc[i] = bankPc[i + 2 * i0];
+  if (n === 0 && k0 !== BANK_END.cut && k1 !== BANK_END.cut && s1 - s0 > eps){
+    let x0 = lo, x1 = hi;
+    const w = Math.min(m, s1 - s0);
+    if (x1 - x0 < w){ const mid = (s0 + s1) / 2; x0 = mid - w / 2; x1 = mid + w / 2; }
+    bankPc[0] = x0; bankPc[1] = x1; n = 1;
+  }
+  return n;
+}
+// Strokes a bank stretch from angle a0 to a1 on radius R (the caller sets colour, alpha, width and glow) as its ink
+// pieces, in one path with butt caps, so the glow is drawn once. Rg is the settled orbit radius the grid is laid on.
+// Leaves the line cap round, as the arc draw keeps it.
+function strokeBank(p, R, Rg, dir, ccw, a0, a1, k0, k1){
+  const kR = Rg * dir;
+  const n = bankPieces(a0 * kR, a1 * kR, k0, k1);
+  if (n === 0) return;
+  ctx.lineCap = 'butt';
+  ctx.beginPath();
+  for (let i = 0; i < n; i++){
+    const b0 = bankPc[2 * i] / kR, b1 = bankPc[2 * i + 1] / kR, c = Math.cos(b0), sn = Math.sin(b0);
+    // Each piece is its own subpath, begun 0.05 px back along its tangent: a moveTo onto the arc's own start can
+    // land a float off it, and that hair-length segment would draw a miter spike at the piece's start.
+    ctx.moveTo(p.x + c * R + 0.05 * dir * sn, p.y + sn * R - 0.05 * dir * c);
+    ctx.arc(p.x, p.y, R, b0, b1, ccw);
+  }
+  ctx.stroke();
+  ctx.lineCap = 'round';
+}
+// Strokes a clean stretch (round caps). An end that meets a bank stretch of the same planet is pulled in by half the
+// stroke width, so its round cap stops at the boundary instead of covering the bank stretch's first gap.
+function strokeClean(p, R, dir, ccw, a0, a1, trim0, trim1, w){
+  let t0 = trim0 ? w / 2 : 0, t1 = trim1 ? w / 2 : 0;
+  const len = (a1 - a0) * dir * R;
+  if (t0 + t1 > len - 1e-3){ const f = Math.max(0, len - 1e-3) / (t0 + t1); t0 *= f; t1 *= f; }
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, R, a0 + dir * t0 / R, a1 - dir * t1 / R, ccw);
+  ctx.stroke();
+}
+// The ↺ bead's radius in world px: BANK_ARC.badge, or more on a small screen so it is never under minCss CSS px.
+function bankBadgeR(){ return Math.max(BANK_ARC.badge, BANK_ARC.minCss / (viewScale > 0 ? viewScale : 1)); }
+// This frame's ↺ beads (centre, radius, alpha, glow), queued by the near pass and drawn after every band stroke.
+// Preallocated: a frame allocates nothing for them.
+const bankBeads = { n: 0, cap: 16, x: new Float64Array(16), y: new Float64Array(16), r: new Float64Array(16),
+  alpha: new Float64Array(16), blur: new Float64Array(16) };
+function queueBankBadge(p, Rb, ang, r, alpha, blur){
+  const i = bankBeads.n;
+  if (i >= bankBeads.cap) return;
+  bankBeads.x[i] = p.x + Math.cos(ang) * Rb; bankBeads.y[i] = p.y + Math.sin(ang) * Rb;
+  bankBeads.r[i] = r; bankBeads.alpha[i] = alpha; bankBeads.blur[i] = blur;
+  bankBeads.n = i + 1;
+}
+function drawBankBadges(){
+  const B = bankBeads;
+  for (let i = 0; i < B.n; i++) drawBankGlyph(B.x[i], B.y[i], B.r[i], B.alpha[i], 1, B.blur[i]);
+  bankBeads.n = 0;
+}
+// A band-coloured bead of radius r with the ↺ on it in ink (the glyph scaled with the bead).
+function drawBankGlyph(cx, cy, r, alpha, inkAlpha, blur){
+  const g = r / BANK_ARC.badge;
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = RHYTHM.arcBand;
+  ctx.shadowColor = RHYTHM.arcBand;
+  ctx.shadowBlur = blur;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = inkAlpha;
+  ctx.strokeStyle = BANK_ARC.ink;
+  ctx.fillStyle = BANK_ARC.ink;
+  ctx.lineWidth = BANK_ARC.arrowWidth * g;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.arc(cx, cy, BANK_ARC.arrowR * g, BANK_GLYPH.s, BANK_GLYPH.e, true);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx + BANK_GLYPH.tx * g, cy + BANK_GLYPH.ty * g);
+  ctx.lineTo(cx + BANK_GLYPH.lx * g, cy + BANK_GLYPH.ly * g);
+  ctx.lineTo(cx + BANK_GLYPH.rx * g, cy + BANK_GLYPH.ry * g);
+  ctx.closePath();
+  ctx.fill();
+}
 let ringDepthId = -1, ringDepthGlow = 0;           // the lit ring's planet id and its level (0..1)
 let ringDepthKeyT = NaN, ringDepthKeyA = NaN, ringDepthKeyC = -1, ringDepthHold = false;
 function ringGlowForDepth(depth){
@@ -15192,16 +16030,18 @@ function syncRingDepth(){
 }
 // Arc v2 presentation flags. Written by the arc draw; read by the comet, the aim ring and the
 // first-orbit label, which draw after it in the same frame. update() never reads them.
-let arcCometInside = false, arcBandShown = false, arcLabelAnchor = null;
+let arcCometInside = false, arcBandShown = false, arcLabelAnchor = null, arcBankShown = false;
 function drawRhythmArc(){
   if (aimGuide === 'off' || rhythm.n < 1 || !player || player.mode !== 'orbit' ||
       rhythm.planet !== player.planet || rhythm.caps !== captureCount) return;
   const lim = Math.min(aimSpan(), RHYTHM.span) + 1e-9;
   ctx.save();
-  ctx.setLineDash([]);
+  ctx.setLineDash(BANK_NO_DASH);
   ctx.lineCap = 'round';
+  bankBeads.n = 0;
   if (lim < RHYTHM.span) drawRhythmSpans(false, lim);
   drawRhythmSpans(true, lim);
+  drawBankBadges(); // W1-1: the ↺ beads go on top of every band stroke
   ctx.restore();
   ctx.globalAlpha = 1;
   ctx.shadowBlur = 0;
@@ -15211,67 +16051,82 @@ function rInClass(k, near, lim){ return rId[k] >= 0 && (rCT[k] <= lim) === near;
 function drawRhythmSpans(near, lim){
   const p = player.planet, R = rhythmOrbitRAt(p, time), ccw = rhythm.dir < 0, dir = rhythm.dir;
   const now = player.angle;
+  const Rg = rhythmOrbitRAt(p, Infinity); // W1-1: the settled orbit radius, which the bank dash grid is laid on
+  // W1-1: bank styling once the flick is unlocked (the first-orbit tutorial stays clean), and only while there is a
+  // combo to lose: at x1 a bounce resets nothing, so a bank catch there is as good as a clean one.
+  const bankOn = flickUnlocked && combo > 1;
+  const w = near ? RHYTHM.bandWidth : RHYTHM.farWidth;
   let s = 0;
   while (s < rhythm.n){
     const k = rIdx(s);
     const id = rId[k];
     if (!rInClass(k, near, lim)){ s++; continue; }
-    // A span: samples s..e that catch the same new planet, in this class.
+    // A span: samples s..e that catch the same new planet, in this class, and all bank or all clean (W1-1).
+    const bank = bankOn && rBn[k] > 0;
     let e = s;
-    while (e + 1 < rhythm.n && rId[rIdx(e + 1)] === id && rInClass(rIdx(e + 1), near, lim)) e++;
+    while (e + 1 < rhythm.n && rId[rIdx(e + 1)] === id && rInClass(rIdx(e + 1), near, lim) &&
+        (bankOn && rBn[rIdx(e + 1)] > 0) === bank) e++;
     const prev = s > 0 ? rIdx(s - 1) : -1;
-    // Joined to the other class's span of the same planet without a gap; else from the edge.
-    let a0 = prev >= 0 && rId[prev] === id ? rA[prev] : prev >= 0 && rEdge[prev] === rEdge[prev] ? rEdge[prev] : rA[k];
-    const ke = rIdx(e);
-    let a1 = rEdge[ke] === rEdge[ke] ? rEdge[ke] : rA[ke];
+    const ke = rIdx(e), next = e + 1 < rhythm.n ? rIdx(e + 1) : -1;
+    const samePrev = prev >= 0 && rId[prev] === id, sameNext = next >= 0 && rId[next] === id;
+    // Joined to the other class's span of the same planet without a gap; else from the edge. Between a bank
+    // sample and a clean one of the same planet, the bank span takes the stride (the cautious side).
+    let a0 = samePrev ? (!bank && bankOn && rBn[prev] > 0 ? rA[k] : rA[prev]) :
+      prev >= 0 && rEdge[prev] === rEdge[prev] ? rEdge[prev] : rA[k];
+    let a1 = rEdge[ke] === rEdge[ke] ? rEdge[ke] : bank && sameNext && !(rBn[next] > 0) ? rA[next] : rA[ke];
     // Just rebuilt (only the live anchor sample, no budget left this update): a one-stride stub
     // from the comet, so a slowed comet is never left without an arc for that frame.
     if (rhythm.n === 1) a1 = rA[ke] + orbitAngleDelta(p, rAge[ke], RHYTHM.stride, RHYTHM.waltz);
-    if ((now - a0) * dir > 0) a0 = now; // the part already passed is used up
+    const start = a0; // the span's own start, before the used-up part is cut (the bank bead's anchor)
+    const cut = (now - a0) * dir > 0;
+    if (cut) a0 = now; // the part already passed is used up
     if ((a1 - a0) * dir > 1e-4){
       const inside = rhythm.liveNow && rhythm.liveId === id && (rhythm.liveT <= lim) === near;
       // The band brightens while the comet is inside it (the live catch, near or far); the comet gets
       // a rim in the band colour. The first drawn span anchors the first-orbit label.
       if (inside) arcCometInside = true;
       arcBandShown = true;
+      if (bank) arcBankShown = true;
       if (!arcLabelAnchor) arcLabelAnchor = { x: p.x + Math.cos(a0) * R, y: p.y + Math.sin(a0) * R, a: a0, R };
-      if (!near){
-        ctx.globalAlpha = inside ? RHYTHM.bandIn : RHYTHM.bandRest;
-        ctx.strokeStyle = RHYTHM.arcBand;
-        ctx.lineWidth = RHYTHM.farWidth;
-        ctx.shadowBlur = 0;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, R, a0, a1, ccw);
-        ctx.stroke();
-        s = e + 1;
-        continue;
-      }
       ctx.globalAlpha = inside ? RHYTHM.bandIn : RHYTHM.bandRest;
       ctx.strokeStyle = RHYTHM.arcBand;
-      ctx.lineWidth = RHYTHM.bandWidth;
-      ctx.shadowColor = RHYTHM.arcBand;
-      ctx.shadowBlur = inside ? RHYTHM.glowInside : RHYTHM.glowOutside;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, R, a0, a1, ccw);
-      ctx.stroke();
+      ctx.lineWidth = w;
+      if (near){
+        ctx.shadowColor = RHYTHM.arcBand;
+        ctx.shadowBlur = inside ? RHYTHM.glowInside : RHYTHM.glowOutside;
+      } else ctx.shadowBlur = 0;
+      // W1-1: where a bank stretch meets a clean one of the same planet in this pass, the two strokes leave the
+      // boundary readable (see bankPieces and strokeClean).
+      const joinPrev = samePrev && rInClass(prev, near, lim), joinNext = sameNext && rInClass(next, near, lim);
+      if (bank){
+        strokeBank(p, R, Rg, dir, ccw, a0, a1, cut ? BANK_END.cut : joinPrev ? BANK_END.joined : BANK_END.free,
+          next < 0 ? BANK_END.cut : joinNext ? BANK_END.joined : BANK_END.free);
+      } else {
+        strokeClean(p, R, dir, ccw, a0, a1, !cut && joinPrev && bankOn && rBn[prev] > 0,
+          joinNext && bankOn && rBn[next] > 0, w);
+      }
       ctx.shadowBlur = 0;
-      // PERFECT core: where the catch depth is at or under the threshold (linear between samples).
+      if (!near){ s = e + 1; continue; }
+      // PERFECT core: where the catch depth is at or under the threshold (linear between samples). A same-planet
+      // sample just past either end of the span (a bank/clean split, or the near/far join) takes part, so the core
+      // ends where the depth crosses the threshold rather than snapping to the split.
+      const i0 = samePrev ? s - 1 : s, i1 = sameNext ? e + 1 : e;
       let c0 = NaN;
-      for (let i = s; i <= e; i++){
+      for (let i = i0; i <= i1; i++){
         const ki = rIdx(i), perfect = rDepth[ki] <= RHYTHM.perfect;
         if (perfect && c0 !== c0){
-          if (i > s){
+          if (i > i0){
             const kp = rIdx(i - 1), d0 = rDepth[kp], d1 = rDepth[ki];
             c0 = rA[kp] + (rA[ki] - rA[kp]) * (d0 > d1 ? (d0 - RHYTHM.perfect) / (d0 - d1) : 0);
-          } else c0 = a0;
+          } else c0 = i < s ? rA[ki] : a0;
         }
-        if (c0 === c0 && (!perfect || i === e)){
+        if (c0 === c0 && (!perfect || i === i1)){
           let c1;
           if (!perfect){
             const kp = rIdx(i - 1), d0 = rDepth[kp], d1 = rDepth[ki];
             c1 = rA[kp] + (rA[ki] - rA[kp]) * (d1 > d0 ? (RHYTHM.perfect - d0) / (d1 - d0) : 0);
-          } else c1 = a1;
-          if ((now - c0) * dir > 0) c0 = now;
+          } else c1 = i > e ? rA[ki] : a1;
+          if ((a0 - c0) * dir > 0) c0 = a0; // a0 is already past the used-up part
           if ((c1 - a1) * dir > 0) c1 = a1;
           if ((c1 - c0) * dir > 1e-4){
             ctx.globalAlpha = inside ? 1 : 0.85;
@@ -15283,6 +16138,15 @@ function drawRhythmSpans(near, lim){
           }
           c0 = NaN;
         }
+      }
+      // W1-1: the ↺ bead of a bank stretch still ahead of the comet: just outside the band, centred on the stretch's
+      // start. Its angle is the cached start, so it never moves along the orbit (it rides out with the band while the
+      // orbit snaps in); it hides once the comet reaches the stretch, and a stretch the comet is in (its start already
+      // dropped from the cache: s = 0) never gets one again.
+      if (bank && prev >= 0 && (start - now) * dir > 0){
+        const r = bankBadgeR();
+        queueBankBadge(p, R + RHYTHM.bandWidth / 2 + BANK_ARC.lift + r, start, r,
+          inside ? RHYTHM.bandIn : RHYTHM.bandRest, inside ? RHYTHM.glowInside : RHYTHM.glowOutside);
       }
     }
     s = e + 1;
@@ -15581,7 +16445,7 @@ function drawReleaseArrow(){
 }
 function drawReleaseCue(){
   partyAim.on = false; // B13: this frame's aim-guide box starts empty (the room's name tags keep clear of it)
-  arcCometInside = false; arcBandShown = false; arcLabelAnchor = null; arcLabelBox = null; // this frame's arc flags
+  arcCometInside = false; arcBandShown = false; arcLabelAnchor = null; arcLabelBox = null; arcBankShown = false; // this frame's arc flags
   if (state !== 'playing' || !player || player.mode !== 'orbit' || !player.planet) return;
   if (aimGuide !== 'off'){
     drawRhythmArc();
@@ -15644,7 +16508,10 @@ function revealWithoutResuming(){
   menuTrackSent = undefined; // G7: the shell may have stopped the loop while hidden, so say it again
   try { syncMenuMusic(); } catch (e) {}
   if (audioInterruptionEnded) recoverAudioQuietly();
+  try { partyRevealResume(); } catch (e) {} // W1-7: a room seat held while the page was away is taken back now
+  syncResultDaily(); // W1-4: a warm resume onto yesterday's card offers the new day's Daily
 }
+window.addEventListener('online', () => { try { partyRevealResume(); } catch (e) {} });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) holdRun();
   else revealWithoutResuming();
@@ -15726,20 +16593,36 @@ function partyEnsureClient(){
   partyClient = createPartyClient({
     url: ROOMS_URL, WebSocket: window.WebSocket, now: () => Date.now(),
     setTimeout: (f, ms) => window.setTimeout(f, ms), clearTimeout: id => window.clearTimeout(id),
-    setInterval: (f, ms) => window.setInterval(f, ms), clearInterval: id => window.clearInterval(id)
+    setInterval: (f, ms) => window.setInterval(f, ms), clearInterval: id => window.clearInterval(id),
+    online: () => !(typeof navigator !== 'undefined' && navigator.onLine === false),   // W1-7: "offline", not "full"
+    fetch: typeof window.fetch === 'function' ? (u, o) => window.fetch(u, o) : null    // W1-7: one GET /v1/status after a refused socket
   });
   partyClient.on(onPartyEvent);
   return partyClient;
 }
+// W1-7: back on the page (visible, pageshow, the native shell's reveal) or back online: a seat being taken back is tried at
+// once instead of after the backoff, and a socket that died while the page was hidden is noticed. Nothing for a player who
+// is not in a room.
+function partyRevealResume(){
+  if (ROOMS_ON && partyClient) partyClient.resumeNow();
+}
 function onPartyEvent(type, data){
   if (type === 'heat_start') partyOnHeatStart(data);
-  else if (type === 'closed' || type === 'fallback'){ clearTimeout(partyLaunchTimer); partyLaunchTimer = 0; }
+  else if (type === 'closed' || type === 'fallback'){ clearTimeout(partyLaunchTimer); partyLaunchTimer = 0; partyCountdownStop(); }
   else if (type === 'error' && data) { partyNote = data.message; partyNoteErr = true; }
   partyRender();
+  // W1-7: the fallback words are not in a live region, so say them; after a Try again that failed, focus them too, so a
+  // screen-reader user is not left on the heading that the retry moved focus to.
+  if (type === 'fallback' && data){
+    announce(tl(data.message));
+    if (partyRetried){ const f = partyEl('partyFallbackText'); if (f && !f.closest('[hidden]')) f.focus({ preventScroll: true }); }
+  }
+  if (type === 'fallback' || type === 'state' && partyClient && partyClient.state.status === 'in_room') partyRetried = false;
 }
 function partyOnHeatStart(hs){
   if (hs.rules !== GHOST_SIM_VERSION || hs.H !== DUEL_H){
     partyNote = 'This room runs a different version of the game. Reload the page to update, then join again.'; partyNoteErr = true;
+    partyCountdownStop();
     partyClient.leave();
     return;
   }
@@ -15747,19 +16630,146 @@ function partyOnHeatStart(hs){
   if (hs.submitted){ partyHeatNo = hs.heat; return; }
   clearTimeout(partyLaunchTimer);
   partyLaunchTimer = setTimeout(() => partyLaunch(hs), Math.max(0, hs.localStartAt - Date.now()));
+  partyCountdownStart(hs);                                       // W1-6: 3-2-1 ticks and GO, once per heat
   partyPanelOpen = true;                                         // the countdown shows over whatever screen was up
   if (state !== 'playing') syncScreens();
 }
 function partyBuildRivals(){
   partyRivals.length = 0;
+  partyPass.reset(); partyHeatT0 = Date.now();                   // W1-6: a fresh pass watch for each heat
   const room = partyClient && partyClient.state.room;
   if (!room) return;
-  let k = 0;
   for (const p of room.players){
     if (p.id === partyClient.state.you || p.left) continue;
-    partyRivals.push({ id: p.id, nick: p.nick, label: orbitNickLabel(p.nick), color: PARTY_COLORS[k++ % PARTY_COLORS.length], visible: false, w: 0,
+    // W1-6: the seat's colour, so every phone shows this rival in the same hue.
+    const hue = partySeatHue(room.players, p.id, PARTY_COLORS.length);
+    partyRivals.push({ id: p.id, nick: p.nick, label: orbitNickLabel(p.nick), color: PARTY_COLORS[hue], hue, visible: false, w: 0,
       gh: { out: new Float64Array(6), trail: new Float64Array(GHOST_TRAIL_CAP * 2), tn: 0, fadeAt: 0, dead: false, diverged: false, duel: false, rec: null } });
   }
+}
+// ---- W1-6 Party Feel Pack v2: seat colours, the leader's edge marker, honest pass pops and the countdown -------------
+// Presentation only: nothing here reads or writes the sim, the score, the world RNG or the run log, and no new message
+// goes to the room (colours come from the seat order every client already has). The words below are English with AI
+// draft translations, like the I18N table (they stay out of it: Orbit Party's other words are English-only for now).
+const PARTY_FEEL_TEXT = Object.freeze({
+  seenAs: Object.freeze({ en: 'Others see you as the {color} comet', es: 'Tu color para los demás: {color}', de: 'Deine Farbe für die anderen: {color}',
+    fr: 'Ta couleur pour les autres : {color}', ja: 'みんなから見たあなたの色：{color}', 'pt-BR': 'Sua cor para os outros: {color}' }),
+  passed: Object.freeze({ en: 'Passed {name}!', es: '¡Adelantaste a {name}!', de: '{name} überholt!', fr: 'Tu dépasses {name} !', ja: '{name}を抜いた！', 'pt-BR': 'Ultrapassou {name}!' }),
+  lead: Object.freeze({ en: 'You lead!', es: '¡Vas primero!', de: 'Du führst!', fr: 'Tu mènes !', ja: 'トップに立った！', 'pt-BR': 'Você lidera!' }),
+  heatStarting: Object.freeze({ en: 'Heat {n} starting', es: 'Empieza la manga {n}', de: 'Lauf {n} startet', fr: 'La manche {n} commence', ja: 'ヒート{n}開始', 'pt-BR': 'Começa a bateria {n}' })
+});
+const PARTY_COLOR_WORDS = Object.freeze({ en: PARTY_COLOR_NAMES,
+  es: Object.freeze(['aguamarina', 'coral', 'violeta', 'amarillo', 'menta', 'rosa', 'azul', 'lavanda']),
+  de: Object.freeze(['Aqua', 'Koralle', 'Violett', 'Gelb', 'Mint', 'Rosa', 'Blau', 'Lavendel']),
+  fr: Object.freeze(['turquoise', 'corail', 'violet', 'jaune', 'menthe', 'rose', 'bleu', 'lavande']),
+  ja: Object.freeze(['水色', 'コーラル', 'バイオレット', '黄色', 'ミント', 'ピンク', '青', 'ラベンダー']),
+  'pt-BR': Object.freeze(['água-marinha', 'coral', 'violeta', 'amarelo', 'menta', 'rosa', 'azul', 'lavanda']) });
+function partyFeelText(key, params){
+  const row = PARTY_FEEL_TEXT[key];
+  if (!row) return key;
+  const s = row[I18N_LANG] || row.en;
+  return params ? s.replace(/\{(\w+)\}/g, (m, k) => (Object.prototype.hasOwnProperty.call(params, k) ? String(params[k]) : m)) : s;
+}
+function partyColorWord(hue){ const words = PARTY_COLOR_WORDS[I18N_LANG] || PARTY_COLOR_NAMES; return words[hue] || PARTY_COLOR_NAMES[hue] || ''; }
+const partyPass = createPassWatch();
+let partyHeatT0 = 0;                                             // Date.now() when this heat's rivals were built
+const PARTY_LEAD_COLOR = '#FFD966';                              // "You lead!": the gold of the room's points
+// A track is live while its newest snapshot is under PARTY_TRACK.stale old (the same rule sample() draws by), and fresh
+// for a pass once it also has two snapshots (a track that just arrived never counts). A rival whose run has ended stops
+// relaying, so their track goes stale while their last score still stands: once the room marks their run submitted it
+// stays fresh, and climbing past a crashed leader is a pass. A rival who went quiet without submitting is not a target.
+function partyTrackLive(tr, now){ const n = tr ? tr.t.length : 0; return n > 0 && now - tr.t[n - 1] <= PARTY_TRACK.stale; }
+function partyRivalDone(room, id){
+  if (!room || !Array.isArray(room.players)) return false;
+  for (const p of room.players) if (p && p.id === id) return !!p.submitted;
+  return false;
+}
+// Your race against each rival, from the HUD tick: a pop (in the rival's colour), the gate haptic and a screen-reader
+// line when you pass someone; "You lead!" when the pass puts you first. Being passed back only changes the HUD's place line.
+function partyFeelTick(){
+  if (!partyRunning || !partyClient || state !== 'playing' || !player) return;
+  const now = Date.now(), mine = cleanScore(score), rows = [], room = partyClient.state.room;
+  for (const r of partyRivals){
+    const tr = partyClient.tracks.get(r.id);
+    if (tr && tr.t.length) rows.push({ id: r.id, score: tr.score(), fresh: tr.seen >= 2 && (partyTrackLive(tr, now) || partyRivalDone(room, r.id)) });
+  }
+  const pop = partyPass.step(now, now - partyHeatT0, mine, rows);
+  if (!pop) return;
+  const r = partyRivals.find(x => x.id === pop.passed[0]);
+  const text = pop.lead || !r ? partyFeelText('lead') : partyFeelText('passed', { name: orbitNickName(r.nick) });
+  partyPopup(text, pop.lead || !r ? PARTY_LEAD_COLOR : r.color);
+  Haptics.play('gate');
+  announce(text);
+  partyFeelStats.pops++;
+}
+const partyFeelStats = { pops: 0, beats: 0, go: 0, heatsCounted: 0 }; // tests and tuning only
+// A pass pop: the warp chip's dark backing under the text, drawn in screen space by drawPartyTags (not with the world's
+// popups: it holds still while you fly and keeps clear of your aim guide). It shows at full strength for `hold` s, then
+// fades out by `life` (a plain popup starts fading at once and is gone in 1.1 s, too short to read a name mid-release).
+// Motion on, it scales in quickly; Reduce Motion draws it still, with the opacity fade only. Never under 12 CSS px.
+const PARTY_POP = Object.freeze({ life: 1.8, hold: 0.6, px: 18, minCss: 12, pad: 8, h: 22 });
+function partyPopup(text, color){ popups.push({ x: 0, y: 0, text, color, t: 0, chip: true, pop: true, life: PARTY_POP.life }); }
+function partyPopAlpha(t){ return t >= PARTY_POP.life ? 0 : Math.min(1, 1 - Math.max(0, t - PARTY_POP.hold) / (PARTY_POP.life - PARTY_POP.hold)); }
+function partyPopScale(t){
+  const inS = 0.22, from = 0.5, c1 = 2;                          // an ease-out-back: 0.5 to a 1.07 peak, settling at 1
+  if (!(t >= 0) || t >= inS) return 1;
+  const u = t / inS - 1;
+  return from + (1 - from) * (1 + (c1 + 1) * u * u * u + c1 * u * u);
+}
+// The single rival who leads the race by relayed score, or null: strictly ahead of you (never you) and of every other
+// live rival; a tie at the top goes to the earlier seat. No allocation (called every frame).
+function partyLeaderRival(){
+  if (!partyClient) return null;
+  const now = Date.now();
+  let best = null, top = cleanScore(score);
+  for (let i = 0; i < partyRivals.length; i++){
+    const r = partyRivals[i], tr = partyClient.tracks.get(r.id);
+    if (!partyTrackLive(tr, now)) continue;
+    const sc = tr.score();
+    if (sc > top){ best = r; top = sc; }
+  }
+  return best;
+}
+// The countdown: a soft tick 3, 2 and 1 s before the heat starts and GO an octave up at the start, in the music's key
+// (the duel's final-seconds tick). Each beat is armed by a timer just before it and placed exactly by soundTone's delay
+// on the audio clock, so leaving the room, Sound off or a suspended context in the meantime silences what is left.
+// A beat already past is skipped. One countdown per heat: a resume that repeats heat_start does not start another.
+// Every beat belongs to its room and heat: leaving (or a closed room) stops them, and a beat plays only while the room
+// is still counting down that same heat, so an old countdown never sounds in a new lobby. While you are still flying
+// another run (a solo run, or the last heat's after a long pause) the beats stay silent, and "Heat N starting" waits for
+// that run to end. The room screen's big digit is redrawn on each beat too, so it changes with the tick.
+let partyCountKey = '', partyCountSay = '';
+const partyBeatTimers = [];
+function partyCountdownStop(){
+  for (const id of partyBeatTimers) clearTimeout(id);
+  partyBeatTimers.length = 0;
+  partyCountKey = ''; partyCountSay = '';
+}
+function partyCountdownStart(hs){
+  const key = hs.heat + '/' + hs.startAt + '/' + hs.seed;
+  if (key === partyCountKey) return;
+  partyCountdownStop();
+  partyCountKey = key;
+  partyFeelStats.heatsCounted++;
+  const say = partyFeelText('heatStarting', { n: partyInt(hs.heat) }), heat = hs.heat, startAt = hs.startAt;
+  if (state === 'playing') partyCountSay = say; else announce(say);
+  for (const b of partyCountdownBeats(hs.localStartAt, Date.now())){
+    partyBeatTimers.push(setTimeout(() => partyBeat(b, heat, startAt), Math.max(0, b.at - Date.now() - PARTY_COUNT.leadMs)));
+    partyBeatTimers.push(setTimeout(() => { if (partyPanelOpen && partyCountingDown(heat, startAt)) partyRender(); }, Math.max(0, b.at - Date.now())));
+  }
+}
+function partyCountingDown(heat, startAt){
+  const hs = partyInRoom() && partyClient.state.heat;
+  return !!hs && hs.heat === heat && hs.startAt === startAt;
+}
+function partyBeat(b, heat, startAt){
+  if (!partyCountingDown(heat, startAt) || (state === 'playing' && partyHeatNo !== heat)) return;
+  if (partyCountSay){ announce(partyCountSay); partyCountSay = ''; }
+  if (muted) return;
+  const hz = duelFinalTickHz() * (b.go ? 2 : 1);
+  if (b.go) partyFeelStats.go++; else partyFeelStats.beats++;
+  // `scheduled`: the beat may use the slot above the ordinary four, so GO is not lost under the run's first sounds.
+  soundTone(DUEL_FINAL.wave, hz, hz, DUEL_FINAL.dur * (b.go ? 2 : 1), DUEL_FINAL.peak, Math.max(0, (b.at - Date.now()) / 1000), false, true);
 }
 // Starts the heat on the room's seed: the same path as a Duel Sprint (an armed duel on DUEL_H).
 function partyLaunch(hs){
@@ -15795,8 +16805,10 @@ function partyRunEnded(){
   partyRunning = false;
   const log = dailyRunLog;
   partyOwnScore = cleanScore(death ? death.score : score);
-  if (partyInRoom() && log && !log.bad && Array.isArray(log.ev)) partyClient.submitRun(partyHeatNo, partyOwnScore, log.ev.slice());
+  const sent = !!(partyInRoom() && log && !log.bad && Array.isArray(log.ev));
+  if (sent) partyClient.submitRun(partyHeatNo, partyOwnScore, log.ev.slice());
   else { partyNote = 'Your run could not be counted this heat.'; partyNoteErr = true; }
+  partyWatchBegin(partyOwnScore, death && death.reason, sent); // W1-7: the heat screen becomes a live race board
   clearTimeout(partyShowTimer);
   partyShowTimer = setTimeout(() => {
     partyShowTimer = 0;
@@ -15813,6 +16825,138 @@ function partyAfterEndRun(){
   partyNote = 'You left this heat. It counts as unfinished.'; partyNoteErr = false;
   if (partyInRoom()){ partyPanelOpen = true; syncScreens(); partyRender(); }
   partyHudTick();
+}
+// ---- Heat Watch (W1-7) ----------------------------------------------------------------------------------------------
+// Crash early in a heat and the heat screen is a live race board instead of a static list: a headline with your score and
+// the time left in the sprint, everyone still seated sorted by live score in their colour, "done ~2,310" for a rival who
+// has finished until heat_result gives the official number, and a single pulse plus a spoken "Swift Comet passed you" (at
+// most one every 3 s) when a rival passes your score. Refreshed at 4 Hz. Without rival tracks (a heat with no positions)
+// the plain list shows under the headline. Under Reduce Motion there is no pulse. Presentation only.
+// A pass seen before the board is on screen (the death moment, while the results card speaks its own line) is held, and
+// only the latest one still standing is spoken when the board opens. A run that will not count (not sent, or refused)
+// ranks nobody: your row says "not counted" and nothing is announced against it.
+const PARTY_WATCH = Object.freeze({ tickMs: 250, announceGapMs: 3000 });
+let partyWatch = null;        // { heat, score, horn, counted, ahead, lastAnnounceAt, pending, pulses: Set of ids waiting to pulse }
+let partyWatchTimer = 0;
+function partyWatchBegin(ownScore, reason, counted){
+  partyWatch = { heat: partyHeatNo, score: ownScore, horn: reason === 'duel' || reason === 'daily', counted: counted !== false,
+    ahead: null, lastAnnounceAt: -Infinity, pending: 0, pulses: new Set() };
+  if (!partyWatchTimer) partyWatchTimer = setInterval(partyWatchTick, PARTY_WATCH.tickMs);
+  partyWatchTick();
+}
+function partyWatchEnd(){
+  partyWatch = null;
+  if (partyWatchTimer){ clearInterval(partyWatchTimer); partyWatchTimer = 0; }
+}
+// Your watch applies while the room is still racing the heat you finished and you are not flying.
+function partyWatchLive(){
+  const st = partyClient && partyClient.state, room = st && st.room;
+  return !!(partyWatch && !partyRunning && partyInRoom() && room && room.phase === 'heat' && partyInt(room.heat) === partyWatch.heat);
+}
+// False once your run is known not to count: the page did not send it, or the server refused it unrecorded (rate limit or
+// busy: the client's local 'dnf' ack). Latched, so a resume (which clears the ack) does not make it count again. A run the
+// replay flags shows as such when heat_result comes.
+function partyWatchCounted(){
+  const w = partyWatch, ack = partyClient && partyClient.state.ack;
+  if (w && ack && ack.local && partyInt(ack.heat) === w.heat) w.counted = false;
+  return !!(w && w.counted);
+}
+function partyWatchRows(){
+  const st = partyClient.state;
+  return partyHeatWatchRows(st.room, st.you, partyWatch.score, partyClient.tracks, st.result, partyWatch.heat, partyWatchCounted());
+}
+function partyWatchTick(){
+  if (!partyWatchLive()){ partyWatchEnd(); return; }
+  const w = partyWatch, rows = partyWatchRows(), counted = partyWatchCounted();
+  if (rows && counted){
+    const step = partyWatchPasses(rows, w.score, w.ahead);
+    w.ahead = step.ahead;
+    if (step.passed.length) w.pending = step.passed[step.passed.length - 1];
+  } else if (!counted){ w.pending = 0; w.ahead = null; }
+  // Spoken and pulsed only with the board on screen: the latest pass still standing, spoken at most once every 3 s.
+  if (w.pending && !(w.ahead && w.ahead.get(w.pending) === true)) w.pending = 0;     // fell back behind: nothing to say
+  if (partyPanelOpen && w.pending && rows){
+    const now = Date.now(), r = rows.find(x => x.id === w.pending);
+    if (r && now - w.lastAnnounceAt >= PARTY_WATCH.announceGapMs){
+      w.lastAnnounceAt = now;
+      announce(t('party.passedYou', { name: orbitNickName(r.nick) }));
+    }
+    w.pulses.add(w.pending);                                                // partyWatchPulse skips it under Reduce Motion
+    w.pending = 0;
+  }
+  if (partyPanelOpen) partyRender();                                       // the board opens with its own render
+}
+// The headline: "Your run: 2,140 · 0:23 left", then "Your run: 2,140 · waiting for the last scores" once the sprint is
+// over (or when the sprint's own end finished your run). The clock is the heat's sprint (the same 45 s every player flies)
+// from the room's aligned start.
+function partyWatchHeadline(){
+  const hs = partyClient.state.heat, w = partyWatch, score = partyNum(w.score);
+  const clock = !w.horn && hs ? partyHornClock(hs.localStartAt, Date.now(), DUEL_SPRINT_SECONDS) : '0:00';
+  return clock === '0:00' ? t('party.watchRunWaiting', { score }) : t('party.watchRun', { score, clock });
+}
+function partyNum(n){ return partyInt(n).toLocaleString(I18N_LANG === 'en' ? 'en-US' : I18N_LANG); }
+function partyWatchColor(id){
+  for (const r of partyRivals) if (r.id === id && r.color) return r.color;        // whatever colour the rival is drawn in
+  // Your own row (or a rival not drawn this heat) takes its W1-6 seat colour, the one the others see it in. Never the
+  // duel rival's lime: that hue is kept for the duel ghost alone (tests/rival-ghost-f1.test.cjs).
+  const room = partyClient && partyClient.state.room, hue = partySeatHue(room && room.players, id, PARTY_COLORS.length);
+  return PARTY_COLORS[hue >= 0 ? hue : Math.abs(partyInt(id)) % PARTY_COLORS.length];
+}
+// Keyed rows: a row keeps its element across the 4 Hz refresh, so a pulse is not restarted and the order changes only
+// when a place does. The number column stays short (the state is in the tag), so a narrow card wraps a row instead of
+// squeezing the name; an approximate number reads "about 2,310" to a screen reader, not "tilde".
+function partyRenderWatch(list, rows){
+  const w = partyWatch, byId = new Map();
+  for (const li of Array.from(list.children)) byId.set(li.dataset.id, li);
+  const keep = new Set();
+  rows.forEach((r, i) => {
+    const key = String(r.id);
+    keep.add(key);
+    let li = byId.get(key);
+    if (!li){
+      li = document.createElement('li');
+      li.dataset.id = key;
+      for (const c of ['rk', 'em', 'nm', 'tag dim', 'pt']){ const s = document.createElement('span'); s.className = c; li.appendChild(s); }
+      li.children[1].setAttribute('aria-hidden', 'true');
+    }
+    const [rk, em, nm, tag, pt] = li.children;
+    const set = (el, text) => { if (el.textContent !== text) el.textContent = text; };
+    set(rk, (i + 1) + '.');
+    set(em, orbitNickEmoji(r.nick));
+    set(nm, orbitNickName(r.nick) + (r.me ? ' (you)' : ''));
+    const tagText = !r.connected ? 'away' : r.state === 'flying' || r.state === 'waiting' ? 'flying' : r.state === 'landed' || r.state === 'done' ? 'done'
+      : r.state === 'flagged' ? 'not counted' : r.state === 'dnf' ? 'unfinished' : '';
+    set(tag, tagText); tag.hidden = !tagText;
+    const num = r.score == null ? '' : partyNum(r.score), approx = r.state === 'landed' && num !== '';
+    const said = approx ? t('party.aboutScore', { score: num }) : '';
+    if (pt.dataset.v !== num + '|' + said){
+      pt.dataset.v = num + '|' + said;
+      pt.textContent = '';
+      if (approx){
+        const v = document.createElement('span'); v.setAttribute('aria-hidden', 'true'); v.textContent = '~' + num;
+        const sr = document.createElement('span'); sr.className = 'sr-only'; sr.textContent = said;
+        pt.appendChild(v); pt.appendChild(sr);
+      } else pt.textContent = num;
+    }
+    pt.hidden = num === '';
+    li.className = (r.me ? 'me ' : '') + (r.state === 'landed' ? 'landed' : r.state === 'flying' || r.state === 'waiting' ? 'flying' : 'done') + (li.classList.contains('pass') ? ' pass' : '');
+    li.style.setProperty('--rc', partyWatchColor(r.id));
+    if (list.children[i] !== li) list.insertBefore(li, list.children[i] || null);
+    if (w && w.pulses.has(r.id)){ w.pulses.delete(r.id); partyWatchPulse(li); }
+  });
+  for (const [key, li] of byId) if (!keep.has(key)) li.remove();
+}
+// One pulse in the rival's colour (a scripted animation, so no stylesheet keyframes); none under Reduce Motion, where the
+// new order and the spoken line carry it. A glow only: a scale would push the row past a narrow card's edge.
+function partyWatchPulse(li){
+  if (reducedMotion || typeof li.animate !== 'function') return;
+  const c = li.style.getPropertyValue('--rc') || '#8FA0FF';
+  li.classList.add('pass');
+  try {
+    const a = li.animate([{ boxShadow: '0 0 0 0 ' + c }, { boxShadow: '0 0 0 3px ' + c, offset: 0.3 }, { boxShadow: '0 0 0 0 transparent' }],
+      { duration: 900, easing: 'ease-out' });
+    a.onfinish = a.oncancel = () => li.classList.remove('pass');
+  } catch (_) { li.classList.remove('pass'); }
 }
 function partyToTitle(){
   if (state === 'playing') return;
@@ -15838,9 +16982,12 @@ function openParty(code){
 }
 function closeParty(){
   if (partyClient) partyClient.leave();
+  partyCountdownStop();                                          // W1-6: the countdown belongs to the room left
   clearTimeout(partyLaunchTimer); partyLaunchTimer = 0;
   clearTimeout(partyShowTimer); partyShowTimer = 0;
   partyRunning = false; partyHeatNo = 0; partyRivals.length = 0;
+  partyWatchEnd();
+  partyRetried = false;
   partyPanelOpen = false;
   partyNote = ''; partyNoteErr = false;
   if (state !== 'title' && state !== 'playing') partyToTitle();
@@ -15874,6 +17021,15 @@ function partyShare(){
     navigator.share({ title: 'Zipwaltz Orbit Party', text: 'Race me in Zipwaltz. Room ' + code, url }).then(() => done('Invite sent.'), copy);
   } else copy();
 }
+// W1-7: "Try again" on the offline / unreachable fallback repeats the last Create or Join once.
+let partyRetried = false;     // a Try again is under way (a fallback that follows it takes the focus)
+function partyRetryNow(){
+  if (!partyClient || !partyClient.retry()) return;
+  partyRetried = true;
+  partyNote = ''; partyNoteErr = false;
+  partyRender();
+  const h = partyEl('partyHeading'); if (h) h.focus({ preventScroll: true });
+}
 function partyDuelInstead(){
   partyFromMore = false; // the duel starts from the bare title
   closeParty();
@@ -15903,6 +17059,7 @@ function partyHudTick(){
   }
   if (el.textContent !== text) el.textContent = text;
   el.hidden = false;
+  partyFeelTick();                                               // W1-6: a pop when you pass someone
 }
 // Per-step from the loop: send this player's position snapshot to the room's relay (a no-op unless this heat's start advertised it).
 function partyStepTick(){
@@ -15938,21 +17095,32 @@ function partyAimAdd(x0, y0, x1, y1){
 // Name tags in screen space after the camera (like the duel rival's tag): placed by partyPlaceTags so a tag never
 // covers your aim guide (the flight preview, the catch ring, your comet and its orbit) and fades when tags crowd.
 function drawPartyTags(view, displayY){
-  if (!partyRunning || !partyRivals.length) { if (partyTagDebug.tags.length) partyTagDebug.tags = PARTY_NO_TAGS; return; }
+  if (!partyRunning || !partyRivals.length) {
+    if (partyTagDebug.tags.length) partyTagDebug.tags = PARTY_NO_TAGS;
+    partyTagDebug.edge = null; partyTagDebug.edgeBox = null; partyTagDebug.pop = null;
+    return;
+  }
   const vs = viewScale > 0 ? viewScale : 1, scale = view ? view.scale : 1, now = performance.now();
   const leanO = nextLeanOffset(now);
   const toX = x => (view ? view.tx + scale * x : x) - scale * leanO.x;
   const toY = y => (view ? view.ty + scale * y : y - displayY) - scale * leanO.y;
   const T = PARTY_TAG, px = Math.round(Math.max(T.px, T.px / vs)), pad = T.pad / vs, gap = T.gap / vs, th = px + 8 / vs;
   const bounds = { l: T.sideCss / vs, t: T.topCss / vs, r: W - T.sideCss / vs, b: H - T.bottomCss / vs };
+  const tagFont = '700 ' + px + 'px "Space Grotesk", ui-sans-serif, system-ui, sans-serif';
   ctx.save();
-  ctx.font = '700 ' + px + 'px "Space Grotesk", ui-sans-serif, system-ui, sans-serif';
+  ctx.font = tagFont;
   const items = [];
+  // W1-6: the race leader off the playfield gets the duel's edge marker in their colour (one marker, no text).
+  const leader = partyLeaderRival();
+  let edgeR = null, edgeX = 0, edgeAbove = false;
   for (let i = 0; i < partyRivals.length; i++){
     const r = partyRivals[i];
     if (!r.visible) continue;
     const hx = toX(r.gh.out[0]), hy = toY(r.gh.out[1]);
-    if (hy < 0 || hy > H || hx < -20 || hx > W + 20) continue;
+    if (hy < 0 || hy > H || hx < -20 || hx > W + 20){
+      if (r === leader && (hy < 0 || hy > H)){ edgeR = r; edgeX = hx; edgeAbove = hy < 0; }
+      continue;
+    }
     if (r.wFont !== ctx.font){ r.wFont = ctx.font; r.w = ctx.measureText(r.label).width; }
     items.push({ id: r.id, x: hx, y: hy, w: r.w + 2 * pad, h: th, r, d: player ? Math.hypot(r.gh.out[0] - player.x, r.gh.out[1] - player.y) : 0 });
   }
@@ -15961,6 +17129,7 @@ function drawPartyTags(view, displayY){
   const keeps = [];
   const kp = T.keepPad / vs;
   if (partyAim.on) keeps.push({ l: toX(partyAim.x0) - kp, t: toY(partyAim.y0) - kp, r: toX(partyAim.x1) + kp, b: toY(partyAim.y1) + kp });
+  partyTagDebug.aim = partyAim.on ? keeps[0] : null;
   if (player && state === 'playing'){
     const hk = T.headKeep / vs * scale;
     keeps.push({ l: toX(player.x) - hk, t: toY(player.y) - hk, r: toX(player.x) + hk, b: toY(player.y) + hk });
@@ -15970,8 +17139,29 @@ function drawPartyTags(view, displayY){
     }
   }
   if (arcLabelBox) keeps.push({ l: arcLabelBox.x - kp, t: arcLabelBox.y - kp, r: arcLabelBox.x + arcLabelBox.w + kp, b: arcLabelBox.y + arcLabelBox.h + kp });
+  // W1-6: the leader's edge marker is worked out first (where drawRivalEdge will put it), so no tag covers it. Above, it
+  // drops under the HUD's measured bottom where a line of HUD text is in its way, with no floor of its own (the duel's
+  // 132 CSS px tag floor put it mid-playfield on a landscape phone). The duel's own marker is unchanged.
+  const R = RIVAL_GHOST, edgeBottom = H - T.bottomCss / vs;
+  let hudTop = 0, edgeBox = null;
+  if (edgeR){
+    hudTop = R.edgeTopCss / vs;
+    if (edgeAbove){
+      const hud = document.getElementById('hud');
+      const rect = hud && !hud.hidden ? hud.getBoundingClientRect() : null;
+      if (rect && Number.isFinite(rect.bottom) && rect.bottom > viewY) hudTop = Math.max(hudTop, (rect.bottom - viewY) / vs + R.tagGap / vs);
+    }
+    edgeBox = partyEdgeBox(edgeX, edgeAbove, R.edgeTopCss / vs, hudTop, edgeBottom, px, vs, now, kp);
+    keeps.push(edgeBox);
+  }
+  partyTagDebug.edgeBox = edgeBox;
+  // W1-6: the pass pop, placed next (clear of the aim guide, your comet and the marker); no tag covers it either.
+  const pop = partyPopPlace(keeps, bounds, vs, now, edgeBox);
+  if (pop) keeps.push({ l: pop.l - kp, t: pop.t - kp, r: pop.r + kp, b: pop.b + kp });
+  partyTagDebug.pop = pop;
   const placed = partyPlaceTags(items, keeps, bounds, gap);
   partyTagDebug.tags = placed; partyTagDebug.keeps = keeps; partyTagDebug.bounds = bounds; partyTagDebug.vs = vs;
+  ctx.font = tagFont;
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   for (let i = 0; i < placed.length; i++){
     const p = placed[i], it = items[i];
@@ -15988,6 +17178,92 @@ function drawPartyTags(view, displayY){
     ctx.fillStyle = '#F3EFFF';
     ctx.fillText(it.r.label, p.l + p.w / 2, p.t + p.h / 2);
   }
+  if (pop) drawPartyPop(pop);
+  partyTagDebug.edge = edgeR ? { id: edgeR.id, above: edgeAbove, color: edgeR.color } : null;
+  if (edgeR){
+    // As the duel's marker: on the playfield's top edge, or under the HUD's bottom where a line of HUD text is in its way.
+    ctx.save();
+    drawRivalEdge(edgeX, edgeAbove, R.edgeTopCss / vs, hudTop, edgeBottom, px, ghostFadeLeft(edgeR.gh), vs, now, edgeR.color);
+    ctx.restore();
+  }
+  ctx.restore();
+}
+// W1-6: the box drawRivalEdge's marker covers in screen px (its glow cap and chevron, by the same geometry), padded by
+// `pad`: the same x clamp and the same choice of edge (the top edge, under the HUD where HUD text is in the way, or the
+// bottom edge).
+function partyEdgeBox(hx, above, topEdge, hudTop, bottom, px, vs, now, pad){
+  const side = RIVAL_GHOST.sideCss / vs, ch = px * 0.5, gr = px * 0.8 * 2.2;
+  const cx = Math.max(side + gr, Math.min(W - side - gr, hx));
+  let ey = bottom;
+  if (above){
+    ey = topEdge;
+    for (const b of rivalEdgeHudBoxes(now, vs)) if (b.r > cx - gr && b.l < cx + gr && b.b > ey && b.t < ey + gr){ ey = hudTop; break; }
+  }
+  const inward = Math.max(gr * 0.55, 3.5 / vs + ch), outward = gr * 1.45; // the cap reaches 0.55 gr in; the chevron 2/vs + ch + half its stroke
+  return above ? { l: cx - gr - pad, t: ey - outward - pad, r: cx + gr + pad, b: ey + inward + pad }
+    : { l: cx - gr - pad, t: ey - inward - pad, r: cx + gr + pad, b: ey + outward + pad };
+}
+// W1-6: where this frame's pass pop goes (screen px), or null when none shows. Two slots, both centred: just above the
+// bottom controls (the Menu button and the room's place line, which carries the same news) or, when your aim guide, your
+// comet, its orbit or the leader's marker is in the way there, just under the HUD (and under the leader's marker when it
+// has dropped there). A pop keeps its slot while that slot stays clear. The words never drop under PARTY_POP.minCss CSS px, and shrink to fit the playfield's width if a long name
+// in a long language needs it.
+let partyPopFloorAt = -Infinity, partyPopFloorY = Infinity;
+function partyPopFloor(now, vs){                                 // the bottom controls' top in canvas px, re-measured every 250 ms
+  if (now - partyPopFloorAt < RIVAL_EDGE_HUD_MS && now >= partyPopFloorAt) return partyPopFloorY;
+  partyPopFloorAt = now; partyPopFloorY = Infinity;
+  for (const id of ['pause', 'partyHud']){
+    const el = document.getElementById(id);
+    const b = el && !el.hidden ? el.getBoundingClientRect() : null;
+    if (b && b.bottom > b.top && b.right > b.left) partyPopFloorY = Math.min(partyPopFloorY, (b.top - viewY) / vs);
+  }
+  return partyPopFloorY;
+}
+function partyPopPlace(keeps, bounds, vs, now, edge){
+  let q = null;
+  for (let i = 0; i < popups.length; i++) if (popups[i].pop && (!q || popups[i].t < q.t)) q = popups[i];   // the newest
+  if (!q) return null;
+  const P = PARTY_POP, maxW = bounds.r - bounds.l;
+  const fontOf = n => '700 ' + n + 'px "Space Grotesk", ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+  let fpx = Math.round(Math.max(P.px, P.minCss / vs));
+  ctx.font = fontOf(fpx);
+  let tw = ctx.measureText(q.text).width;
+  if (tw + 2 * P.pad * fpx / P.px > maxW){                       // a long name and language: shrink the words to fit
+    const n = Math.max(1, Math.floor(fpx * maxW / (tw + 2 * P.pad * fpx / P.px)));
+    tw = tw * n / fpx; fpx = n;                                  // text width scales with the font size
+    ctx.font = fontOf(fpx);
+  }
+  const k = fpx / P.px, w = tw + 2 * P.pad * k, h = P.h * k, g = PARTY_TAG.gap / vs;
+  const l = Math.max(bounds.l, Math.min(bounds.r - w, W / 2 - w / 2));
+  const lowB = Math.min(bounds.b, partyPopFloor(now, vs) - g);
+  let hudB = -Infinity;
+  for (const b of rivalEdgeHudBoxes(now, vs)) if (b.b > hudB) hudB = b.b;
+  let highT = Number.isFinite(hudB) ? hudB + g : bounds.t;
+  if (edge && edge.l < l + w && edge.r > l && edge.t < highT + h && edge.b > highT) highT = edge.b + g;   // under the leader's marker too
+  const low = { l, t: lowB - h, r: l + w, b: lowB }, high = { l, t: highT, r: l + w, b: highT + h };
+  const hit = b => { for (let i = 0; i < keeps.length; i++){ const c = keeps[i]; if (b.l < c.r && b.r > c.l && b.t < c.b && b.b > c.t) return true; } return false; };
+  let slot = q.slot;
+  if (slot !== 0 && slot !== 1) slot = hit(low) && !hit(high) ? 1 : 0;
+  else if (hit(slot ? high : low) && !hit(slot ? low : high)) slot = 1 - slot;
+  q.slot = slot;
+  const box = slot ? high : low;
+  return { l: box.l, t: box.t, r: box.r, b: box.b, w, h, px: fpx, font: ctx.font, text: q.text, color: q.color, slot,
+    alpha: partyPopAlpha(q.t), k: reducedMotion ? 1 : partyPopScale(q.t) };
+}
+// The pop itself: the warp chip's dark backing and the words in the passed rival's colour (gold for "You lead!"; every
+// seat hue is 7:1 or better on it), scaled about the chip's centre while it pops in (motion on only).
+function drawPartyPop(p){
+  if (!(p.alpha > 0)) return;
+  const cx = (p.l + p.r) / 2, cy = (p.t + p.b) / 2;
+  ctx.save();
+  if (p.k !== 1){ ctx.translate(cx, cy); ctx.scale(p.k, p.k); ctx.translate(-cx, -cy); }
+  ctx.globalAlpha = p.alpha * 0.94;
+  ctx.fillStyle = '#100C28';
+  ctx.fillRect(p.l, p.t, p.w, p.h);
+  ctx.globalAlpha = p.alpha;
+  ctx.font = p.font; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = p.color;
+  ctx.fillText(p.text, cx, cy);
   ctx.restore();
 }
 
@@ -15996,8 +17272,21 @@ function partyRow(parent, nick, opts){
   const li = document.createElement('li');
   if (opts.me) li.className = 'me';
   if (opts.rank){ const rk = document.createElement('span'); rk.className = 'rk'; rk.textContent = opts.rank + '.'; li.appendChild(rk); }
+  // W1-6: opts.hue (a seat's colour slot) adds a 10 px swatch; with opts.seen (the lobby) your own row also says the
+  // colour the others see you in. The results boards show the swatches only.
+  const hue = Number.isInteger(opts.hue) && opts.hue >= 0 && opts.hue < PARTY_COLORS.length ? opts.hue : -1;
+  if (hue >= 0){ const sw = document.createElement('span'); sw.className = 'sw'; sw.setAttribute('aria-hidden', 'true'); sw.style.background = PARTY_COLORS[hue]; li.appendChild(sw); }
   const em = document.createElement('span'); em.className = 'em'; em.setAttribute('aria-hidden', 'true'); em.textContent = orbitNickEmoji(nick);
   const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = orbitNickName(nick) + (opts.me ? ' (you)' : '');
+  if (hue >= 0 && opts.me && opts.seen){
+    // "Others see you as the violet comet", with the colour's word in its colour (every hue is at least 7:1 on the row).
+    const seen = document.createElement('span'); seen.className = 'seen';
+    const parts = partyFeelText('seenAs').split('{color}'), bit = (tag, text) => { const e = document.createElement(tag); e.textContent = text; seen.appendChild(e); return e; };
+    bit('span', parts[0]);
+    bit('b', partyColorWord(hue)).style.color = PARTY_COLORS[hue];
+    bit('span', parts.slice(1).join(''));
+    nm.appendChild(seen);
+  }
   li.appendChild(em); li.appendChild(nm);
   for (const tag of opts.tags || []){
     const s = document.createElement('span'); s.className = 'tag' + (tag.dim ? ' dim' : ''); s.textContent = tag.text; li.appendChild(s);
@@ -16054,7 +17343,13 @@ function partyRender(){
   partyEl('partyCreate').disabled = busy; partyEl('partyJoin').disabled = busy;
   partyEl('partyBack').textContent = inRoom ? 'Leave room' : 'Back';
   partyEl('partyBack').hidden = partyRunning;
-  if (fallback){ partyEl('partyFallbackText').textContent = st.fallback.message; }
+  if (fallback){
+    partyEl('partyFallbackText').textContent = tl(st.fallback.message);
+    // W1-7: offline or unreachable can be tried again by hand (never in a loop); a server that said full cannot.
+    show('partyRetry', st.fallback.reason === 'offline' || st.fallback.reason === 'connect_failed');
+    const again = t('party.tryAgain'), retry = partyEl('partyRetry');
+    if (retry && retry.textContent !== again) retry.textContent = again;
+  }
   if (inRoom && room){
     const me = st.you, host = room.host === me;
     if (phase === 'lobby'){
@@ -16064,22 +17359,36 @@ function partyRender(){
         const tags = [];
         if (p.host) tags.push({ text: 'Host' });
         if (!p.connected) tags.push({ text: 'away', dim: true });
-        partyRow(list, p.nick, { me: p.id === me, tags });
+        partyRow(list, p.nick, { me: p.id === me, tags, hue: partySeatHue(room.players, p.id, PARTY_COLORS.length), seen: true });
       }
       const n = room.players.length, canStart = host && n >= 2;
+      const away = room.players.filter(p => !p.connected).length;          // W1-7: a seat held for someone who is away
       const start = partyEl('partyStart');
       start.hidden = !host; start.disabled = !canStart;
-      start.textContent = n >= 2 ? 'Start heat 1 of ' + partyInt(room.heats) + ' (' + n + ' players)' : 'Waiting for friends';
+      start.textContent = n >= 2 ? 'Start heat 1 of ' + partyInt(room.heats) + ' (' + n + ' players' + (away ? ', ' + away + ' away' : '') + ')' : 'Waiting for friends';
       partyEl('partyLobbyHint').textContent = host ? (n >= 2 ? 'Start when everyone is here.' : 'Share the code or the invite link. You need 2 to 8 players.') : 'Waiting for the host to start the race.';
     } else if (phase === 'heat'){
       const total = partyInt(room.heats);
       partyEl('partyHeatLine').textContent = 'Heat ' + partyInt(room.heat) + ' of ' + total;
       const hs = st.heat, before = hs && hs.localStartAt > Date.now();
-      partyEl('partyCountdown').textContent = before ? partyCountdownText() : (st.submitted ? '✓' : '');
-      const list = partyEl('partyDone'); list.textContent = '';
-      for (const p of room.players){
-        if (p.left) continue;
-        partyRow(list, p.nick, { me: p.id === me, tags: [p.submitted ? { text: 'done' } : { text: before ? 'ready' : 'flying', dim: true }].concat(p.connected ? [] : [{ text: 'away', dim: true }]) });
+      // W1-7 Heat Watch: after your run, a headline and (with rival tracks) the live board in place of the plain list.
+      const watching = !before && partyWatchLive(), rows = watching ? partyWatchRows() : null;
+      const head = partyEl('partyWatchHead'), board = partyEl('partyWatchList'), list = partyEl('partyDone');
+      head.hidden = !watching;
+      const liveLabel = t('party.watchLabel');
+      if (board.getAttribute('aria-label') !== liveLabel) board.setAttribute('aria-label', liveLabel);
+      if (watching){ const line = partyWatchHeadline(); if (head.textContent !== line) head.textContent = line; }
+      partyEl('partyCountdown').textContent = before ? partyCountdownText() : (st.submitted && !watching ? '✓' : '');
+      partyEl('partyCountdown').hidden = watching;
+      board.hidden = !rows; list.hidden = !!rows;
+      if (rows) partyRenderWatch(board, rows);
+      else {
+        if (board.firstChild) board.textContent = '';
+        list.textContent = '';
+        for (const p of room.players){
+          if (p.left) continue;
+          partyRow(list, p.nick, { me: p.id === me, tags: [p.submitted ? { text: 'done' } : { text: before ? 'ready' : 'flying', dim: true }].concat(p.connected ? [] : [{ text: 'away', dim: true }]) });
+        }
       }
       if (before && !partyCountTimer){ partyCountTimer = setInterval(() => { if (partyPanelOpen) partyRender(); }, 200); }
     } else {
@@ -16096,13 +17405,14 @@ function invitedHint(){
 function partyRenderBoard(room, st, host, phase){
   const final = phase === 'final';
   const names = new Map(room.players.map(p => [p.id, p]));
+  const hueOf = id => partySeatHue(room.players, id, PARTY_COLORS.length); // W1-6: each row's seat colour, as on the comets
   const list = partyEl('partyStandings'); list.textContent = '';
   let title = '';
   if (final && st.final){
     const win = st.final.winners || [];
     title = win.length > 1 ? 'A tie at the top' : win.length === 1 && names.get(win[0]) ? orbitNickName(names.get(win[0]).nick) + ' wins' : 'Final standings';
     for (const s of st.final.standings){
-      partyRow(list, s.nick, { me: s.id === st.you, rank: partyInt(s.rank), tags: (win.indexOf(s.id) >= 0 ? [{ text: 'winner' }] : []).concat(s.left ? [{ text: 'left', dim: true }] : []), pts: partyInt(s.total) + ' pts' });
+      partyRow(list, s.nick, { me: s.id === st.you, rank: partyInt(s.rank), tags: (win.indexOf(s.id) >= 0 ? [{ text: 'winner' }] : []).concat(s.left ? [{ text: 'left', dim: true }] : []), pts: partyInt(s.total) + ' pts', hue: hueOf(s.id) });
     }
   } else if (st.result){
     title = 'Heat ' + partyInt(st.result.heat) + ' of ' + partyInt(room.heats) + ' results';
@@ -16114,11 +17424,11 @@ function partyRenderBoard(room, st, host, phase){
       if (r.status === 'flagged') tags.push({ text: 'not counted', dim: true });
       else if (r.status === 'dnf') tags.push({ text: 'unfinished', dim: true });
       const tt = total.get(r.id);
-      partyRow(list, p.nick, { me: r.id === st.you, rank: partyInt(r.rank), tags, pts: partyInt(r.score) + ' · +' + partyInt(r.points) + (tt ? ' = ' + partyInt(tt.total) : '') });
+      partyRow(list, p.nick, { me: r.id === st.you, rank: partyInt(r.rank), tags, pts: partyInt(r.score) + ' · +' + partyInt(r.points) + (tt ? ' = ' + partyInt(tt.total) : ''), hue: hueOf(r.id) });
     }
   } else {
     title = 'Standings';
-    for (const p of room.players.slice().sort((a, b) => partyInt(b.total) - partyInt(a.total))) partyRow(list, p.nick, { me: p.id === st.you, pts: partyInt(p.total) + ' pts' });
+    for (const p of room.players.slice().sort((a, b) => partyInt(b.total) - partyInt(a.total))) partyRow(list, p.nick, { me: p.id === st.you, pts: partyInt(p.total) + ' pts', hue: hueOf(p.id) });
   }
   partyEl('partyBoardTitle').textContent = title;
   const rematch = partyEl('partyRematch');
@@ -16143,6 +17453,7 @@ function initParty(){
   bindOverlayControl('partyStart', () => { if (partyClient) partyClient.start(); });
   bindOverlayControl('partyRematch', () => { if (partyClient){ partyHeatNo = 0; partyClient.rematch(); } });
   bindOverlayControl('partyDuel', partyDuelInstead);
+  bindOverlayControl('partyRetry', partyRetryNow);
   const code = partyEl('partyCode');
   code.addEventListener('pointerdown', e => e.stopPropagation());
   code.addEventListener('input', () => { const c = partyNormalizeCode(code.value); if (c !== code.value) code.value = c; });
