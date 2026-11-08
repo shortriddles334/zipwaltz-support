@@ -93,9 +93,14 @@
   #daily,#duelNew,#more,#openParty,#duelSkip,#moreBack,#share,#shareClip,#shareCardOption,#shareClipOption,#openStats,#openSettings,#openSettingsResult,#settingsBack,#statsBack{text-transform:none;letter-spacing:.01em}
   .settings-row{display:block;width:100%;min-height:44px;margin-top:8px;padding:8px 12px;border-radius:10px;cursor:pointer;
     border:1px solid #A99CD6;background:#120E2E;color:#F3EFFF;font:700 14px var(--font-body);text-align:left}
-  /* Seven settings rows fit a 320x568 screen without scrolling: a slightly tighter gap on short screens. */
+  /* A slightly tighter gap between settings rows on short screens (the card scrolls inside when they do not fit). */
   @media (max-height:600px){ .settings-row{margin-top:6px} }
   .settings-row:focus-visible,#openStats:focus-visible,#openSettings:focus-visible,#openSettingsResult:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+  /* W2-10: the Assist note under its two rows. --dim on the panel is about 6.7:1. */
+  .settings-note{margin:10px 2px 0;font-size:13px;line-height:1.35;color:var(--dim);text-align:left}
+  /* W2-10: the Assist group's sub-heading (it names the HUD's ASSIST tag) and its one-line trade-off, above the rows. */
+  .settings-sub{margin:16px 2px 0;font:700 13px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:#F3EFFF;text-align:left}
+  .settings-sub + .settings-note{margin-top:2px}
   /* W2-14 Settings > Language: the open list's rows sit a little closer; the current choice has a mint border and a ✓ (not colour alone). */
   #setLangList .settings-row{margin-top:6px}
   #setLangList .settings-row[aria-current="true"]{border-color:var(--mint)}
@@ -473,6 +478,10 @@
   /* Daily runs: "DAILY #N · RUN SCORE" on the label line, so it costs no height. */
   .result-daily{color:var(--text);text-transform:uppercase}
   .result-daily::after{content:" · ";color:var(--dim)}
+  /* W2-10: an Assist run's tag ("ASSIST 85%") sits on its own line above RUN SCORE. Inline it overflows the score column
+     beside the replay at 320-390 px; the hero row is the replay's height, so the extra line does not grow the card. */
+  .result-score-label.result-label-assist .result-daily{display:block}
+  .result-score-label.result-label-assist .result-daily::after{content:none}
   /* W2-1: "Race · Daily #N" is a race card's only statement of the day raced, so it is never cut: RUN SCORE gives way
      (the duel line under the score names both scores) and the day may wrap onto a second line in the hero column. */
   #gameOverScreen .result-score-label:has(> #dailyFront[data-race]){white-space:normal;overflow-wrap:anywhere;font-size:0;letter-spacing:0}
@@ -771,6 +780,11 @@
   .party-list li .seen{display:block;margin-top:2px;font-weight:400;font-size:12px;color:var(--dim)}
   .party-list li .seen b{font-weight:700}
   #partyHeatLine,#partyBoardTitle{margin-top:12px;font:700 15px/1.3 var(--font-body);color:var(--text)}
+  #partyBoardMult{margin-top:4px;color:var(--gold)}
+  /* W2-12: the tag wraps as one piece; where the doubled final's heat line still takes two rows (a short landscape card),
+     the countdown under it gives the row back, so its digits sit no lower than on any other heat */
+  #partyHeatLine .x2tag{white-space:nowrap}
+  @media (max-height:420px){#partyHeatLine.x2~#partyCountdown{margin-top:2px;font-size:clamp(40px,20vw,64px)}}
   #partyCountdown{margin:6px auto 0;font:400 clamp(44px,20vw,84px)/1 var(--font-display);color:var(--gold)}
   #partyFallbackText{margin:14px auto 0;max-width:300px;font:700 16px/1.4 var(--font-body);color:var(--text)}
   #partyRetry{display:block;margin:10px auto 0!important;min-height:44px}
@@ -896,6 +910,7 @@
       </div>
       <div id="partyBoard" hidden>
         <div id="partyBoardTitle"></div>
+        <div id="partyBoardMult" class="party-note" hidden></div>
         <ol id="partyStandings" class="party-list" aria-label="Standings"></ol>
         <button class="action" id="partyRematch" type="button">Rematch</button>
         <div id="partyBoardHint" class="party-note"></div>
@@ -1007,6 +1022,11 @@
       <button class="settings-row" id="setEffects" type="button" aria-pressed="false">Reduced effects off</button>
       <button class="settings-row" id="setGhost" type="button" aria-pressed="true">Show ghost on</button>
       <button class="settings-row" id="setSimpleGhost" type="button" aria-pressed="false">Simple rival ghosts off</button>
+      <div class="settings-sub" id="assistHeading" role="heading" aria-level="3">Assist</div>
+      <p class="settings-note" id="assistSummary">Endless only · no bests or boards</p>
+      <button class="settings-row" id="setAssistSpeed" type="button" aria-describedby="assistNote">Game speed: 100%</button>
+      <button class="settings-row" id="setAssistWide" type="button" aria-pressed="false" aria-describedby="assistNote">Late-tap help off</button>
+      <p class="settings-note" id="assistNote">Assist slows Endless down or lets late taps still catch. Assist runs earn stardust, missions and rank, not bests or boards. Daily Orbit, duels and Orbit Party stay at full speed, without late-tap help.</p>
     </div>
     </div>
   </div>
@@ -1242,6 +1262,16 @@ const I18N = Object.freeze({
   "aria.stats": Object.freeze({ "en": "Stats", "es": "Estadísticas", "de": "Statistiken", "fr": "Stats", "ja": "統計", "pt-BR": "Estatísticas" }),
   "aria.stopClip": Object.freeze({ "en": "Stop recording clip", "es": "Detener la grabación del clip", "de": "Clip-Aufnahme beenden", "fr": "Arrêter l'enregistrement du clip", "ja": "クリップの録画を停止", "pt-BR": "Parar a gravação do clipe" }),
   "aria.getApp": Object.freeze({ "en": "Get Zipwaltz", "es": "Consigue Zipwaltz", "de": "Zipwaltz holen", "fr": "Obtenir Zipwaltz", "ja": "Zipwaltzを入手", "pt-BR": "Baixe o Zipwaltz" }),
+  "assist.speed": Object.freeze({ "en": "Game speed: {pct}%", "es": "Velocidad: {pct} %", "de": "Spieltempo: {pct} %", "fr": "Vitesse du jeu : {pct} %", "ja": "ゲーム速度: {pct}%", "pt-BR": "Velocidade do jogo: {pct}%" }),
+  "assist.lateOn": Object.freeze({ "en": "Late-tap help on", "es": "Ayuda con toques tardíos: activada", "de": "Hilfe bei späten Taps an", "fr": "Aide aux touches tardives : activée", "ja": "遅れタップ補助 オン", "pt-BR": "Ajuda para toques atrasados: ligada" }),
+  "assist.lateOff": Object.freeze({ "en": "Late-tap help off", "es": "Ayuda con toques tardíos: desactivada", "de": "Hilfe bei späten Taps aus", "fr": "Aide aux touches tardives : désactivée", "ja": "遅れタップ補助 オフ", "pt-BR": "Ajuda para toques atrasados: desligada" }),
+  "assist.note": Object.freeze({ "en": "Assist slows Endless down or lets late taps still catch. Assist runs earn stardust, missions and rank, not bests or boards. Daily Orbit, duels and Orbit Party stay at full speed, without late-tap help.", "es": "La asistencia hace más lento el modo infinito o deja que los toques tardíos atrapen igual. Las partidas asistidas dan polvo estelar, misiones y rango, pero no récords ni clasificaciones. La Órbita diaria, los duelos y Orbit Party van a velocidad normal, sin ayuda con toques tardíos.", "de": "Assist macht Endlos langsamer oder lässt späte Taps noch fangen. Assist-Läufe bringen Sternenstaub, Missionen und Rang, aber keine Rekorde oder Bestenlisten. Tagesorbit, Duelle und Orbit Party laufen mit vollem Tempo, ohne Hilfe bei späten Taps.", "fr": "L'assistance ralentit le mode infini ou laisse les touches tardives attraper quand même. Les parties assistées rapportent poussières d'étoile, missions et rang, mais ni records ni classements. L'Orbite du jour, les duels et Orbit Party restent à pleine vitesse, sans aide aux touches tardives.", "ja": "アシストはエンドレスを遅くしたり、少し遅れたタップでもキャッチできるようにします。アシストのプレイでもスターダスト・ミッション・ランクは得られますが、ベストやランキングには残りません。デイリーオービット・対戦・Orbit Partyは常に通常速度で、遅れタップ補助もありません。", "pt-BR": "A assistência deixa o modo infinito mais lento ou deixa toques atrasados ainda pegarem. Partidas assistidas dão poeira estelar, missões e rank, mas não recordes nem placares. A Órbita diária, os duelos e o Orbit Party ficam na velocidade normal, sem ajuda para toques atrasados." }),
+  "assist.hud": Object.freeze({ "en": "ASSIST {pct}%", "es": "ASISTENCIA {pct} %", "de": "ASSIST {pct} %", "fr": "ASSISTANCE {pct} %", "ja": "アシスト {pct}%", "pt-BR": "ASSISTÊNCIA {pct}%" }),
+  "assist.hudWide": Object.freeze({ "en": "ASSIST", "es": "ASISTENCIA", "de": "ASSIST", "fr": "ASSISTANCE", "ja": "アシスト", "pt-BR": "ASSISTÊNCIA" }),
+  "assist.result": Object.freeze({ "en": "Assist · no bests or boards", "es": "Sin récords ni rankings", "de": "Ohne Rekord und Rangliste", "fr": "Ni record ni classement", "ja": "ベスト・ランキング対象外", "pt-BR": "Sem recordes nem placares" }),
+  "assist.fullSpeed": Object.freeze({ "en": "Assist is off here: Endless only", "es": "Asistencia desactivada aquí: solo infinito", "de": "Assist hier aus: nur Endlos", "fr": "Assistance désactivée ici : infini seulement", "ja": "ここではアシスト無効：エンドレスのみ", "pt-BR": "Assistência desligada aqui: só no infinito" }),
+  "assist.heading": Object.freeze({ "en": "Assist", "es": "Asistencia", "de": "Assist", "fr": "Assistance", "ja": "アシスト", "pt-BR": "Assistência" }),
+  "assist.summary": Object.freeze({ "en": "Endless only · no bests or boards", "es": "Solo infinito · sin récords ni rankings", "de": "Nur Endlos · ohne Rekord/Rangliste", "fr": "Infini seul · ni record ni classement", "ja": "エンドレスのみ・ベスト/順位対象外", "pt-BR": "Só no infinito · sem recorde/placar" }),
   "best.checkpoint": Object.freeze({ "en": "checkpoint best this session", "es": "mejor de la sesión con checkpoint", "de": "Checkpoint-Rekord dieser Sitzung", "fr": "record checkpoint de la session", "ja": "このセッションのチェックポイントベスト", "pt-BR": "melhor checkpoint desta sessão" }),
   "best.checkpointSaved": Object.freeze({ "en": "saved checkpoint best", "es": "mejor guardado con checkpoint", "de": "gespeicherter Checkpoint-Rekord", "fr": "record checkpoint sauvegardé", "ja": "保存済みチェックポイントベスト", "pt-BR": "melhor checkpoint salvo" }),
   "best.saved": Object.freeze({ "en": "saved best", "es": "mejor guardado", "de": "gespeicherter Rekord", "fr": "record sauvegardé", "ja": "保存済みベスト", "pt-BR": "melhor salvo" }),
@@ -1643,6 +1673,10 @@ const I18N = Object.freeze({
   "party.fallbackOffline": Object.freeze({ "en": "You're offline. Rooms need a connection; solo runs and duels work offline.", "es": "Estás sin conexión. Las salas necesitan conexión; las partidas en solitario y los duelos funcionan sin ella.", "de": "Du bist offline. Räume brauchen eine Verbindung; Solo-Läufe und Duelle gehen auch offline.", "fr": "Tu es hors ligne. Les salons ont besoin d'une connexion. Les parties en solo et les duels marchent hors ligne.", "ja": "オフラインです。ルームには接続が必要です。ソロとデュエルはオフラインでも遊べます。", "pt-BR": "Você está offline. As salas precisam de conexão; partidas solo e duelos funcionam offline." }),
   "party.fallbackUnreachable": Object.freeze({ "en": "Can't reach rooms right now. Try again, or play a duel.", "es": "No se puede conectar con las salas ahora. Reintenta o juega un duelo.", "de": "Räume sind gerade nicht erreichbar. Versuch es erneut oder spiel ein Duell.", "fr": "Impossible de joindre les salons pour l'instant. Réessaie ou joue un duel.", "ja": "いまルームに接続できません。もう一度試すか、デュエルで遊んでください。", "pt-BR": "Não foi possível acessar as salas agora. Tente de novo ou jogue um duelo." }),
   "party.fallbackRateLimited": Object.freeze({ "en": "Too many tries from this network for now. Play a duel, or try again later.", "es": "Demasiados intentos desde esta red por ahora. Juega un duelo o vuelve a intentarlo más tarde.", "de": "Gerade zu viele Versuche aus diesem Netzwerk. Spiel ein Duell oder versuch es später erneut.", "fr": "Trop de tentatives depuis ce réseau pour l'instant. Joue un duel ou réessaie plus tard.", "ja": "このネットワークからの試行が多すぎます。デュエルで遊ぶか、あとでもう一度試してください。", "pt-BR": "Tentativas demais desta rede por enquanto. Jogue um duelo ou tente de novo mais tarde." }),
+  "party.finalHeatTag": Object.freeze({ "en": "Final heat: ×2", "es": "Manga final: ×2", "de": "Finaler Lauf: ×2", "fr": "Manche finale\u00a0: ×2", "ja": "最終ヒート：×2", "pt-BR": "Bateria final: ×2" }),
+  "party.finalHeatSr": Object.freeze({ "en": "Final heat: double points", "es": "Manga final: puntos dobles", "de": "Finaler Lauf: doppelte Punkte", "fr": "Manche finale\u00a0: points doublés", "ja": "最終ヒート：ポイント2倍", "pt-BR": "Bateria final: pontos em dobro" }),
+  "party.finalHeatStarting": Object.freeze({ "en": "Final heat starting: double points", "es": "Empieza la manga final: puntos dobles", "de": "Finaler Lauf startet: doppelte Punkte", "fr": "La manche finale commence\u00a0: points doublés", "ja": "最終ヒート開始：ポイント2倍", "pt-BR": "Começa a bateria final: pontos em dobro" }),
+  "party.finalHeatNext": Object.freeze({ "en": "The final heat is next: double points.", "es": "Ahora viene la manga final: puntos dobles.", "de": "Als Nächstes kommt der finale Lauf: doppelte Punkte.", "fr": "Prochaine manche, la finale\u00a0: points doublés.", "ja": "次は最終ヒート：ポイント2倍。", "pt-BR": "A próxima é a bateria final: pontos em dobro." }),
   "party.title": Object.freeze({ "en": "Orbit Party", "es": "Fiesta orbital", "de": "Orbit-Party", "fr": "Fête orbitale", "ja": "オービットパーティー", "pt-BR": "Festa orbital" }),
   "party.changeEmoji": Object.freeze({ "en": "Change emoji", "es": "Cambiar emoji", "de": "Emoji ändern", "fr": "Changer d'emoji", "ja": "絵文字を変更", "pt-BR": "Trocar emoji" }),
   "party.changeFirst": Object.freeze({ "en": "Change first word", "es": "Cambiar la primera palabra", "de": "Erstes Wort ändern", "fr": "Changer le premier mot", "ja": "最初の単語を変更", "pt-BR": "Trocar a primeira palavra" }),
@@ -7453,7 +7487,99 @@ syncRulesBank();
 // missions, rank, stardust) only at the default window: a ?grace= override is a test setting, and a wider
 // window would make a run easier. Anything it saved would reach Game Center later through a ranked run's
 // achievement sweep. The Daily never graces, so the window does not touch it and a Daily run always counts.
-function runIsRanked(){ return !duelActive && !dailyRaceActive && (dailyActive || releaseGraceWindow === RELEASE_GRACE.seconds); } // W2-1: a Daily race is unranked like a duel
+// W2-10: an Assist run is never ranked (no best, board, achievement or gate); runEarnsRewards() below still pays it.
+// W2-1: a Daily race is unranked like a duel (it sets dailyActive, so assistApplies() is already false for it).
+function runIsRanked(){ return !duelActive && !dailyRaceActive && !assistRun && (dailyActive || releaseGraceWindow === RELEASE_GRACE.seconds); }
+// W2-10 Assist (solo Endless only): a slower wall clock and a wider late-tap window. The sim never sees the speed:
+// every step stays ENDLESS_STEP, so a run log replays exactly at full speed. Late-tap help is the existing release
+// grace window (a recorded run input, gw). Assist runs earn stardust, missions, rank and keepsakes, never a best, a
+// board, an achievement or a gate. Daily, duels, party heats, checkpoint, ghosts and replays always run at speed 1.
+// chipLife/chipFadeS: the Daily/duel "Assist is off here" chip holds at full opacity, then fades over its last chipFadeS.
+const ASSIST = Object.freeze({ speeds: Object.freeze([100, 85, 70]), graceSeconds: 0.20, chipLife: 2.8, chipFadeS: 0.8 });
+const ASSIST_SPEED_KEY = 'zipwaltz-assist-speed', ASSIST_WIDE_KEY = 'zipwaltz-assist-wide';
+function readAssistSpeed(){ try { const v = Number(localStorage.getItem(ASSIST_SPEED_KEY)); return ASSIST.speeds.indexOf(v) >= 0 ? v : 100; } catch (_) { return 100; } }
+function readAssistWide(){ try { return localStorage.getItem(ASSIST_WIDE_KEY) === 'on'; } catch (_) { return false; } }
+let assistSpeedPct = readAssistSpeed(), assistWide = readAssistWide(); // the settings
+let assistRun = false, assistRunPct = 100, assistRunSpeed = 1;      // this run, latched in reset()
+let assistGraceSaved = null;      // the window an Assist run widened; the next latch restores it
+let assistFullSpeedNoted = false; // the Daily/duel "Assist is off here" chip was shown this session
+let assistChip = null;            // { text, t0 } that chip while it is up (t0: the run time it appeared)
+function assistOn(){ return assistSpeedPct < 100 || assistWide; }
+function assistApplies(){
+  if (!assistOn()) return false;
+  let ghost = false, party = false, warm = false;
+  try { ghost = !!window.__ghostMode; } catch (_) {}
+  try { party = partyInRoom(); } catch (_) {}
+  try { warm = !!warmupForDuel; } catch (_) {} // W1-2's duel warm-up teaches the race at its real speed
+  return !ghost && !party && !warm && !dailyActive && !duelActive && !checkpointActive;
+}
+// Called first in reset(), before anything reads runIsRanked() or records gw. With Assist off it writes no existing
+// global: the window is restored only when an earlier Assist run widened it, so a hand-set window (tests, tools) stands.
+function latchAssist(){
+  assistChip = null; // a new run never inherits the last run's chip
+  let replay = !!endlessReplayNext;
+  try { replay = replay || !!endlessReplaying; } catch (_) {} // declared further down the script
+  if (replay){ assistRun = false; assistRunPct = 100; assistRunSpeed = 1; return; } // the log's own gw stands
+  if (assistGraceSaved !== null){ releaseGraceWindow = assistGraceSaved; assistGraceSaved = null; }
+  assistRun = assistApplies();
+  assistRunPct = assistRun ? assistSpeedPct : 100;
+  assistRunSpeed = assistRunPct === 100 ? 1 : assistRunPct / 100;
+  if (assistRun && assistWide){ assistGraceSaved = releaseGraceWindow; releaseGraceWindow = Math.max(releaseGraceWindow, ASSIST.graceSeconds); }
+}
+// Missions, rank, stardust, keepsakes, lifetime captures and the run count: a ranked run, or an Assist run at the
+// default window (a ?grace= override wins over Assist: that run earns nothing, as today).
+function runEarnsRewards(){
+  return runIsRanked() || (assistRun && (assistGraceSaved !== null ? assistGraceSaved : releaseGraceWindow) === RELEASE_GRACE.seconds);
+}
+function assistBadgeText(){ return assistRunPct < 100 ? hudKeyed('best', 'assist.hud', 'pct', assistRunPct) : hudKeyed('best', 'assist.hudWide', 'pct', 100); }
+function assistShareTag(){ return assistRun ? ' with Assist' : ''; } // share text is English-only today
+function setAssistSpeed(pct){ if (ASSIST.speeds.indexOf(pct) < 0) return; assistSpeedPct = pct; try { localStorage.setItem(ASSIST_SPEED_KEY, String(pct)); } catch (_) {} syncSettingsPanel(); }
+function setAssistWide(on){ assistWide = !!on; try { localStorage.setItem(ASSIST_WIDE_KEY, assistWide ? 'on' : 'off'); } catch (_) {} syncSettingsPanel(); }
+// Once per session, when Assist is on and a Daily or duel run starts at full speed: a chip and the same line spoken.
+// Never in a party heat (its countdown stays clean), a ghost frame, a replay or an Assist run. The chip is drawn in
+// screen space (drawAssistChip), holds at full opacity, fades at the end and never moves.
+function noteAssistFullSpeed(){
+  if (assistRun || !assistOn() || assistFullSpeedNoted || !(dailyActive || duelActive) || endlessReplayNext) return;
+  let ghost = false, party = false;
+  try { ghost = !!window.__ghostMode; } catch (_) {}
+  try { party = partyInRoom(); } catch (_) {}
+  if (ghost || party) return;
+  assistFullSpeedNoted = true;
+  assistChip = { text: t('assist.fullSpeed'), t0: time };
+  announce(t('assist.fullSpeed'));
+}
+const ASSIST_CHIP_FONT = '700 18px "Space Grotesk", ui-sans-serif, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+const ASSIST_CHIP_PAD = 12, ASSIST_CHIP_BELOW = 40;
+// The chip's opacity at this run time: 1 for chipLife - chipFadeS seconds, then a linear fade to 0 at chipLife. It
+// reads the run clock (time), which stops while the run is paused or held; the Daily and duels run at speed 1.
+function assistChipAlpha(){
+  if (!assistChip) return 0;
+  const age = time - assistChip.t0;
+  return age < 0 || age >= ASSIST.chipLife ? 0 : Math.min(1, (ASSIST.chipLife - age) / ASSIST.chipFadeS);
+}
+// Screen space, one line under the sector banner's (a run can open with a banner up), so it never overlaps the banner,
+// the camera never carries it away and a slower reader finds it in one place. Opacity only, in every motion mode.
+// PAL.peri on #100C28 is about 7.8:1.
+function drawAssistChip(){
+  if (state !== 'playing' || !assistChip) return;
+  const alpha = assistChipAlpha();
+  if (alpha <= 0){ assistChip = null; return; }
+  ctx.save();
+  ctx.font = ASSIST_CHIP_FONT;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  const half = ctx.measureText(assistChip.text).width / 2, pad = ASSIST_CHIP_PAD;
+  const x = Math.max(8 + half + pad, Math.min(W - 8 - half - pad, W / 2));
+  const y = SECTOR_BANNER_Y + ASSIST_CHIP_BELOW;
+  ctx.globalAlpha = alpha * 0.94;
+  ctx.fillStyle = '#100C28';
+  ctx.fillRect(x - half - pad, y - 22, (half + pad) * 2, 30);
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = PAL.peri;
+  ctx.fillText(assistChip.text, x, y);
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
 let sectorBanner = null;       // { index, text, mix, tint, t, life } while the name is on screen
 let voidCueAnnounced = false;  // the void warning is spoken once per run
 let sectorShown = -1;          // last announced sector index; a new run forces it again
@@ -7570,6 +7696,7 @@ function beginDailyStream(){
 // descriptor, the checkpoint), hands them to simReset in the ZW-CORE region, then resets the DOM, timers, audio,
 // HUD, draw-only state, the run log and the tutorial, and generates the planets and the player (step 5 moves those).
 function reset(){
+  latchAssist(); // W2-10: first, so armNewBest (runIsRanked) and the run log (gw, as) see this run's Assist
   const seed = runSeed();
   armNewBest(); // F2: before the run's flags change below (endlessReplayNext is consumed here)
   calmHudArm(); // F9: which hints still teach this run
@@ -7633,6 +7760,7 @@ function reset(){
   rhythmResetRun();
   if (resultsTimer){ clearTimeout(resultsTimer); resultsTimer = 0; }
   syncHud();
+  noteAssistFullSpeed(); // W2-10: once per session, a Daily or duel with Assist on says it runs at full speed
   startDailyGhost(); // Daily Duet: a no-op outside the Daily, and inside the ghost replay itself
 }
 
@@ -9271,6 +9399,19 @@ function syncSettingsPanel(){
     simpleRow.textContent = simpleGhosts ? t('set.simpleGhostOn') : t('set.simpleGhostOff');
     simpleRow.setAttribute('aria-pressed', simpleGhosts ? 'true' : 'false');
   }
+  // W2-10 Assist: a three-step cycle (no aria-pressed: it is not on/off) and a toggle; the note explains both.
+  const assistSpeedRow = document.getElementById('setAssistSpeed');
+  if (assistSpeedRow) assistSpeedRow.textContent = t('assist.speed', { pct: assistSpeedPct });
+  const assistWideRow = document.getElementById('setAssistWide');
+  if (assistWideRow){
+    assistWideRow.textContent = assistWide ? t('assist.lateOn') : t('assist.lateOff');
+    assistWideRow.setAttribute('aria-pressed', assistWide ? 'true' : 'false');
+  }
+  const assistNote = document.getElementById('assistNote');
+  if (assistNote) assistNote.textContent = t('assist.note');
+  const assistHeading = document.getElementById('assistHeading'), assistSummary = document.getElementById('assistSummary');
+  if (assistHeading) assistHeading.textContent = t('assist.heading');
+  if (assistSummary) assistSummary.textContent = t('assist.summary');
 }
 function sanitizeSettings(raw){
   const src = raw && typeof raw === 'object' ? raw : {};
@@ -9439,22 +9580,24 @@ function writeLifetimeStats(){
   });
 }
 function saveLifetimeCaptures(){
-  if (!runIsRanked()) return; // an unranked (?grace= override) run saves no lifetime stats
+  if (!runEarnsRewards()) return; // an unranked (?grace= override) run saves no lifetime stats; an Assist run's catches count
   lifetime.captures = clampCount(lifetime.captures + clampCount(captureCount - lifetimeCapturesSaved));
   lifetimeCapturesSaved = captureCount;
   writeLifetimeStats();
 }
 function noteLifetimeRun(){
-  if (!runIsRanked()) return; // an unranked (?grace= override) run saves no lifetime stats
+  if (!runEarnsRewards()) return; // an unranked (?grace= override) run saves no lifetime stats
   lifetime.captures = clampCount(lifetime.captures + clampCount(captureCount - lifetimeCapturesSaved));
   lifetimeCapturesSaved = captureCount;
-  const reach = sectorReachIndex();
-  if (reach > lifetime.sector) lifetime.sector = reach;
-  const combo = clampCount(maxCombo, 12);
-  if (combo > lifetime.combo) lifetime.combo = combo;
-  if (dailyActive) lifetime.dailyAttempts = clampCount(lifetime.dailyAttempts + 1);
-  const streak = dailyStreakAsOf(ensureDailyRecord(), dailyRunIso || dailyTodayIso());
-  if (streak > lifetime.bestStreak) lifetime.bestStreak = streak;
+  if (runIsRanked()){ // W2-10: the peaks are bests, so an Assist run (catches only) leaves them alone
+    const reach = sectorReachIndex();
+    if (reach > lifetime.sector) lifetime.sector = reach;
+    const combo = clampCount(maxCombo, 12);
+    if (combo > lifetime.combo) lifetime.combo = combo;
+    if (dailyActive) lifetime.dailyAttempts = clampCount(lifetime.dailyAttempts + 1);
+    const streak = dailyStreakAsOf(ensureDailyRecord(), dailyRunIso || dailyTodayIso());
+    if (streak > lifetime.bestStreak) lifetime.bestStreak = streak;
+  }
   writeLifetimeStats();
   renderStatsPanel();
 }
@@ -9573,6 +9716,8 @@ bindOverlayControl('setColor', () => setColorBlind(!colorBlindRings));
 bindOverlayControl('setEffects', () => setReducedEffects(!reducedEffects));
 bindOverlayControl('setGhost', () => setDailyGhostShow(!ghostShow));
 bindOverlayControl('setSimpleGhost', () => setSimpleGhosts(!simpleGhosts));
+bindOverlayControl('setAssistSpeed', () => { const s = ASSIST.speeds; setAssistSpeed(s[(s.indexOf(assistSpeedPct) + 1) % s.length]); });
+bindOverlayControl('setAssistWide', () => setAssistWide(!assistWide));
 function loadSessionCount(){
   const prev = readStoredNumber(SESSIONS_KEY);
   const base = prev === null ? 0 : Math.floor(prev);
@@ -9921,7 +10066,7 @@ function isDailyRun(){
    because the ghost advances only when the live game steps. */
 // Endless runs use the same log: seed is the Endless run seed, calm and ls are set at reset (see reset).
 function newDailyRunLog(){
-  return { iso: dailyRunIso, H: H, rm: reducedMotion ? 1 : 0, fu: flickUnlocked ? 1 : 0, ag: aimGuide, seed: dailyActive ? null : endlessRunSeed, calm: 0, ls: 0, tut: 0, st: dailyActive ? DAILY_STEP : ENDLESS_STEP, gw: releaseGraceWindow, v: endlessSimVersion, n: 0, ev: [], bad: false };
+  return { iso: dailyRunIso, H: H, rm: reducedMotion ? 1 : 0, fu: flickUnlocked ? 1 : 0, ag: aimGuide, seed: dailyActive ? null : endlessRunSeed, calm: 0, ls: 0, tut: 0, st: dailyActive ? DAILY_STEP : ENDLESS_STEP, gw: releaseGraceWindow, as: assistRunPct, v: endlessSimVersion, n: 0, ev: [], bad: false };
 }
 // An input event is step * 2 + kind (0 release, 1 flick). Events are stored in arrival order, so their steps never decrease.
 function logDailyInput(kind){
@@ -9947,6 +10092,9 @@ function dailyStepHook(){
 // Within the snap of a whole step counts as that step, so frame-time noise cannot turn 1+1 into 0+2.
 // The step is DAILY_STEP for the Daily and ENDLESS_STEP for Endless (recorded as st in the run log).
 function runDailySteps(dt){
+  // W2-10 Assist: an Assist run's clock runs at assistRunSpeed of wall time (1 everywhere else: no multiply). Only the
+  // accumulator sees it, so the sim still steps whole ticks; loop()'s tutorial, camera and audio clocks stay on wall time.
+  if (assistRunSpeed !== 1) dt *= assistRunSpeed;
   // T1 beat 1 holds the simulation like a pause: no steps, and no wall time banked for later.
   if (tutorial && tutorial.frozen){ dailyAcc = 0; renderPrev.valid = false; renderAlpha = 1; return; }
   const step = simStep();
@@ -10056,11 +10204,13 @@ function endlessReplay(desc){
   // The grace window is part of the run: it must be named, and within the range the game allows.
   const gw = Number(desc.gw);
   if (typeof desc.gw !== 'number' || !Number.isFinite(gw) || gw < 0 || gw > RELEASE_GRACE.max) return null;
+  // W2-10: as (the Assist speed) is ignored and may be missing: speed is wall clock, never a sim input, so an Assist
+  // log replays exactly at speed 1. Its widened window is the log's gw, applied above like any other.
   const seed = Number(desc.seed);
   if (!Number.isFinite(seed)) return null;
   // Every global the replay sets is saved here and restored in finally. The simulated run itself (planets, score,
   // state) is the replay's result and is not restored: the page that replays is a test page.
-  const saved = { H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, checkpointActive, launchedThisSession, endlessReplayNext, releaseGraceWindow, tutorialNext, tutorialSeen, duelArmed, duelActive, dailyRaceActive, runEvent, titleEvent, titleEventShown, titleEventIso, titleBurstAt, titleBurstArmed, keepsakeNotice, endlessSimVersion };
+  const saved = { H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, checkpointActive, launchedThisSession, endlessReplayNext, releaseGraceWindow, tutorialNext, tutorialSeen, duelArmed, duelActive, dailyRaceActive, runEvent, titleEvent, titleEventShown, titleEventIso, titleBurstAt, titleBurstArmed, keepsakeNotice, endlessSimVersion, assistRun, assistRunPct, assistRunSpeed };
   try {
     releaseGraceWindow = gw;
     endlessSimVersion = desc.v; // the log's own rules (press() records the same v in the new run log)
@@ -10084,7 +10234,7 @@ function endlessReplay(desc){
     const run = coreRun({ ev, step: ENDLESS_STEP, maxSteps });
     return endlessResult(log.n, worldSig, log.bad || run.steps !== log.n);
   } finally {
-    ({ H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, checkpointActive, launchedThisSession, endlessReplayNext, releaseGraceWindow, tutorialNext, tutorialSeen, duelArmed, duelActive, dailyRaceActive, runEvent, titleEvent, titleEventShown, titleEventIso, titleBurstAt, titleBurstArmed, keepsakeNotice, endlessSimVersion } = saved);
+    ({ H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, checkpointActive, launchedThisSession, endlessReplayNext, releaseGraceWindow, tutorialNext, tutorialSeen, duelArmed, duelActive, dailyRaceActive, runEvent, titleEvent, titleEventShown, titleEventIso, titleBurstAt, titleBurstArmed, keepsakeNotice, endlessSimVersion, assistRun, assistRunPct, assistRunSpeed } = saved);
     endlessReplaying = false;
   }
 }
@@ -10101,7 +10251,7 @@ function endlessRecord(){
   const log = dailyRunLog;
   if (!log || dailyActive) return null;
   return {
-    seed: endlessRunSeed, H: log.H, rm: log.rm, fu: log.fu, ag: log.ag, calm: log.calm, ls: log.ls, tut: log.tut, st: log.st, gw: log.gw, v: log.v,
+    seed: endlessRunSeed, H: log.H, rm: log.rm, fu: log.fu, ag: log.ag, calm: log.calm, ls: log.ls, tut: log.tut, st: log.st, gw: log.gw, as: log.as, v: log.v,
     ev: log.ev.slice(), steps: log.n, bad: log.bad,
     score, catches: captureCount, death: death ? death.reason : null, endSig: worldSignature()
   };
@@ -10846,6 +10996,14 @@ function partyHornClock(localStartAt, now, sprintSeconds){
   const raw = Math.ceil((sprintSeconds * 1000 - (now - localStartAt)) / 1000), left = Number.isFinite(raw) ? Math.max(0, raw) : 0;
   return Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0');
 }
+// W2-12 Final heat x2. The server computes every point and total; these only decide what the page LABELS, from the room's
+// own fields (heat_start.mult, heat_result.mult, room.finalMult). Older servers send none of them, so nothing is labelled.
+// A multiplier from the server: exactly the number 2, or 1 (a string, 3 or NaN is 1).
+function partyMult(v){ return v === 2 ? 2 : 1; }
+// True when `heat` is the doubled final heat of a session of `heats` (2 or more). A x2 on any other heat (a future server)
+// gets no "Final heat" label: the points the server sent still add up. Heat-result rows always show the server's points
+// as sent ("+16 = 30"); the board's gold line above them says the heat counted double.
+function partyFinalX2(heat, heats, mult){ return partyMult(mult) === 2 && partyInt(heats) >= 2 && partyInt(heat) === partyInt(heats); }
 // ---- Race my best heat (W2-4) ----------------------------------------------------------------------------------------
 // The heat to offer as a duel link: among the heats the room confirmed ok whose link fits (a non-empty link), the
 // highest score; a tie goes to the earlier heat. Null when none qualifies.
@@ -11115,8 +11273,10 @@ function duelRecord(nick){
 // globals it sets are restored; the replayed run is the result.
 function duelReplay(g){
   if (!duelGhostValid(g) || g.rules !== GHOST_SIM_VERSION || state === 'playing') return null;
-  const saved = { H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, duelActive, dailyRaceActive, duelArmed, checkpointActive, duelIncoming };
+  const saved = { H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, duelActive, dailyRaceActive, duelArmed, checkpointActive, duelIncoming,
+    assistRun, assistRunPct, assistRunSpeed, assistGraceSaved, releaseGraceWindow, assistFullSpeedNoted };
   try {
+    assistFullSpeedNoted = true; // W2-10: a replay never shows the "full speed" chip; restored below with the latch
     H = g.H; reducedMotion = !!g.rm; flickUnlocked = !!g.fu; aimGuide = g.ag;
     pendingDaily = false;
     dailyRaceActive = false;
@@ -11131,7 +11291,8 @@ function duelReplay(g){
     if (run.steps !== log.n) return null;
     return { score: cleanScore(run.finalScore), hops, steps: log.n, reason: run.death };
   } finally {
-    ({ H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, duelActive, dailyRaceActive, duelArmed, checkpointActive, duelIncoming } = saved);
+    ({ H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, duelActive, dailyRaceActive, duelArmed, checkpointActive, duelIncoming,
+      assistRun, assistRunPct, assistRunSpeed, assistGraceSaved, releaseGraceWindow, assistFullSpeedNoted } = saved);
   }
 }
 // W2-1 test hook, duelReplay's twin for a Daily race (a format-3 ghost): plays it through the title's own race path
@@ -11140,8 +11301,10 @@ function duelReplay(g){
 // it writes the replayed run's state, so use it only on a page kept for tests; the live globals it sets are restored.
 function dailyRaceReplay(g){
   if (!dailyRaceGhostValid(g) || g.rules !== GHOST_SIM_VERSION || state === 'playing') return null;
-  const saved = { H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, duelActive, dailyRaceActive, dailyRaceIso, dailyRaceH, duelArmed, checkpointActive, duelIncoming };
+  const saved = { H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, duelActive, dailyRaceActive, dailyRaceIso, dailyRaceH, duelArmed, checkpointActive, duelIncoming,
+    assistRun, assistRunPct, assistRunSpeed, assistGraceSaved, releaseGraceWindow, assistFullSpeedNoted };
   try {
+    assistFullSpeedNoted = true; // W2-10: a replay never shows the "full speed" chip; restored below with the latch
     H = g.H; reducedMotion = !!g.rm; flickUnlocked = !!g.fu; aimGuide = g.ag;
     pendingDaily = false;
     duelIncoming = null; // a received link waiting on the title does not hold this replay's start
@@ -11154,7 +11317,8 @@ function dailyRaceReplay(g){
     if (run.steps !== log.n) return null;
     return { score: cleanScore(run.finalScore), hops, steps: log.n, reason: run.death, worldSig: run.worldSig, exact: !log.bad };
   } finally {
-    ({ H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, duelActive, dailyRaceActive, dailyRaceIso, dailyRaceH, duelArmed, checkpointActive, duelIncoming } = saved);
+    ({ H, reducedMotion, flickUnlocked, aimGuide, pendingDaily, dailyActive, duelActive, dailyRaceActive, dailyRaceIso, dailyRaceH, duelArmed, checkpointActive, duelIncoming,
+      assistRun, assistRunPct, assistRunSpeed, assistGraceSaved, releaseGraceWindow, assistFullSpeedNoted } = saved);
   }
 }
 // B4b: checks a received ghost in a fresh ghost instance (the live game is not touched). Resolves to
@@ -12409,7 +12573,9 @@ function reportRunScore(){
   if (board === 'endless') Native.post('gc.score', { board: 'challenge', value }); // B5a: the run's own score, once
 }
 function sweepAchievements(){
-  if (!runIsRanked()) return; // a ?grace= override run earns no achievement and is not counted as a run
+  // A ?grace= override run earns no achievement and is not counted as a run. An Assist run (W2-10) is counted as a
+  // run but sweeps no achievement: its catches, combo and score are not performance bests.
+  if (!runIsRanked()){ if (runEarnsRewards()) noteFinishedRun(); return; }
   const runs = noteFinishedRun();
   const stats = collectRunStats();
   const comboPeak = Math.max(Number(stats.maxCombo) || 0, death ? Number(death.maxCombo) || 0 : 0);
@@ -12718,6 +12884,8 @@ function syncHud(){
     setHudText('best', hudKeyed('best', 'hud.bestDaily', 'score', formatScore(dailyTodayBest())));
   } else if (checkpointActive){
     setHudText('best', hudKeyed('best', checkpointBestSaved ? 'hud.bestCheckpointSaved' : 'hud.bestCheckpoint', 'score', formatScore(checkpointBest)));
+  } else if (assistRun){ // W2-10: the best cannot be beaten in an Assist run, so the slot names the run instead
+    setHudText('best', assistBadgeText());
   } else {
     setHudText('best', hudKeyed('best', bestSaved ? 'hud.bestSaved' : 'hud.best', 'score', formatScore(best)));
   }
@@ -12859,13 +13027,13 @@ function runEnded(reason, previousBest){
   ensureMeta();
   const missionBoard = meta.active.slice();
   const dustBeforeMissions = meta.dust;
-  // An unranked (?grace= override) run moves no mission or rank and banks no stardust. The guards sit here,
-  // not in onRunStats or bankRunStardust: those are the pinned run reducer and stay byte-identical.
-  if (runIsRanked()) onRunStats(collectRunStats());
+  // An unranked run (a duel, a ?grace= override) moves no mission or rank and banks no stardust; an Assist run does (W2-10).
+  // The guards sit here, not in onRunStats or bankRunStardust: those are the pinned run reducer and stay byte-identical.
+  if (runEarnsRewards()) onRunStats(collectRunStats());
   else rankUnlockNotice = [];
-  if (runIsRanked()) renderMissionResults(missionBoard, meta.dust - dustBeforeMissions);
+  if (runEarnsRewards()) renderMissionResults(missionBoard, meta.dust - dustBeforeMissions);
   else renderMissionResults([], 0); // nothing moved: no board on the card
-  if (runIsRanked()) bankRunStardust();
+  if (runEarnsRewards()) bankRunStardust();
   else runDustBanked = true;
   noteEventKeepsake();
   simFx.results(reason);
@@ -12873,13 +13041,14 @@ function runEnded(reason, previousBest){
   syncResultDaily(); // W1-4: the card offers today's Daily when every gate holds
 }
 // E4: a finished ranked Endless run that started during an event unlocks that event's keepsake (once; kept forever).
+// An Assist run counts too (W2-10: a participation cosmetic, not a best).
 // Never the Daily, a duel, a Checkpoint run, an unranked ?grace= run or the ghost frame. The results card names it
 // once, on the run that unlocked it, except on a calm or tutorial run (the first-session rules: no extra notes).
 let keepsakeNotice = null; // the keepsake this run unlocked, for its results card, or null
 let endlessReplaying = false; // true inside endlessReplay: a replayed run is not a finished run
 function noteEventKeepsake(){
   keepsakeNotice = null;
-  if (endlessReplaying || !runEvent || !runIsRanked() || dailyActive || duelActive || checkpointActive || eventGhostFrame()) return null;
+  if (endlessReplaying || !runEvent || !runEarnsRewards() || dailyActive || duelActive || checkpointActive || eventGhostFrame()) return null;
   const item = keepsakeForEvent(runEvent.id);
   ensureMeta();
   if (!item || meta.owned.indexOf(item.id) >= 0) return null;
@@ -12908,15 +13077,17 @@ function showResults(reason){
   document.getElementById('finalBest').textContent = formatScore(shownBest);
   const moment = racingRun() && duelIncoming ? duelMomentLine(death.score) : ''; // C14: '' with the flag off
   document.getElementById('nextGoal').textContent = racingRun() && duelIncoming ? duelResultLine(death.score) + (moment ? '\n' + moment : '')
-    : duelActive && duelReplyLink() ? t('duel.send') : resultsNextGoal(death.score, shownBest); // B4d: only when Share has a link
+    : duelActive && duelReplyLink() ? t('duel.send') : assistRun ? t('assist.result') : resultsNextGoal(death.score, shownBest); // B4d: only when Share has a link
   syncRetryLabel();
   syncLeadReplayButton(); // F8
   document.getElementById('resultDetails').open = false;
   const dailyFront = document.getElementById('dailyFront');
-  dailyFront.hidden = !dailyActive;
+  dailyFront.hidden = !dailyActive && !assistRun; // W2-10: an Assist run names itself over RUN SCORE ("ASSIST 85%")
   dailyFront.textContent = duelActive ? t('duel.sprint') : dailyRaceActive ? t('duel.dailyFront', { n: dailyNumberForDate(dailyRunIso) })
-    : dailyActive ? t('daily.number', { n: dailyNumberForDate(dailyRunIso || dailyTodayIso()) }) : '';
+    : dailyActive ? t('daily.number', { n: dailyNumberForDate(dailyRunIso || dailyTodayIso()) }) : assistRun ? assistBadgeText() : '';
   if (dailyRaceActive) dailyFront.setAttribute('data-race', ''); else dailyFront.removeAttribute('data-race'); // W2-1: the label's CSS
+  const scoreLabel = dailyFront.parentElement; // W2-10: the Assist tag stacks above RUN SCORE (CSS .result-label-assist)
+  if (scoreLabel && scoreLabel.classList){ if (assistRun) scoreLabel.classList.add('result-label-assist'); else scoreLabel.classList.remove('result-label-assist'); }
   document.getElementById('finalHops').textContent = death.hops;
   document.getElementById('finalCombo').textContent = '×' + death.maxCombo;
   const heightPts = player.bestAlt || 0;
@@ -12932,7 +13103,7 @@ function showResults(reason){
     missEl.textContent = '';
   }
   const dustEl = document.getElementById('runStardust');
-  if (runStardust > 0 && runIsRanked()){ // an unranked run (a duel, a ?grace= override) banks no stardust
+  if (runStardust > 0 && runEarnsRewards()){ // an unranked run (a duel, a ?grace= override) banks no stardust; an Assist run does
     dustEl.hidden = false;
     dustEl.textContent = t('results.stardust', { n: runStardust }) + (nearMissCount ? t('results.closeCount', { n: nearMissCount }) : '');
   } else {
@@ -14860,7 +15031,8 @@ function shareCardText(){
   const scored = death && Number.isFinite(death.score) ? death.score : score;
   const comboPeak = death && Number.isFinite(death.maxCombo) ? death.maxCombo : maxCombo;
   const name = constellationName(constellationStars.length, scored, captureIds);
-  const body = '✦ ' + name + ' · ' + starsTextEn(litStars()) + ' · x' + comboPeak + ' · ' + formatShareScore(scored);
+  const body = '✦ ' + name + ' · ' + starsTextEn(litStars()) + ' · x' + comboPeak + ' · ' + formatShareScore(scored) +
+    (assistRun ? ' · Assist' : ''); // W2-10: a slowed or helped Endless run says so (never the Daily or a duel)
   const badge = supporterActive() ? ' · Supporter' : '';
   const where = shareWhere();
   if (racingRun()){
@@ -15163,8 +15335,8 @@ function shareMessageText(){
   const vs = duelVersusPhrase(scored); // B6a: a duel says how it went
   const lead = lit > 0
     ? 'I drew ' + constellationName(constellationStars.length, scored, captureIds) + ' (' + starsTextEn(lit) + ') in ' +
-      where + ' and scored ' + formatShareScore(scored) + (vs ? ' (' + vs + ')' : '') + '.'
-    : 'I scored ' + formatShareScore(scored) + ' in ' + where + (vs ? ' and ' + vs : '') + '.';
+      where + assistShareTag() + ' and scored ' + formatShareScore(scored) + (vs ? ' (' + vs + ')' : '') + '.'
+    : 'I scored ' + formatShareScore(scored) + ' in ' + where + assistShareTag() + (vs ? ' and ' + vs : '') + '.';
   let invite = lead + ' Can you beat it?' + (WEB_PORTAL ? '' : ' ' + storeLinkWithToken(SHARE_STORE_URL, duelActive ? 'duel' : dailyActive ? 'daily' : 'endless')); // B16: no outgoing link
   const reply = duelActive ? duelReplyLink() : ''; // B4c: a duel sends itself back instead of the store link
   if (reply) invite = lead + ' Can you beat it? ' + reply;
@@ -16810,6 +16982,7 @@ function draw(){
   drawRivalTag(fitted || (camActive && fx) || null, displayY); // F1: screen space
   drawPartyTags(fitted || (camActive && fx) || null, displayY); // B13: the room's name tags, clear of your aim guide
   drawSectorBanner();
+  drawAssistChip(); // W2-10: the Daily/duel "Assist is off here" chip
   drawConfetti();
   drawOverdriveEdge();
   drawVoidDangerGlow();
@@ -18014,7 +18187,9 @@ function partyCountdownStart(hs){
   partyCountdownStop();
   partyCountKey = key;
   partyFeelStats.heatsCounted++;
-  const say = partyFeelText('heatStarting', { n: partyInt(hs.heat) }), heat = hs.heat, startAt = hs.startAt;
+  // W2-12: the doubled final heat says so instead of "Heat 3 starting" (an old server sends no mult: unchanged)
+  const say = partyFinalX2(hs.heat, hs.heats, hs.mult) ? t('party.finalHeatStarting') : partyFeelText('heatStarting', { n: partyInt(hs.heat) });
+  const heat = hs.heat, startAt = hs.startAt;
   if (state === 'playing') partyCountSay = say; else announce(say);
   for (const b of partyCountdownBeats(hs.localStartAt, Date.now())){
     partyBeatTimers.push(setTimeout(() => partyBeat(b, heat, startAt), Math.max(0, b.at - Date.now() - PARTY_COUNT.leadMs)));
@@ -18346,18 +18521,29 @@ function partyJoinNow(){
 }
 // The small line at the bottom of the playfield during a heat: your name, the heat and, when rivals' positions
 // arrive, your place by live score. Never over the playfield's middle; hidden when the run ends.
+let partyHudWant = '';                                           // the HUD line last asked for (W2-12: the shown one may drop " ×2")
 function partyHudTick(){
   const el = partyEl('partyHud');
   if (!el) return;
-  if (!ROOMS_ON || !partyRunning || !partyClient){ if (!el.hidden){ el.hidden = true; el.textContent = ''; } if (!partyRunning && partyTickTimer){ clearInterval(partyTickTimer); partyTickTimer = 0; } return; }
+  if (!ROOMS_ON || !partyRunning || !partyClient){ partyHudWant = ''; if (!el.hidden){ el.hidden = true; el.textContent = ''; } if (!partyRunning && partyTickTimer){ clearInterval(partyTickTimer); partyTickTimer = 0; } return; }
   const st = partyClient.state, room = st.room;
-  let text = orbitNickLabel(partyNick) + ' · ' + (room ? t('party.hudHeatOf', { n: partyHeatNo, total: partyInt(room.heats) }) : t('party.hudHeat', { n: partyHeatNo }));
+  const head = orbitNickLabel(partyNick) + ' · ' + (room ? t('party.hudHeatOf', { n: partyHeatNo, total: partyInt(room.heats) }) : t('party.hudHeat', { n: partyHeatNo }));
+  const x2 = !!st.heat && st.heat.heat === partyHeatNo && partyFinalX2(st.heat.heat, st.heat.heats, st.heat.mult);   // W2-12
+  let place = '';
   if (partyClient.tracks.size){
     let ahead = 0;
     for (const [, tr] of partyClient.tracks) if (tr.score() > cleanScore(score)) ahead++;
-    text += ' · ' + t('party.hudPlace', { place: i18nOrdinal(ahead + 1), total: partyClient.tracks.size + 1 });
+    place = ' · ' + t('party.hudPlace', { place: i18nOrdinal(ahead + 1), total: partyClient.tracks.size + 1 });
   }
-  if (el.textContent !== text) el.textContent = text;
+  const text = head + (x2 ? ' ×2' : '') + place;
+  if (partyHudWant !== text || el.textContent === ''){
+    partyHudWant = text;
+    el.hidden = false;
+    el.textContent = text;
+    // W2-12: " ×2" never costs the place. Where it would push the line into its ellipsis (a long name in the narrow
+    // landscape HUD) the line goes without it: the heat intro and the board carry the label. Measured on a change only.
+    if (x2 && el.scrollWidth > el.clientWidth) el.textContent = head + place;
+  }
   el.hidden = false;
   partyFeelTick();                                               // W1-6: a pop when you pass someone
 }
@@ -18594,6 +18780,23 @@ function partyRow(parent, nick, opts){
   if (opts.pts != null){ const s = document.createElement('span'); s.className = 'pt'; s.textContent = opts.pts; li.appendChild(s); }
   parent.appendChild(li);
 }
+// W2-12: a line that may carry the "Final heat: ×2" tag: `text`, then (when x2) " · " and the tag, which a screen reader
+// hears as "Final heat: double points". Rewritten only when the text, the tag or the language changes (the countdown
+// redraws every 200 ms); the last key per element id is kept here, not on the element.
+const partyMultKeys = new Map();
+function partyMultLine(el, text, x2){
+  if (!el) return;
+  const key = text + '|' + (x2 ? 1 : 0) + '|' + I18N_LANG;
+  if (partyMultKeys.get(el.id) === key) return;
+  partyMultKeys.set(el.id, key);
+  if (typeof el.replaceChildren === 'function') el.replaceChildren();
+  el.textContent = x2 && text ? text + ' · ' : text;
+  if (el.classList) el.classList[x2 ? 'add' : 'remove']('x2');
+  if (!x2) return;
+  const tag = document.createElement('span'); tag.className = 'x2tag'; tag.setAttribute('aria-hidden', 'true'); tag.textContent = t('party.finalHeatTag');
+  const sr = document.createElement('span'); sr.className = 'sr-only'; sr.textContent = t('party.finalHeatSr');
+  el.appendChild(tag); el.appendChild(sr);
+}
 function partyCountdownText(){
   const hs = partyClient && partyClient.state.heat;
   if (!hs) return '';
@@ -18673,8 +18876,11 @@ function partyRender(){
       partyEl('partyLobbyHint').textContent = host ? (n >= 2 ? t('party.hintStart') : t('party.hintShare')) : t('party.hintWaitHost');
     } else if (phase === 'heat'){
       const total = partyInt(room.heats);
-      partyEl('partyHeatLine').textContent = t('party.heatOf', { heat: partyInt(room.heat), heats: total });
       const hs = st.heat, before = hs && hs.localStartAt > Date.now();
+      // W2-12: "Heat 3/3 · Final heat: ×2" for the whole doubled final heat (only from this heat's own heat_start). The short
+      // "3/3" (the HUD's form) keeps it on one row of the 194 px landscape card in all but the longest language.
+      const x2 = !!hs && hs.heat === partyInt(room.heat) && partyFinalX2(hs.heat, hs.heats, hs.mult);
+      partyMultLine(partyEl('partyHeatLine'), x2 ? t('party.hudHeatOf', { n: partyInt(room.heat), total }) : t('party.heatOf', { heat: partyInt(room.heat), heats: total }), x2);
       // W1-7 Heat Watch: after your run, a headline and (with rival tracks) the live board in place of the plain list.
       const watching = !before && partyWatchLive(), rows = watching ? partyWatchRows() : null;
       const head = partyEl('partyWatchHead'), board = partyEl('partyWatchList'), list = partyEl('partyDone');
@@ -18735,6 +18941,17 @@ function partyRenderBoard(room, st, host, phase){
     for (const p of room.players.slice().sort((a, b) => partyInt(b.total) - partyInt(a.total))) partyRow(list, p.nick, { me: p.id === st.you, pts: t('party.pts', { n: partyInt(p.total) }), hue: hueOf(p.id) });
   }
   partyEl('partyBoardTitle').textContent = title;
+  // W2-12: the gold line under the title. The final board says the last heat counted double (from its heat_result, else
+  // the room's captured rule); the board after the second-to-last heat says the doubled final is next, up here where a
+  // small phone sees it during the intermission (the bottom hint can sit below the card's fold).
+  const fx = st.result && partyInt(st.result.heat) === partyInt(room.heats) ? partyFinalX2(st.result.heat, room.heats, st.result.mult)
+    : partyFinalX2(room.heats, room.heats, room.finalMult);
+  const nextX2 = !final && partyFinalX2(partyInt(room.heat) + 1, room.heats, room.finalMult);
+  const multEl = partyEl('partyBoardMult');
+  if (multEl){
+    multEl.hidden = !((final && fx) || nextX2);
+    if (final && fx) partyMultLine(multEl, '', true); else if (nextX2) partyMultLine(multEl, t('party.finalHeatNext'), false);
+  }
   const rematch = partyEl('partyRematch');
   rematch.hidden = !(final && host);
   partyEl('partyBoardHint').textContent = final ? (host ? t('party.hintRematch') : t('party.hintWaitRematch')) : t('party.hintNextHeat');
