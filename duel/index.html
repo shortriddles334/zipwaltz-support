@@ -444,7 +444,7 @@
   .result-goal{white-space:pre-line;padding:8px 10px;border-radius:10px;background:rgba(110,231,200,.08);border:1px solid rgba(110,231,200,.28);
     color:var(--text);font-size:16px;line-height:1.35;font-weight:700}
   /* F8: a quiet text link under the duel line (never an .action): Retry keeps its place and its timing. */
-  .lead-replay{display:block;margin:0 auto;min-height:32px;padding:4px 12px;border:0;border-radius:8px;background:transparent;
+  .lead-replay{display:block;margin:0 auto;min-width:44px;min-height:44px;padding:4px 12px;border:0;border-radius:8px;background:transparent;
     color:var(--dim);font:600 13px/1.3 'Space Grotesk',sans-serif;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
   .lead-replay::before{content:"\25B6\FE0E\00A0";text-decoration:none;display:inline-block}
   .lead-replay[hidden]{display:none}
@@ -1653,8 +1653,8 @@ const I18N = Object.freeze({
   "mission.t3-gate-9": Object.freeze({ "en": "pass 9 gates", "es": "pasa 9 puertas", "de": "durchquere 9 Tore", "fr": "passe 9 portails", "ja": "ゲートを9つ通過", "pt-BR": "passe por 9 portais" }),
   "mission.t3-near-12": Object.freeze({ "en": "Near-miss: 8 close passes", "es": "Por poco: 8 pasadas cercanas", "de": "Knapp daneben: 8 knappe Vorbeiflüge", "fr": "Frôlement\u00a0: 8 passages serrés", "ja": "ニアミス：8回", "pt-BR": "Quase: 8 passagens próximas" }),
   "mission.t3-near-8": Object.freeze({ "en": "6 close passes", "es": "6 pasadas cercanas", "de": "6 knappe Vorbeiflüge", "fr": "6 passages serrés", "ja": "ニアミス 6回", "pt-BR": "6 passagens próximas" }),
-  "mission.t3-od-2": Object.freeze({ "en": "Combo depth: 2 catches at x12", "es": "Profundidad de combo: 2 capturas en x12", "de": "Combo-Tiefe: 2 Fänge bei x12", "fr": "Profondeur de combo\u00a0: 2 captures en x12", "ja": "コンボ：x12で2回キャッチ", "pt-BR": "Profundidade de combo: 2 capturas em x12" }),
-  "mission.t3-od-5": Object.freeze({ "en": "5 catches at x12", "es": "5 capturas en x12", "de": "5 Fänge bei x12", "fr": "5 captures en x12", "ja": "x12で5回キャッチ", "pt-BR": "5 capturas em x12" }),
+  "mission.t3-od-2": Object.freeze({ "en": "Combo depth: 20 catches at x12", "es": "Profundidad de combo: 20 capturas en x12", "de": "Combo-Tiefe: 20 Fänge bei x12", "fr": "Profondeur de combo\u00a0: 20 captures en x12", "ja": "コンボ：x12で20回キャッチ", "pt-BR": "Profundidade de combo: 20 capturas em x12" }),
+  "mission.t3-od-5": Object.freeze({ "en": "Combo depth: 40 catches at x12", "es": "Profundidad de combo: 40 capturas en x12", "de": "Combo-Tiefe: 40 Fänge bei x12", "fr": "Profondeur de combo\u00a0: 40 captures en x12", "ja": "コンボ：x12で40回キャッチ", "pt-BR": "Profundidade de combo: 40 capturas em x12" }),
   "mission.t3-perfect-5": Object.freeze({ "en": "PERFECT catches: 5 in a run", "es": "capturas PERFECT: 5 en una partida", "de": "PERFECT-Fänge: 5 in einem Lauf", "fr": "captures PERFECT\u00a0: 5 dans une partie", "ja": "PERFECTキャッチ：1プレイで5回", "pt-BR": "capturas PERFECT: 5 em uma partida" }),
   "mission.t3-pick-magnet": Object.freeze({ "en": "collect a Magnet", "es": "consigue un imán", "de": "sammle einen Magneten", "fr": "récupère un aimant", "ja": "マグネットを取る", "pt-BR": "pegue um ímã" }),
   "mission.t3-pick-shield": Object.freeze({ "en": "collect a Shield", "es": "consigue un escudo", "de": "sammle einen Schild", "fr": "récupère un bouclier", "ja": "シールドを取る", "pt-BR": "pegue um escudo" }),
@@ -4575,10 +4575,10 @@ const MISSIONS = Object.freeze([
   Object.freeze({ id: 't3-combo-12', tier: 3, text: 'x12 combo', kind: 'combo', target: 12, dust: 36, retired: true }),
   // The combo caps at x12, so the old x16/x20 combo missions could never complete. New ids, so a
   // saved board drops them and refills its slot; their progress (a max combo) can't carry over.
-  // Progress is the best single run. 2 and 5 catches at x12 need roughly 13 and 16 fast new catches in a
-  // row: hard, but within reach (8 would match the impossible old chains). "x12" is the HUD's own word.
-  Object.freeze({ id: 't3-od-2', tier: 3, text: 'Combo depth: 2 catches at x12', kind: 'overdrive', target: 2, dust: 48 }),
-  Object.freeze({ id: 't3-od-5', tier: 3, text: '5 catches at x12', kind: 'overdrive', target: 5, dust: 60, retired: true }),
+  // Progress is the best single run. Endless v3 raised the bar from 2 to 20 catches at x12: the expert bot
+  // finished 2 in 49 of 50 v3 runs, and 41 of 50 finish 20 (tests/mission-t3-od-2.test.cjs). t3-od-5 (retired) keeps 40. "x12" is the HUD's own word.
+  Object.freeze({ id: 't3-od-2', tier: 3, text: 'Combo depth: 20 catches at x12', kind: 'overdrive', target: 20, dust: 48 }),
+  Object.freeze({ id: 't3-od-5', tier: 3, text: 'Combo depth: 40 catches at x12', kind: 'overdrive', target: 40, dust: 60, retired: true }),
   Object.freeze({ id: 't3-cap-30', tier: 3, text: '30 captures', kind: 'captures', target: 30, dust: 36, retired: true }),
   Object.freeze({ id: 't3-cap-40', tier: 3, text: '40 captures', kind: 'captures', target: 40, dust: 48, retired: true }),
   Object.freeze({ id: 't3-near-8', tier: 3, text: '6 close passes', kind: 'near_miss', target: 6, dust: 36, retired: true }),
@@ -5560,6 +5560,13 @@ function replaceAudioContext(){
     const closing = old && typeof old.close === 'function' ? old.close() : null;
     if (closing && typeof closing.catch === 'function') closing.catch(() => {});
   } catch (e) {}
+  // Closing a context need not deliver onended for queued sources; release their slots now.
+  for (const voice of soundVoices) if (voice.ac === old) endSoundVoice(voice);
+  // A Reduce Motion replay may already be waiting on its finish timer with a future cue queued.
+  if (typeof songReplay !== 'undefined' && songReplay){
+    songReplay.ctx = null; songReplay.next = 0;
+    songCancelFrame(); songSchedule();
+  }
   return audio();
 }
 // Recover only within an accepted user gesture. Audio failure never blocks play.
@@ -5822,7 +5829,14 @@ function cutRoomTail(){
 function syncSoundMute(){
   // Sound and the sector-music stem are independent. Mute still stops one-shots
   // and the overdrive stem. Music off is what stops the sector layer.
-  if (muted) { stopSoundVoices(); stopOverdriveLayer(); }
+  if (muted) {
+    stopSoundVoices(); stopOverdriveLayer();
+    // Unmute can restore canceled future cues on the same context, including a parked static replay.
+    if (typeof songReplay !== 'undefined' && songReplay){
+      songReplay.ctx = null; songReplay.next = 0;
+      songCancelFrame(); songSchedule();
+    }
+  }
   else if (overdriveWanted) syncOverdrive(true);
   if (typeof sectorLayerWanted !== 'undefined' && sectorLayerWanted) syncSectorLayer(sectorLayerWanted);
 }
@@ -10899,7 +10913,17 @@ function createPartyClient(deps){
     if (sock){ try { setT(() => { try { sock.close(); } catch (_) {} }, 50); } catch (_) {} }
     resetRoom(); state.status = 'idle'; state.error = null; state.fallback = null; changed();
   };
-  api.submitRun = (heat, score, ev) => { state.submitted = true; changed(); return send({ t: 'run', heat, score, ev }); };
+  api.submitRun = (heat, score, ev) => {
+    const sent = send({ t: 'run', heat, score, ev });
+    state.submitted = sent;
+    if (!sent){
+      state.ack = { t: 'run_ack', heat, status: 'dnf', score: 0, reason: 'send_failed', local: true };
+      state.error = { code: 'send_failed', message: PARTY_RUN_REFUSED_TEXT };
+    }
+    changed();
+    if (!sent) emit('error', state.error);  // the watch cannot claim that a disconnected socket submitted a run
+    return sent;
+  };
   // Own position for the room's relay: only when this heat's start advertised it (heat_start.pos.hz), at most once per 1000 / hz ms.
   api.sendPos = (heat, step, x, y, score) => {
     const h = state.heat;
@@ -12189,7 +12213,11 @@ function prepareDailyGhost(){
   const token = ++ghostToken;
   loadDailyGhost().then(loaded => {
     if (!loaded) return;
-    if (token !== ghostToken || window.__ghostMode || !ghostShow){ try { loaded.frame.remove(); } catch (_) {} return; }
+    // An iframe prepared on the title may finish loading after Start. Do not retain an unused
+    // full game instance during live play; the next Daily attempt can prepare it again.
+    if (token !== ghostToken || window.__ghostMode || !ghostShow || state === 'playing'){
+      try { loaded.frame.remove(); } catch (_) {} return;
+    }
     if (ghostInst){ try { ghostInst.frame.remove(); } catch (_) {} }
     loaded.key = key;
     ghostInst = loaded;
@@ -14621,6 +14649,13 @@ function songAdvance(nowMs){
   if (state !== 'dead' || !resultsShown){ cancelSongReplay(); return; }
   let elapsed = (nowMs - r.startedAt) / 1000;
   const ac = AC;
+  // Sound/Music may be enabled mid-replay, or recovery may replace the context. Preserve the picture's
+  // elapsed time and reconsider canceled future cues; overdue notes still skip below.
+  if (songAudible() && ac && ac.state === 'running' && r.ctx !== ac){
+    r.ctx = ac;
+    r.audioAt = ac.currentTime - elapsed;
+    r.next = 0;
+  }
   // After a page hide or an audio interruption the audio clock and the picture can disagree: the picture
   // then follows the audio clock, so the stars and their notes stay together.
   if (r.ctx && ac === r.ctx && ac.state === 'running' && Math.abs((ac.currentTime - r.audioAt) - elapsed) > 0.25){
@@ -14633,13 +14668,16 @@ function songAdvance(nowMs){
       const star = r.plan.stars[r.next];
       const at = r.audioAt + star.at;
       if (at > horizon) break;
-      r.next++;
       // A note already overdue (the audio was paused, or the page was hidden) is skipped, never burst.
-      if (!star.voiced || at < ac.currentTime) continue;
+      if (!star.voiced || at < ac.currentTime){ r.next++; continue; }
+      const voices = songVoices(star.hz, star.grade);
+      // Wait for the whole chord to fit soundTone's ordinary four-voice cap, keeping its planned time.
+      if (soundVoices.size + voices.length > 4) break;
+      r.next++;
       const wait = at - ac.currentTime;
       // D5: panned by the recorded catch x (centred when a record has none), in the same room.
       const ev = songEvents[star.index], pan = ev ? cuePan(ev.x) : 0;
-      for (const v of songVoices(star.hz, star.grade)) soundTone(v.type, v.from, v.to, v.dur, v.peak, wait + v.delay, false, false, pan, true);
+      for (const v of voices) soundTone(v.type, v.from, v.to, v.dur, v.peak, wait + v.delay, false, false, pan, true);
     }
   }
   if (reducedMotion){
@@ -15940,6 +15978,7 @@ function equipMomentPoint(p, cx, cy){
 function drawEquipMoment(now){
   const m = equipMoment;
   if (!m) return;
+  if (reducedMotion) m.still = true; // a live preference change settles the active moment
   const canvas = document.getElementById('hangarPreviewCanvas');
   let g = null;
   try { g = canvas && typeof canvas.getContext === 'function' ? canvas.getContext('2d') : null; } catch (_) { g = null; }
@@ -16099,6 +16138,7 @@ function paintPurchaseGlint(g, x, y, r){
 function drawPurchaseMoment(now){
   const m = purchaseMoment;
   if (!m) return;
+  if (reducedMotion) m.still = true; // a live preference change settles the active moment
   const canvas = document.getElementById('hangarPreviewCanvas');
   let g = null;
   try { g = canvas && typeof canvas.getContext === 'function' ? canvas.getContext('2d') : null; } catch (_) { g = null; }
@@ -16871,7 +16911,8 @@ function draw(){
   // The composite op changes only where a run of hot sparks starts or ends, and is source-over after the loop.
   const fxFull = !reducedEffects && !reducedMotion;
   let additive = false;
-  for (const q of particles){
+  // A live Reduce Motion change also hides particles emitted before the preference changed.
+  if (!reducedMotion) for (const q of particles){
     const k = q.t/q.life;
     const glow = fxFull && !!q.hot;
     if (glow !== additive){ ctx.globalCompositeOperation = glow ? 'lighter' : 'source-over'; additive = glow; }
@@ -18243,11 +18284,12 @@ function partyRunEnded(){
   partyRunning = false;
   const log = dailyRunLog;
   partyOwnScore = cleanScore(death ? death.score : score);
-  const sent = !!(partyInRoom() && log && !log.bad && Array.isArray(log.ev));
+  let sent = !!(partyInRoom() && log && !log.bad && Array.isArray(log.ev));
   if (sent){
-    try { partyBestRecord(); } catch (_) {} // W2-4: kept as a duel ghost (offered once the room says ok); never in the way of the submit
-    partyClient.submitRun(partyHeatNo, partyOwnScore, log.ev.slice());
-  } else { partyNote = t('party.runNotCounted'); partyNoteErr = true; }
+    sent = partyClient.submitRun(partyHeatNo, partyOwnScore, log.ev.slice());
+    if (sent) { try { partyBestRecord(); } catch (_) {} } // W2-4: only offered after a server ack confirms this heat
+  }
+  if (!sent){ partyNote = t('party.runNotCounted'); partyNoteErr = true; }
   partyWatchBegin(partyOwnScore, death && death.reason, sent); // W1-7: the heat screen becomes a live race board
   clearTimeout(partyShowTimer);
   partyShowTimer = setTimeout(() => {
