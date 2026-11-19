@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <link rel="canonical" href="https://shortriddles334.github.io/zipwaltz-support/rescue/privacy/">
+  <link rel="stylesheet" href="../../styles.css">
+  <title>Delete a Rescue guest profile · Zipwaltz</title>
+  <style>
+    label, input { display: block; }
+    input { width: min(100%, 27rem); margin: .4rem 0 .8rem; padding: .65rem; font: inherit; }
+    button { cursor: pointer; border: 0; font: inherit; }
+    input:focus-visible, button:focus-visible { outline: 3px solid #ffc765; outline-offset: 3px; }
+    #status { min-height: 1.5em; }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+  <header><div class="container"><a class="brand" href="../../">✦ ZIPWALTZ</a>
+    <nav aria-label="Main navigation"><a href="../../">Support</a><a href="../../privacy/#rescue">Privacy policy</a></nav>
+  </div></header>
+  <main class="container" id="content">
+    <h1>Delete a Rescue guest profile</h1>
+    <p class="lead">Request removal of your Zipwaltz Rescue profile and its online game data from Nimbus Bikes LLC.</p>
+    <p>With the game installed, open <strong>Expedition → Rescue → Rescue privacy &amp; data</strong> and confirm the deletion request. The game verifies your profile and gives you a private receipt.</p>
+    <h2>Request deletion by email</h2>
+    <p>You can contact us here even after uninstalling Zipwaltz. Tell us whether you used iPhone or Android. If you already submitted a request, mention that you have a receipt. Support will explain what it needs to verify your request.</p>
+    <p><a class="button-link" href="mailto:slingshotplanet-support.tiling324@simplelogin.com?subject=Delete%20my%20Zipwaltz%20Rescue%20guest%20profile">Email Zipwaltz support</a><br><a class="email-link" href="mailto:slingshotplanet-support.tiling324@simplelogin.com">slingshotplanet-support.tiling324@simplelogin.com</a></p>
+    <p>Guest profiles are device-based. An email address or a shared room invite alone cannot identify the owner. Your solo save, store purchases, Epic account and profiles in other games are separate from your Zipwaltz Rescue profile.</p>
+    <section class="panel" aria-labelledby="receipt-title">
+      <h2 id="receipt-title">Check an existing request</h2>
+      <form id="lookup" autocomplete="off">
+        <label for="receipt">Private receipt from Zipwaltz</label>
+        <input id="receipt" type="text" required pattern="[0-9a-fA-F]{32}" minlength="32" maxlength="32" autocapitalize="none" spellcheck="false" autocomplete="off" aria-describedby="retention">
+        <button type="submit" class="button-link">Check status</button>
+      </form>
+      <p id="status" role="status"></p>
+      <p class="small muted" id="retention">The receipt works for 30 days after completion. We remove your product user ID from the request record at completion.</p>
+      <noscript><p>Email support to check your request.</p></noscript>
+    </section>
+  </main>
+  <script>
+    const form = document.getElementById('lookup');
+    const receipt = document.getElementById('receipt');
+    const status = document.getElementById('status');
+    const button = form.querySelector('button');
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      if (button.disabled || !form.reportValidity()) return;
+      button.disabled = true;
+      status.textContent = 'Checking your request…';
+      try {
+        const response = await fetch('https://zipwaltz-rooms.shortriddles334.workers.dev/v1/rescue/deletion', {
+          headers: { Authorization: 'Bearer ' + receipt.value.trim().toLowerCase() },
+          cache: 'no-store', credentials: 'omit', redirect: 'error', referrerPolicy: 'no-referrer'
+        });
+        if (response.status === 404 || response.status === 401) {
+          status.textContent = 'Receipt not found. Check the number or contact support.';
+          return;
+        }
+        if (!response.ok) throw new Error();
+        const body = await response.json();
+        if (body.status === 'queued') status.textContent = 'Your request is queued for support.';
+        else if (body.status === 'complete') status.textContent = 'Your Zipwaltz Rescue deletion is complete.';
+        else throw new Error();
+      } catch {
+        status.textContent = 'Status is unavailable right now. Try again or email support.';
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
